@@ -1,8 +1,9 @@
 from pythonosc.osc_server import AsyncIOOSCUDPServer
 from pythonosc.dispatcher import Dispatcher
 import asyncio
-import time
 import os
+from score import Score
+from relay import Relay
 
 # Ip Address of the host. 
 ip = "192.168.0.11"
@@ -35,26 +36,22 @@ def processSignal(address, args):
         message = '1 ' + str(vol) + ';' # make a string for use with pdsend
         send2pd(message)
 
-# Main loop that will run in parallel to OSC server endpoint.
+# Main loop that will run in parallel to the OSC server endpoint.
 async def main_loop():
     global reset 
-    idx = 0
-    cur_time = time.time()
-    max = 8
+    # Setup relays. 
+    relay = Relay()
+
+    # Setup score.
+    score = Score(relay)
     while True:
+        # Update score.
         if (play == True):
-            # Do something in here. 
-            elapsedTime = time.time() - cur_time; 
-            if (elapsedTime > 0.1):
-                print(idx)
-                idx += 1
-                cur_time = time.time()
-                if (idx == max):
-                    idx = 0  
+            score.update()
         
+        # Reset score.
         if (reset == True):
-            idx = 0
-            cur_time = time.time()
+            score.reset()
             reset = False
 
         # Give control to OSC.  

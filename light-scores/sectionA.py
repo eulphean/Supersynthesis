@@ -3,13 +3,11 @@
 
 from time import time
 from enum import Enum
-
-# Max keys
-Num_Keys = 8
+from section import Section, Direction
 
 # On time for notes. 
-key_press_time = 0.125
-light_on_time = 0.25
+Key_Press_Time = 0.125
+Lights_On_Time = 0.25
 
 # Different parts of this section.
 class Part(Enum):
@@ -18,102 +16,105 @@ class Part(Enum):
     Glide_Left = 3
     On_Left = 4
 
-class SectionA:
-    def __init__(self, relay) -> None:
-        # Save a copy of the relay. 
-        self.relay = relay
-        # Section params.
-        self.idx = 0
+class SectionA(Section):
+    # Section initialization
+    def __init__(self, relay, num_lights) -> None:
+        # Call super class
+        super().__init__(relay, num_lights)
+        print ("Init: SectionA")
+
+        # Init variables.
+        self.reset()
+    
+    def begin(self) -> None:
+        # Complete cleanup.
+        self.fullTurnOff()
+        # Light up the first glider. 
+        self.switchOn(self.gliderA)
         # Snapshot of current time. 
-        self.cur_time = time()
-        # Forward (1) or backward (0)
-        self.direction = True
-        # Are lights on?
-        self.isLightOn = False
-        # First index. 
-        self.relay.on(self.idx)
-        # Start with first part. 
-        self.part = Part(Part.Glide_Right)
-        # Time variable for comparison. 
-        self.check_time = key_press_time
-
-    def glide(self, direction) -> None: 
-        # Release previous key.
-        self.relay.off(self.idx)
-        # Change idx based on direction. 
-        if (direction == True):
-            # Increment key.
-            self.idx += 1
-        else:
-            # Decrement key. 
-            self.idx -= 1
-        # Press next key. 
-        self.relay.on(self.idx)
-        # Have we reached extreme right?
-        if (self.idx == Num_Keys):
-            self.part = Part.On_Right
-        # Have we reached extreme left?
-        if (self.idx == 0):
-            self.part = Part.On_Left
-
-    def light_on(self, startIdx, endIdx) -> None: 
-        for x in range(startIdx, endIdx):   
-            self.relay.on(x)
-        # Lights are on. 
-        self.isLightOn = True
-
-    def light_off(self, startIdx, endIdx) -> None:
-        for x in range(startIdx, endIdx):   
-            self.relay.off(x)
-        # Lights are off. 
-        self.isLightOn = False
+        self.curTime = time()
 
     def update(self) -> None:
-        elapsedTime = time() - self.cur_time
-        
-        # For keeping lights on, we use a different time checker. 
-        if (self.isLightOn == True):
-            self.check_time = light_on_time
-        else:
-            self.check_time = key_press_time
+        elapsedTime = time() - self.curTime
 
-        # Handle first part. 
-        if (elapsedTime > self.check_time and self.part == Part.Glide_Right):
-            # Are lights on?
-            if (self.isLightOn):
-                self.light_off(0, 4)
+        # Glide from left to right.
+        if (elapsedTime > self.stateTime and self.part == Part.Glide_Right):
             # Glide left to right. 
             self.glide(True)
             # Reset current time. 
-            self.cur_time = time()
+            self.curTime = time()
 
-        # Handle second part.
-        elif (elapsedTime > self.check_time and self.part == Part.On_Right):
-            self.light_on(4, Num_Keys)
-            # Update to next state. 
-            self.part = Part.Glide_Left
+        # Turn on and off half the lights on the right.
+        elif (elapsedTime > self.stateTime and self.part == Part.On_Right):
+            if (self.areLightsOn):
+                # Turn off half the lights on the right.
+                # Reset glider for next state.
+                self.lightsOff(int(self.numLights/2), self.numLights)
+                self.gliderA = self.numLights - 1
+                self.switchOn(self.gliderA)
+                self.part = Part.Glide_Left
+                # Reset state time.
+                self.stateTime = Key_Press_Time
+            else:
+                # Turn off pending glider light.
+                self.switchOff(self.gliderA)
+                # Turn on half the lights on the right.
+                self.lightsOn(int(self.numLights/2), self.numLights)
+                # Update state time.
+                self.stateTime = Lights_On_Time
+            
             # Reset current time. 
-            self.cur_time = time()
+            self.curTime = time()
 
-        # Handle third part.
-        elif (elapsedTime > self.check_time and self.part == Part.Glide_Left):
-            # Are lights on? 
-            if (self.isLightOn):
-                self.light_off(4, Num_Keys)
+        # Glide right to left.
+        elif (elapsedTime > self.stateTime and self.part == Part.Glide_Left):
             # Glide right to left. 
             self.glide(False)
             # Reset current time.
             self.cur_time = time()
 
-        # Handle fourth part.
-        elif (elapsedTime > self.check_time and self.part == Part.On_Left):
-            self.light_on(0, 4)
-            # Update to next state.
-            self.part = Part.Glide_Right
+        # Turn on and off half the lights on the left.
+        elif (elapsedTime > self.stateTime and self.part == Part.On_Left):
+            if (self.areLightsOn):
+                # Turn off half the lights on the left.
+                self.lightsOff(0, int(self.numLights/2))
+                self.gliderA = 0
+                self.switchOn(self.gliderA)
+                self.part = Part.Glide_Right
+                # Reset state time.
+                self.stateTime = Key_Press_Time
+            else:
+                # Turn off pending glider light.
+                self.switchOff(self.gliderA)
+                self.lightsOn(0, int(self.numLights/2))
+                self.stateTime = Lights_On_Time
+
             # Reset current time. 
             self.cur_time = time()
+    
+    def glide(self, direction) -> None: 
+        # Turn off previous light.
+        self.switchOff(self.gliderA)
+        # Change idx based on direction. 
+        if (direction == True):
+            # Increment key.
+            self.gliderA += 1
+        else:
+            # Decrement key. 
+            self.gliderA -= 1
+        # Turn on the current glider.
+        self.switchOn(self.gliderA)
+        # Have we reached extreme right?
+        if (self.gliderA == self.numLights-1):
+            self.part = Part.On_Right
+            print("On Right...")
+        # Have we reached extreme left?
+        if (self.gliderA == 0):
+            print("On Left...")
+            self.part = Part.On_Left
 
     def reset(self) -> None:
-        self.idx = 0
-        self.cur_time = 0
-        pass
+        self.stateTime = Key_Press_Time
+        self.direction = Direction.Right
+        self.part = Part(Part.Glide_Right)
+        self.gliderA = 0

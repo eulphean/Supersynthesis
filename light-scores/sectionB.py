@@ -1,121 +1,103 @@
 # Section Implementation: A section is a small module that can be plugged inside a score. 
 # Multiple sections can be mixed and matched to create different scores. 
-
-from ast import Num
-from py_compile import _get_default_invalidation_mode
 from time import time
 from enum import Enum
-
-# Max keys
-Num_Keys = 8
+from section import Section
 
 # On time for notes. 
-key_press_time = 0.125
-light_on_time = 0.1
+Key_Press_Time = 0.125
+Lights_On_Time = 0.1
 
 # Max number of times we bounce between two states. 
-max_ping_pong_count = 5
+Max_Ping_Pong_Count = 5
 
 # Different parts of this section.
 class Part(Enum):
     Glide = 1
-    Light_On = 2
-    Light_Off = 3
+    Blink = 2
 
-class SectionB:
-    def __init__(self, relay) -> None:
-        # Save a copy of the relay. 
-        self.relay = relay
-        
-        # Setup gliders that'll be traversing the light. 
-        # Start by turning on these lights. 
-        self.set_glider()
+class SectionB(Section):
+    def __init__(self, relay, numLights) -> None:
+        super().__init__(relay, numLights)
+        print ("Init: SectionB")
+        self.reset()
 
-        # Time variable for comparison. 
-        self.check_time = key_press_time
-        # Are lights on?
-        self.isLightOn = False
-        # Snapshot of current time. 
-        self.cur_time = time()
-        # Counts how many times we ping pong between two states.
-        self.pingPongCounter = 0
+    def begin(self) -> None:
+        # Complete cleanup.
+        self.fullTurnOff()
+        # Turn on both the gliders.
+        self.switchOn(self.leftGlider)
+        self.switchOn(self.rightGlider)
+        # Snapshot of current time.
+        self.curTime = time()
 
-        # Set the first part.
-        self.part = Part(Part.Glide)
+    def update(self) -> None:
+        elapsedTime = time() - self.curTime
+        # Handle first part. 
+        if (elapsedTime > self.stateTime and self.part == Part.Glide):
+            # Glide.
+            self.glide()
+            # Reset current time. 
+            self.curTime = time()
 
+        elif (elapsedTime > self.stateTime and self.part == Part.Blink):
+            if (self.areLightsOn):
+                # turn off the lights. 
+                self.lightsOff(0, self.numLights)
+                self.pingPongCounter += 1
+            else:
+                # Turn off previous gliders.
+                self.switchOff(self.leftGlider)
+                self.switchOff(self.rightGlider)
+
+                # Turn on all the lights. 
+                self.lightsOn(0, self.numLights)
+                self.stateTime = Lights_On_Time
+            
+            # Have we ping ponged enough?
+            if (self.pingPongCounter == Max_Ping_Pong_Count-1):
+                # Reset ping pong counter.
+                self.pingPongCounter = 0
+
+                # Reset gliders back to original position.
+                # Light them up.
+                self.leftGlider = 0
+                self.rightGlider = self.numLights-1
+                self.switchOn(self.leftGlider)
+                self.switchOn(self.rightGlider)
+                
+                # Reset time back to original time.
+                self.stateTime = Key_Press_Time
+                # Move back to glide.
+                self.part = Part.Glide
+
+            # Take a snapshot of current time.
+            self.curTime = time()
+            
     def glide(self) -> None: 
         # Turn off the gliders.
-        self.relay.off(self.leftGlider)
-        self.relay.off(self.rightGlider)
+        self.switchOff(self.leftGlider)
+        self.switchOff(self.rightGlider)
 
-        # Increment the glider
+        # Increment the two gliders.
         self.leftGlider += 1
         self.rightGlider -= 1
 
-        # Turn on gliders
-        self.relay.on(self.leftGlider)
-        self.relay.on(self.rightGlider)
+        # Turn on new gliders.
+        self.switchOn(self.leftGlider)
+        self.switchOn(self.rightGlider)
 
-        # Have they reached the center?
+        # Have they crossed the center?
         if (self.leftGlider > self.rightGlider):
-            self.part = Part.Light_On
-    
-    def light_on(self, startIdx, endIdx) -> None: 
-        for x in range(startIdx, endIdx):   
-            self.relay.on(x)
-        # Lights are on. 
-        self.isLightOn = True
+            self.part = Part.Blink
 
-    def light_off(self, startIdx, endIdx) -> None:
-        for x in range(startIdx, endIdx):   
-            self.relay.off(x)
-        # Lights are off. 
-        self.isLightOn = False
-
-    def set_glider(self) -> None:
-        self.leftGlider = 0
-        self.rightGlider = Num_Keys - 1
-        self.relay.on(self.leftGlider)
-        self.relay.on(self.rightGlider)
-
-    def update(self) -> None:
-        elapsedTime = time() - self.cur_time
-        
-        # For keeping lights on, we use a different time checker. 
-        if (self.isLightOn == True):
-            self.check_time = light_on_time
-        else:
-            self.check_time = key_press_time
-
-        # Handle first part. 
-        if (elapsedTime > self.check_time and self.part == Part.Glide):
-            # Are lights on?
-            if (self.isLightOn):
-                self.light_off(0, Num_Keys)
-
-            # Sweep the gliders. 
-            self.glide()
-            # Reset current time. 
-            self.cur_time = time()
-
-        elif (elapsedTime > self.check_time and self.part == Part.Light_On):
-            self.light_on(0, Num_Keys)
-            self.pingPongCounter += 1
-            self.part = Part.Light_Off 
-            self.cur_time = time()
-
-        elif (elapsedTime > self.check_time and self.part == Part.Light_Off):
-            self.light_off(0, Num_Keys)
-            if(self.pingPongCounter < 5):
-                self.part = Part.Light_On
-            else:
-                self.part = Part.Glide
-                self.pingPongCounter = 0
-                # Set the gliders back on.
-                self.set_glider()
-            self.cur_time = time()
-            
-    
     def reset(self) -> None:
-        # TODO Implement this.
-        pass
+        # Initialize the two gliders.
+        self.leftGlider = 0
+        self.rightGlider = self.numLights - 1
+        # Time variable for comparison. 
+        self.stateTime = Key_Press_Time
+        # Counts how many times we ping pong between two states.
+        self.pingPongCounter = 0
+        # Set the first part to start with.
+        self.part = Part(Part.Glide)

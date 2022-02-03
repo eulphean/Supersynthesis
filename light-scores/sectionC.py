@@ -1,156 +1,117 @@
 # Section Implementation: A section is a small module that can be plugged inside a score. 
 # Multiple sections can be mixed and matched to create different scores. 
-
-from ast import Num
+from re import S
 from time import time
 from enum import Enum
 from random import randint
-
-# Max keys
-Num_Keys = 8
+from section import Section
 
 # On time for notes. 
-key_press_time = 0.5
-
-# Maximum random notes to pick
-Num_Random_Notes = Num_Keys
+Key_Press_Time = 0.25
 
 # Different parts of this section.
 class Part(Enum):
     Random = 1
     Glide = 2
 
-class SectionC:
-    def __init__(self, relay) -> None:
-        # Save a copy of the relay. 
-        self.relay = relay
+class SectionC(Section):
+    def __init__(self, relay, numLights) -> None:
+        super().__init__(relay, numLights)
+        print ("Init: SectionC")
+        self.reset()
 
-        # Initialize gliders. 
-        self.initRandomGlider()
-        self.initMovingGliders()
-
-        # Count of random picks we have made. 
-        self.randCount = 0
-        
-        # First state is Random
-        self.part = Part(Part.Random)
-        self.setupRandomGlider()
-
-        # Time variable for comparison. 
-        self.check_time = key_press_time
-
+    def begin(self) -> None:
+        # Complete cleanup.
+        self.fullTurnOff()
+        self.setRandomGlider()        
         # Snapshot of current time. 
-        self.cur_time = time()
+        self.curTime = time()
 
     def update(self) -> None:
-        # How much time has elapsed?
-        elapsedTime = time() - self.cur_time
+        # Calculate elapsed time.
+        elapsedTime = time() - self.curTime
 
-        # Handle first part. 
-        if (elapsedTime > self.check_time and self.part == Part.Random):
-            # Are these gliders on?  
-            if (self.leftGlider != -1 and self.rightGlider != -1):
-                print ("***CLEAN GLIDE***")
-                # Turn them off. 
-                self.relay.off(self.leftGlider)
-                self.relay.off(self.rightGlider)
-                self.initMovingGliders()
-
-            # Do I have anything to turn off?
-            if (self.randomGlider >= 0):
-                # Turn off the glider.
-                self.relay.off(self.randomGlider)
-            
+        # Handle random picking.
+        if (elapsedTime > self.stateTime and self.part == Part.Random):
+            # Turn off random glider.
+            self.switchOff(self.gliderA)
             # Pick next counter.
             self.randCount += 1
-
             # Have we exceeded number of random notes?
-            if (self.randCount >= Num_Random_Notes-1):
-                # Initial random glider.
-                self.initRandomGlider()
-
+            if (self.randCount < self.maxRandomNotes):
+                # Set a new glider.
+                self.setRandomGlider()
+            else:
+                # Reset random count.
+                self.randCount = 0
                 # Setup moving gliders.
-                self.setupMovingGliders()
-                
+                self.setMovingGliders()
                 # Start gliding. 
                 self.part = Part.Glide
+
+            # Reset time.
+            self.curTime = time()
+        
+        # Handle glide.
+        elif (elapsedTime > self.stateTime and self.part == Part.Glide):
+            # Turn off the gliders.
+            self.switchOff(self.leftGlider)
+            self.switchOff(self.rightGlider)
+
+            # Update gliders.
+            self.leftGlider -= 1
+            self.rightGlider += 1
+            
+            # Is it a valid glider?
+            if (self.leftGlider < 0 and self.rightGlider > self.numLights - 1):
+                # Go to next state. 
+                self.setRandomGlider()
+                self.part = Part.Random
             else:
-                # Set a new glider.
-                self.setupRandomGlider()
+                # Turn them on. 
+                self.switchOn(self.leftGlider)
+                self.switchOn(self.rightGlider)
 
             # Reset time.
-            self.cur_time = time()
-        
-        # Handle Glide
-        elif (elapsedTime > self.check_time and self.part == Part.Glide):
-            # Clean last random glider.
-            if (self.randomGlider != -1):
-                print("Clean last random.")
-                self.relay.off(self.randomGlider)
-                self.initRandomGlider()
+            self.curTime = time()
 
-            # Glide baby!
-            self.glide()
-
-            # Reset time.
-            self.cur_time = time()
-    
-    def glide(self) -> None:
-        # Turn off the gliders
-        self.relay.off(self.leftGlider)
-        self.relay.off(self.rightGlider)
-
-        # Update gliders
-        self.leftGlider -= 1
-        self.rightGlider += 1
-
-        # Turn them on. 
-        self.relay.on(self.leftGlider)
-        self.relay.on(self.rightGlider)
-
-        # Check if gliders will go out of
-        # scope in the next run.
-        if (self.leftGlider == 0 and self.rightGlider == Num_Keys - 1):
-            # Go to next state. 
-            self.part = Part.Random
-            self.randCount = 0
-
-    def setupRandomGlider(self) -> None:
-        print("********RANDOM********")
-
+    def setRandomGlider(self) -> None:
         # Create a new random glider.
-        self.randomGlider = randint(0, Num_Keys - 1) # Don't include the last number
-        while (self.randomGlider == self.prevGlider):
-            self.randomGlider = randint(0, Num_Keys - 1)
-        
+        self.gliderA = randint(0, self.numLights - 1) # Don't include the last number
+        while (self.gliderA == self.gliderB):
+            self.gliderA = randint(0, self.numLights - 1)
         # Save current glider as previous glider.
-        # Avoid duplicate randoms to be picked.
-        self.prevGlider = self.randomGlider     
-
+        self.gliderB = self.gliderA     
         # Turn on the glider. 
-        self.relay.on(self.randomGlider)
+        self.switchOn(self.gliderA)
 
-    def setupMovingGliders(self) -> None:
-        print("********GLIDE********")
-
+    def setMovingGliders(self) -> None:
         # Both gliders are at the center. 
-        self.leftGlider = int (Num_Keys / 2) - 1
-        self.rightGlider = int (Num_Keys / 2)
-
+        self.leftGlider = int (self.numLights / 2) - 1
+        self.rightGlider = int (self.numLights / 2)
         # Turn on the gliders. 
-        self.relay.on(self.leftGlider)
-        self.relay.on(self.rightGlider)
+        self.switchOn(self.leftGlider)
+        self.switchOn(self.rightGlider)
 
     def initRandomGlider(self) -> None:
-        self.prevGlider = -1
-        self.randomGlider = -1
+        # Main random glider.
+        self.gliderA = -1
+        # Previous random glider.
+        self.gliderB = -1
 
     def initMovingGliders(self) -> None:
         self.leftGlider = -1
         self.rightGlider = -1
 
-    # TODO: Pending implementation.
     def reset(self) -> None:
-        self.idx = 0
-        self.cur_time = 0
-        pass
+        # Initialize gliders. 
+        self.initRandomGlider()
+        self.initMovingGliders()
+        # Count of random picks we have made. 
+        self.randCount = 0
+        # Time variable for comparison. 
+        self.stateTime = Key_Press_Time
+        # Max random notes to be picked.
+        self.maxRandomNotes = self.numLights
+        # First state is Random
+        self.part = Part(Part.Random)

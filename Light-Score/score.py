@@ -6,8 +6,8 @@ from sectionC import SectionC
 
 # Constants. 
 Warmup_Time = 2
-SectionA_Time = 5
-SectionB_Time = 5
+SectionA_Time = 60
+SectionB_Time = 10
 SectionC_Time = 60
 Score_Time = 30
 

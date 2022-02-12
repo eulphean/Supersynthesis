@@ -2,8 +2,22 @@
 from math import sin, pi
 from time import time
 
+from pd import PD
+
 WIN_WIDTH = 800
 CENTER_POS = WIN_WIDTH / 2
+# 0 Prefix is reserved for sending index of the lights.
+PD_MSG_PREFIX = "0 "
+MAX_AMP = 50
+# This slows down the period of the pattern.
+SLOW_FACTOR = 0.1
+# This adjusts the speed of the loop. 
+# We want to control it to control the on/off
+# time of the light. 
+NOTE_TIME = 0.1
+
+# Global PD object to interact with PureData.
+g_Pd = PD()
 
 # Helper map function. 
 def mapRange(value, inMin, inMax, outMin, outMax):
@@ -17,7 +31,7 @@ class Light:
         self.angle = angle # Starting angle.
         self.lightOn = False # Is light on?
 
-    def update(self, slowFactor, maxAmp):
+    def update(self, relay, slowFactor, maxAmp):
         # Calculate the new position. 
         newPos = sin(self.angle * slowFactor * time())
 
@@ -26,12 +40,12 @@ class Light:
         self.curPos = newPos
 
         # Are we touching the center or any control points?
-        self.intersect()
+        self.intersect(relay)
         
         # Save previous value.
         self.prevPos = self.curPos
     
-    def intersect(self):
+    def intersect(self, relay):
         # checkPointPos = cPoint.pos[0]
         comparePos = CENTER_POS
 
@@ -39,16 +53,24 @@ class Light:
         if (self.curPos > comparePos and self.prevPos < comparePos and self.lightOn == False):
             # Turn on the light.
             print("*****************************Light On:" + str(self.idx))
+            message = PD_MSG_PREFIX + str(self.idx) + ';'
+            # Send the index of the current light. 
+            # g_Pd.send2pd(message)
+            relay.on(self.idx)
             self.lightOn = True
         
         # Upward intersect.
         elif (self.curPos < comparePos and self.prevPos > comparePos and self.lightOn == False):
             print("*****************************Light On:" + str(self.idx))
+            message = PD_MSG_PREFIX + str(self.idx) + ';'
+            # g_Pd.send2pd(message)
+            relay.on(self.idx)
             self.lightOn = True
         
         else:
             if (self.lightOn):
                 self.lightOn = False
+                relay.off(self.idx)
                 print("********************************Light Off:" + str(self.idx))
             else:
                 pass
@@ -66,12 +88,16 @@ class ControlPoint:
         self.curPos = mapRange(sin(self.angle), -1, 1, CENTER_POS - maxAmp, CENTER_POS + maxAmp)
 
 class SHM:
-    def __init__(self, numLights):
-        self.maxAmp = 50 # Change this with a slider.
-        self.slowFactor = 0.05 # Change this with a slider.
+    def __init__(self, relay, numLights):
+        self.relay = relay
+        self.maxAmp = MAX_AMP # Change this with a slider.
+        self.slowFactor = SLOW_FACTOR # Change this with a slider.
         self.lights = []
         self.ctrlPoints = []
+        self.fullTurnOff(numLights)
+        self.curTime = time()
         self.setup(numLights)
+        
         print("SHM Setup Complete")
     
     def setup(self, numLights):
@@ -79,11 +105,17 @@ class SHM:
         self.setupControlPoints(numLights)
     
     def update(self):
-        for l in self.lights:
-            l.update(self.slowFactor, self.maxAmp)
-        
-        for p in self.ctrlPoints:
-            p.update(self.maxAmp)
+        elapsedTime = time() - self.curTime
+        if (elapsedTime > NOTE_TIME):
+            # Elapsed the note time.
+            for l in self.lights:
+                l.update(self.relay, self.slowFactor, self.maxAmp)
+            
+            for p in self.ctrlPoints:
+                p.update(self.maxAmp)
+
+            # Reset current time and start counting again
+            self.curTime = time()
 
     # Setup all the lights.
     def setupLights(self, numLights):
@@ -96,3 +128,8 @@ class SHM:
         for i in range(0, numLights):
             point = ControlPoint(i, CENTER_POS, i, numLights) # idx, curPos, angle. (Angle always starts with 1)
             self.ctrlPoints.append(point)
+    
+    def fullTurnOff(self, numLights) -> None:
+        print ("Full Turn Off...")
+        for x in range(0, numLights):
+            self.relay.off(x)

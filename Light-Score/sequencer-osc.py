@@ -1,7 +1,8 @@
 from pythonosc.osc_server import AsyncIOOSCUDPServer
 from pythonosc.dispatcher import Dispatcher
 import asyncio
-import os
+
+from pd import PD
 from score import Score
 from relay import Relay
 from shm import SHM
@@ -17,10 +18,6 @@ NUM_LIGHTS = 24
 g_Play = True
 g_Reset = False
 
-def send2pd(message=''):
-    # Send a message to PD
-    os.system("echo '" + message + "' | pdsend 3000")
-
 def processSignal(address, args):
     global g_Play, g_Reset
 
@@ -28,19 +25,19 @@ def processSignal(address, args):
     if ("play" in address):
         g_Play = True
         message = '0 1;'
-        send2pd(message)
+        PD.send2pd(message)
     
     # Mapping pause to reset for now. 
     if ("pause" in address):
         g_Play = False
         g_Reset = True
         message = '0 0;'
-        send2pd(message)
+        PD.send2pd(message)
     
     if ("tempo" in address):
         vol = args
         message = '1 ' + str(vol) + ';' # make a string for use with pdsend
-        send2pd(message)
+        PD.send2pd(message)
 
 # Main loop that will run in parallel to the OSC server endpoint.
 async def main_loop():
@@ -48,14 +45,14 @@ async def main_loop():
 
     # Setup relays. 
     
-    #relay = Relay()
+    relay = Relay()
 
     # Setup score.
-    #score = Score(relay, NUM_LIGHTS)
-    shm = SHM(NUM_LIGHTS)
+    score = Score(relay, NUM_LIGHTS)
+    shm = SHM(relay, NUM_LIGHTS)
     while True:
         shm.update()
-        # # Update score.
+        # Update score.
         # if (g_Play == True):
         #     score.update()
         

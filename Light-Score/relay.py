@@ -34,26 +34,26 @@ class Relay:
         self.relayThreePins= [27, 22, 10, 9, 11, 0, 5, 6]
 
         # Store the initialized pin objects. 
-        # self.relayOne = []
-        # self.relayTwo = []
-        # self.relayThree = []
+        self.relayOne = []
+        self.relayTwo = []
+        self.relayThree = []
         self.relay = []
 
         # Set the pins
-        # for x in self.relayOnePins:
-        #     print(x)
-        #     led = LED(x, pin_factory=factory)
-        #     self.relay.append(led)
+        for x in self.relayOnePins:
+            print(x)
+            led = LED(x, pin_factory=factory)
+            self.relay.append(led)
         
         for x in self.relayTwoPins:
             print(x)
             led = LED(x, pin_factory=factory)
             self.relay.append(led)
 
-        # for x in self.relayThreePins:
-        #     print(x)
-        #     led = LED(x, pin_factory=factory)
-        #     self.relay.append(led)
+        for x in self.relayThreePins:
+            print(x)
+            led = LED(x, pin_factory=factory)
+            self.relay.append(led)
 
             
 

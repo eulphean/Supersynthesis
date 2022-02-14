@@ -56,6 +56,5 @@ class Section:
         self.relay.off(idx)
 
     def fullTurnOff(self) -> None:
-        print ("Full Turn Off...")
         for x in range(0, self.numLights):
             self.switchOff(x)

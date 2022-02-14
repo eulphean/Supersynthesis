@@ -44,17 +44,16 @@ async def main_loop():
     g_Reset = False
 
     # Setup relays. 
-    
     relay = Relay()
 
     # Setup score.
     score = Score(relay, NUM_LIGHTS)
-    shm = SHM(relay, NUM_LIGHTS)
+    #shm = SHM(relay, NUM_LIGHTS)
     while True:
-        shm.update()
+        # shm.update()
         # Update score.
-        # if (g_Play == True):
-        #     score.update()
+        if (g_Play == True):
+            score.update()
         
         # # Reset score.
         # if (g_Reset == True):

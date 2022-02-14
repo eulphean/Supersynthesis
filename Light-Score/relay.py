@@ -14,7 +14,7 @@ class Relay:
             print("On, idx: " + str(idx))
             led = self.relay[idx]
             # Flipped by design.
-            led.off()
+            led.on()
         else:
             pass
 
@@ -23,7 +23,7 @@ class Relay:
             print("Off, idx: " + str(idx))
             led = self.relay[idx]
             # Flipped by design.
-            led.on()
+            led.off()
         else:
             pass
 

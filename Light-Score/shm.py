@@ -10,7 +10,7 @@ CENTER_POS = WIN_WIDTH / 2
 PD_MSG_PREFIX = "0 "
 MAX_AMP = 50
 # This slows down the period of the pattern.
-SLOW_FACTOR = 0.1
+SLOW_FACTOR = 0.05
 # This adjusts the speed of the loop. 
 # We want to control it to control the on/off
 # time of the light. 
@@ -53,17 +53,17 @@ class Light:
         if (self.curPos > comparePos and self.prevPos < comparePos and self.lightOn == False):
             # Turn on the light.
             print("*****************************Light On:" + str(self.idx))
-            message = PD_MSG_PREFIX + str(self.idx) + ';'
+            message = PD_MSG_PREFIX + str(self.idx) + ' 1;'
             # Send the index of the current light. 
-            # g_Pd.send2pd(message)
+            g_Pd.send2pd(message)
             relay.on(self.idx)
             self.lightOn = True
         
         # Upward intersect.
         elif (self.curPos < comparePos and self.prevPos > comparePos and self.lightOn == False):
             print("*****************************Light On:" + str(self.idx))
-            message = PD_MSG_PREFIX + str(self.idx) + ';'
-            # g_Pd.send2pd(message)
+            message = PD_MSG_PREFIX + str(self.idx) + ' 1;'
+            g_Pd.send2pd(message)
             relay.on(self.idx)
             self.lightOn = True
         
@@ -72,6 +72,8 @@ class Light:
                 self.lightOn = False
                 relay.off(self.idx)
                 print("********************************Light Off:" + str(self.idx))
+                message = PD_MSG_PREFIX + str(self.idx) + ' 0;'
+                g_Pd.send2pd(message)
             else:
                 pass
 
@@ -94,7 +96,7 @@ class SHM:
         self.slowFactor = SLOW_FACTOR # Change this with a slider.
         self.lights = []
         self.ctrlPoints = []
-        self.fullTurnOff(numLights)
+        #self.fullTurnOff(numLights)
         self.curTime = time()
         self.setup(numLights)
         

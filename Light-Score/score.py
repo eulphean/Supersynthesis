@@ -6,10 +6,10 @@ from sectionC import SectionC
 
 # Constants. 
 Warmup_Time = 2
-SectionA_Time = 60
-SectionB_Time = 10
-SectionC_Time = 60
-Score_Time = 30
+SectionA_Time = 10
+SectionB_Time = 15
+SectionC_Time = 15
+Score_Time = 40
 
 class Section(Enum):
     Empty = 0

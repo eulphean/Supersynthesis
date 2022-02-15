@@ -1,0 +1,35 @@
+{
+  "name": "supersynthesis",
+  "version": "0.1.0",
+  "private": false,
+  "homepage": "https://amaykataria.com/supersynthesis",
+  "dependencies": {
+    "gh-pages": "^2.1.1",
+    "radium": "^0.26.0",
+    "react": "^16.13.1",
+    "react-animations": "^1.0.0",
+    "react-dom": "^16.12.0",
+    "react-scripts": "3.4.0",
+    "socket.io-client": "^4.0.0"
+  },
+  "scripts": {
+    "start": "react-scripts start --no-cache",
+    "build": "react-scripts build",
+    "test": "react-scripts test --no-cache",
+    "eject": "react-scripts eject",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

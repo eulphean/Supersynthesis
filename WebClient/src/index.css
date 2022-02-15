@@ -1,0 +1,28 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  display: block;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  background: rgb(227,238,255); /* Old browsers */
+  background-color: black;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+a:hover {
+  cursor: auto;
+
+}

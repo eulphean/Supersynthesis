@@ -28,15 +28,9 @@ class Websocket {
 
   subscribe() {
       console.log('Connected');
-
       // Subscribe to incoming events from the webserver here. 
       this.socket.on('time', this.logTime.bind(this));
-    //   this.socket.on('receivePresets', this.handlePresets.bind(this));
   }
-
-//   handlePresets(data) {
-//     this.handlePresetsCbk(data); 
-//   }
 
   // ----------------------- DATABASE CALLS --------------------- //
   saveEntry() {
@@ -47,25 +41,8 @@ class Websocket {
 
     this.socket.emit('saveData', payload);
   }
-//   saveGuiPreset(presetName, json) {
-//       let payload = {
-//           'name':  presetName, 
-//           'data': json
-//       }
-//       this.socket.emit('savePreset', payload); 
-//   }
 
-//   readAllPresets(readPresetsCallback) {
-//     console.log('Query Socket Presets.');
-//     this.socket.emit('getPresets'); 
-//     this.handlePresetsCbk = readPresetsCallback; // Subscribe to receive data when the call completes. 
-//   }
-
-//   deletePreset(presetName) {
-//     this.socket.emit('deletePreset', presetName);
-//   }
-
-//   // -------------------- DON'T CHANGE THESE -------------------    
+  // -------------------- DON'T CHANGE THESE -------------------    
   disconnect() {
       console.log('Socket Server Disconnected.');
   }

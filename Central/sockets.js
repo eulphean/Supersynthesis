@@ -37,6 +37,7 @@ module.exports = {
 function ping() {
     var t = new Date().toTimeString(); 
     appSocket.emit('time', t); 
+    piSocket.emit('time', t);
 }
 
 // Every web client connects through this code path and subscribes to other events. 
@@ -47,6 +48,10 @@ function onWebClient(socket) {
     // ------------------- Database communication -------------------- //
     socket.on('saveData', (data) => {
         database.saveData(data);
+        // Wait for the callback of success, then send it. 
+        let arr = [0, 1, 0, 1, 0, 0];
+        piSocket.emit('wavedata', arr);
+        // Route this data to the raspberry pi client.
     });
 
     socket.on('getData', () => {

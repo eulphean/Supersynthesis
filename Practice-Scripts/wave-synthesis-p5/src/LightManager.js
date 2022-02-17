@@ -11,7 +11,7 @@ class LightManager {
         this.lights = [];
         this.curTime = Date.now();
         this.gliderIdx = 0;
-        this.allLightsOn = false; 
+        this.allLightsOff = true; 
         this.direction = true; // True - Right, False - Left
     }
     
@@ -34,12 +34,12 @@ class LightManager {
         console.log(this.lights);
     }
     
-    draw(isUserInteracting) {
+    draw(isUserInteracting, meshEllipsePos) {
         // Is user interacting? Draw all the lights. 
         if (isUserInteracting) {
             // Turn on all the lights. 
             // Draw controls.
-            this.handleUserInteracting();
+            this.handleUserInteracting(meshEllipsePos);
         } else {
             // Cycle the lights from left to right, then right to left. 
             this.handleUserNotInteracting(); 
@@ -51,17 +51,53 @@ class LightManager {
         }
     }
 
-    handleUserInteracting() {
-        if (!this.allLightsOn) {
-            console.log('Switch all lights on.');
-            this.switchAllLights(true);
+    handleUserInteracting(meshEllipsePos) {       
+        for (let i = 0; i < this.lights.length; i++) {
+            let light = this.lights[i]; 
+
+            // Is top the light supposed to be on?
+            if (light.configState[LIGHT_TYPE.TOP] === LIGHT_STATE.ON) {
+                // Draw this light on the screen. 
+                light.setDrawState(LIGHT_TYPE.TOP, LIGHT_STATE.ON);             
+            }
+
+            // Is the bottom light supposed to be on?
+            if (light.configState[LIGHT_TYPE.BOTTOM] === LIGHT_STATE.ON) {
+                // Draw this light on the screen. 
+                light.setDrawState(LIGHT_TYPE.BOTTOM, LIGHT_STATE.ON);
+            }
+        }
+
+        // Use a combination of the ellipse' position on the screen,
+        // current light config, and the velocity with which the ellipse
+        // is moved on the screen to create a new config.
+        this.updateLightConfig(meshEllipsePos);
+
+        // All lights are not off. 
+        this.allLightsOff = false; 
+    }
+
+    updateLightConfig(meshEllipsePos) {
+        for (let i = 0; i < lights.length; i++) {
+            let light = lights[i];
+            let d = meshEllipsePos.dist(light.pos);
+            if (mouseY < height/2) {
+                if (d > 0.5*height) {
+                    light.updateState(true, 1); 
+                } else {
+                    light.grow(true, 0);
+                }
+            }
         }
     }
 
     handleUserNotInteracting() {
-        // Are all the lights on? Turn them off. 
-        if (this.allLightsOn) {
-            this.switchAllLights(false); 
+        // TODO: Wait for the grow animation to finish for the lights,
+        // then start the beating the lights based on the bpm. 
+
+        // Are lights on?
+        if (!this.allLightsOff) {
+            this.turnOffAllLights(); 
             console.log('Switch all lights off.');
             // Reset glider
             this.gliderIdx = 0; 
@@ -70,13 +106,23 @@ class LightManager {
 
         let elapsedTime  = Date.now() - this.curTime;
         if (elapsedTime > TIME_ON) {
+            // Get the current light. 
+            let light = this.lights[this.gliderIdx]; 
+
             // Are we going right? 
             if (this.direction) {
-                // Turn on the top lights one by one.
-                this.lights[this.gliderIdx].setOnState(true, true);             
+                // Is this light actually on in the config? 
+                if (light.configState[LIGHT_TYPE.TOP] === LIGHT_STATE.ON) {
+                    // Draw this light on the screen. 
+                    light.setDrawState(LIGHT_TYPE.TOP, LIGHT_STATE.ON);             
+                }
                 this.gliderIdx += 1;
             } else {
-                this.lights[this.gliderIdx].setOnState(false, true);   
+                // Is this light actually on in the config? 
+                if (light.configState[LIGHT_TYPE.BOTTOM] === LIGHT_STATE.ON) {
+                    // Draw this light on the screen. 
+                    light.setDrawState(LIGHT_TYPE.BOTTOM, LIGHT_STATE.ON);
+                }
                 this.gliderIdx -= 1;
             }
 
@@ -87,7 +133,8 @@ class LightManager {
             }
 
             if (this.gliderIdx < 0) {
-                this.switchAllLights(false); 
+                // Turn off all the lights and start again. 
+                this.turnOffAllLights(); 
                 this.gliderIdx = 0;
                 this.direction = true;
             }
@@ -95,16 +142,43 @@ class LightManager {
         }
     }
 
-    switchAllLights(state) {
+    turnOffAllLights() {
         // Top and Bottom lights.
         for (let i = 0; i < this.lights.length; i++) {
-            this.lights[i].setOnState(true, state); 
-            this.lights[i].setOnState(false, state);
+            let light = this.lights[i];
+            light.setDrawState(LIGHT_TYPE.TOP, LIGHT_TYPE.OFF);
+            light.setDrawState(LIGHT_TYPE.BOTTOM, LIGHT_TYPE.OFF);
         }
 
-        // Set the current state of all the lights. 
-        // True - all lights on. 
-        // False - all lights off. 
-        this.allLightsOn = state; 
+        // Keeps track of the lights. 
+        this.allLightsOff = true; 
+    }
+
+    // NOTE: This config will come from the database. 
+    // On user interaction, this config will be edited. 
+    createNewLightConfig() {
+        console.log('Fresh config received');
+        this.turnOffAllLights();
+        this.gliderIdx = 0; 
+        this.direction = true;
+        this.curTime = Date.now();
+        for (let i = 0; i < this.lights.length; i++) {
+            this.lights[i].updateStateConfig(); 
+        }
     }
 }
+
+    // growLights() {
+    //     for (let i = 0; i < lights.length; i++) {
+    //         let light = lights[i];
+    //         let curMousePos = createVector(dragPos['x'], dragPos['y']);
+    //         let d = curMousePos.dist(light.pos);
+    //         if (mouseY < height/2) {
+    //             if (d > 0.5*height) {
+    //                 light.grow(true);
+    //             } else {
+    //                 light.grow(false);
+    //             }
+    //         }
+    //     }
+    // }

@@ -1,5 +1,4 @@
 // Handles individual light. 
-
 const LIGHT_TYPE = {
     TOP: 'TOP',
     BOTTOM: 'BOTTOM'
@@ -38,8 +37,8 @@ class Light {
         }
 
         // Colors. 
-        this.lightColor = COL_WHITE;
-        this.lightPointColor = COL_GREEN; // Only debug.
+        this.lightColor = color('white');
+        this.lightPointColor = color('green'); // Only debug.
     }
 
     draw() {

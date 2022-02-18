@@ -1,15 +1,10 @@
-
-let tubes = []
-
-const Num_Points = 800
-
-let drawLine = false;
-let vertices = [];
-let clearNextTime = true;
+// const COL_WHITE = color('white');
+// const COL_WHITE_ALPHA = color(255, 255, 255, 100);
+// const COL_RED = color('red');
+// const COL_GREEN = color('green');
+// const COL_BLACK = color('black');
 
 let lightManager, meshManager; 
-let idx = 0;
-
 let isUserInteracting = false; 
 
 function setup() {

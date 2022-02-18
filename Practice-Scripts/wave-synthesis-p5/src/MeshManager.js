@@ -11,34 +11,34 @@ class MeshManager {
             this.ellipsePos['x'] += (mouseX - this.ellipsePos['x']) * EASING;
             this.ellipsePos['y'] += (mouseY - this.ellipsePos['y']) * EASING; 
 
-            // Draw pull lines for top and bottom ones.
+            // Draw pull lines for top and bottom lights.
             for (let i = 0; i < lights.length; i++) {
                 let light = lights[i];
-                if (light.topVal) {
+                if (light.configState[LIGHT_TYPE.TOP] === LIGHT_STATE.ON) {
                     let pos = light.topPos;
                     this.drawLine(pos, this.ellipsePos);
                 }
 
-                if (light.bottomVal) {
+                if (light.configState[LIGHT_TYPE.BOTTOM] === LIGHT_STATE.ON) {
                     let pos = light.bottomPos;
                     this.drawLine(pos, this.ellipsePos);
                 }
             }
 
-            // Draw ellipse in the center
+            // Draw ellipse tracking the mouse. 
             this.drawEllipse();
         }        
     }
 
     drawEllipse() {
-        fill(COL_WHITE);
+        fill(color(255, 255, 255, 200));
         strokeWeight(3);
-        stroke(COL_BLACK);
+        stroke(color('black'));
         ellipse(this.ellipsePos['x'], this.ellipsePos['y'], 30);  
     }
 
     drawLine(startPoint, endPoint) {
-        stroke(COL_WHITE);
+        stroke(color(255, 255, 255, 200));
         strokeWeight(2);
         line(startPoint['x'], startPoint['y'], endPoint['x'], endPoint['y']);
     }

@@ -134,9 +134,7 @@ class LightManager {
 
             if (this.gliderIdx < 0) {
                 // Turn off all the lights and start again. 
-                this.turnOffAllLights(); 
-                this.gliderIdx = 0;
-                this.direction = true;
+                this.resetSystem();
             }
             this.curTime = Date.now();
         }
@@ -158,13 +156,16 @@ class LightManager {
     // On user interaction, this config will be edited. 
     createNewLightConfig() {
         console.log('Fresh config received');
-        this.turnOffAllLights();
-        this.gliderIdx = 0; 
-        this.direction = true;
-        this.curTime = Date.now();
+        this.resetSystem();
         for (let i = 0; i < this.lights.length; i++) {
             this.lights[i].updateStateConfig(); 
         }
+    }
+
+    resetSystem() {
+        this.turnOffAllLights();
+        this.gliderIdx = 0; 
+        this.direction = true;
     }
 }
 

@@ -11,7 +11,7 @@ class LightManager {
         this.lights = [];
         this.curTime = Date.now();
         this.gliderIdx = 0;
-        this.allLightsOff = true; 
+        this.allLightsOff = false; 
         this.direction = true; // True - Right, False - Left
     }
     
@@ -37,8 +37,7 @@ class LightManager {
     draw(isUserInteracting, meshEllipsePos) {
         // Is user interacting? Draw all the lights. 
         if (isUserInteracting) {
-            // Turn on all the lights. 
-            // Draw controls.
+            // Control the lights. 
             this.handleUserInteracting(meshEllipsePos);
         } else {
             // Cycle the lights from left to right, then right to left. 
@@ -52,40 +51,36 @@ class LightManager {
     }
 
     handleUserInteracting(meshEllipsePos) {       
+        // TODO: Use a combination of the ellipse' position on the screen,
+        // current light config, and the velocity with which the ellipse
+        // is moved on the screen to create a new config.
+        // this.updateLightConfig(meshEllipsePos);
         for (let i = 0; i < this.lights.length; i++) {
-            let light = this.lights[i]; 
-
-            // Is top the light supposed to be on?
-            if (light.configState[LIGHT_TYPE.TOP] === LIGHT_STATE.ON) {
-                // Draw this light on the screen. 
-                light.setDrawState(LIGHT_TYPE.TOP, LIGHT_STATE.ON);             
+            let light = this.lights[i];
+            if (light.localState[LIGHT_TYPE.TOP] === LIGHT_STATE.ON) {
+                light.setDrawState(LIGHT_TYPE.TOP, LIGHT_STATE.ON);
             }
 
-            // Is the bottom light supposed to be on?
-            if (light.configState[LIGHT_TYPE.BOTTOM] === LIGHT_STATE.ON) {
-                // Draw this light on the screen. 
+            if (light.localState[LIGHT_TYPE.BOTTOM] === LIGHT_STATE.ON) {
                 light.setDrawState(LIGHT_TYPE.BOTTOM, LIGHT_STATE.ON);
             }
         }
-
-        // Use a combination of the ellipse' position on the screen,
-        // current light config, and the velocity with which the ellipse
-        // is moved on the screen to create a new config.
-        this.updateLightConfig(meshEllipsePos);
 
         // All lights are not off. 
         this.allLightsOff = false; 
     }
 
     updateLightConfig(meshEllipsePos) {
-        for (let i = 0; i < lights.length; i++) {
-            let light = lights[i];
+        for (let i = 0; i < this.lights.length; i++) {
+            let light = this.lights[i];
             let d = meshEllipsePos.dist(light.pos);
-            if (mouseY < height/2) {
-                if (d > 0.5*height) {
-                    light.updateState(true, 1); 
-                } else {
-                    light.grow(true, 0);
+            if (meshEllipsePos['y'] < height/2) {
+                // Have we crossed a certain threshold? 
+                if (d > width / 2) {
+                    console.log('Light it up');
+                    // Draw that light.  
+                    light.setDrawState(LIGHT_TYPE.TOP, LIGHT_STATE.ON);   // Update the config.
+                    light.setMovingHeight();
                 }
             }
         }
@@ -107,20 +102,16 @@ class LightManager {
         let elapsedTime  = Date.now() - this.curTime;
         if (elapsedTime > TIME_ON) {
             // Get the current light. 
-            let light = this.lights[this.gliderIdx]; 
+            let light = this.lights[this.gliderIdx];
 
             // Are we going right? 
             if (this.direction) {
-                // Is this light actually on in the config? 
-                if (light.configState[LIGHT_TYPE.TOP] === LIGHT_STATE.ON) {
-                    // Draw this light on the screen. 
-                    light.setDrawState(LIGHT_TYPE.TOP, LIGHT_STATE.ON);             
+                if (light.localState[LIGHT_TYPE.TOP] === LIGHT_STATE.ON) {
+                    light.setDrawState(LIGHT_TYPE.TOP, LIGHT_STATE.ON);
                 }
                 this.gliderIdx += 1;
             } else {
-                // Is this light actually on in the config? 
-                if (light.configState[LIGHT_TYPE.BOTTOM] === LIGHT_STATE.ON) {
-                    // Draw this light on the screen. 
+                if (light.localState[LIGHT_TYPE.BOTTOM] === LIGHT_STATE.ON) {
                     light.setDrawState(LIGHT_TYPE.BOTTOM, LIGHT_STATE.ON);
                 }
                 this.gliderIdx -= 1;
@@ -158,7 +149,7 @@ class LightManager {
         console.log('Fresh config received');
         this.resetSystem();
         for (let i = 0; i < this.lights.length; i++) {
-            this.lights[i].updateStateConfig(); 
+            this.lights[i].setOriginalState(); 
         }
     }
 

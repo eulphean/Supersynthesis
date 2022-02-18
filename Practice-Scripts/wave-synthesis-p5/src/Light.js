@@ -23,18 +23,30 @@ class Light {
         // Point at the bottom.
         this.bottomPos = createVector(newX, yPos + height/2);        
         
-        // Create a default config. 
-        // TODO: This config will be populated from an incoming
-        // message from the database. 
-        this.configState = {}; 
-        this.updateStateConfig();
-
-        // Local object to keep track if the light is drawn currently
-        // on the screen or not. This is only for drawing purposes. 
-        this.tempDrawState = {
-            'TOP': LIGHT_STATE.OFF,
-            'BOTTOM': LIGHT_STATE.OFF
+        // Create original config.
+        // TODO: This config will come from the database.  
+        this.originalState = {
+            'TOP': -1,
+            'BOTTOM': -1
+        }; 
+        this.localState = {
+            'TOP': -1,
+            'BOTTOM': -1
         }
+        this.drawState = {
+            'TOP': -1,
+            'BOTTOM': -1
+        }
+        // Sets an original state and copies it into Local State
+        this.setOriginalState();
+
+        // Object to control the height of the lights. 
+        this.movingHeight = {
+            'TOP': 0,
+            'BOTTOM': 0
+        };
+        this.setMovingHeight(); 
+
 
         // Colors. 
         this.lightColor = color('white');
@@ -47,13 +59,13 @@ class Light {
         noStroke();
 
         // Am I supposed to draw this top light? 
-        if (this.tempDrawState[LIGHT_TYPE.TOP] === LIGHT_STATE.ON) {
-            rect(newX, this.pos['y'], this.lightWidth, -height/2);
+        if (this.drawState[LIGHT_TYPE.TOP] === LIGHT_STATE.ON) {
+            rect(newX, this.pos['y'], this.lightWidth, this.movingHeight['TOP']);
         }
 
         // Am I supposed to draw this bottom light?
-        if (this.tempDrawState[LIGHT_TYPE.BOTTOM] === LIGHT_STATE.ON) {
-            rect(newX, this.pos['y'], this.lightWidth, height/2);    
+        if (this.drawState[LIGHT_TYPE.BOTTOM] === LIGHT_STATE.ON) {
+            rect(newX, this.pos['y'], this.lightWidth, this.movingHeight['BOTTOM']);    
         }
     }
 
@@ -67,12 +79,17 @@ class Light {
         return this.pos['x'] + this.lightWidth/2; 
     }
 
-    // We need the onState for both top and bottom lights. 
-    setDrawState(lightType, lightState) {
-        this.tempDrawState[lightType] = lightState;
+    // Store temporary state in local state. 
+    setLocalState(lightType, lightState) {
+        this.localState[lightType] = lightState;
     }
 
-    updateStateConfig() {
+    // Only the draw state is stored here. 
+    setDrawState(lightType, lightState) {
+        this.drawState[lightType] = lightState;
+    }
+
+    setOriginalState() {
         // TODO: GET THIS FROM THE DATABASE. 
         let topVal = int(random(0, 2)); // Integer (0 or 1)
         let bottomVal = int(random(0, 2)); // Integer (0 or 1)   
@@ -80,6 +97,10 @@ class Light {
             'TOP': topVal,
             'BOTTOM' : bottomVal
         } 
+        this.localState = {
+            'TOP': topVal,
+            'BOTTOM' : bottomVal
+        }
     }
 
     updateGrowState(isTop, state) {
@@ -87,6 +108,16 @@ class Light {
             this.topVal = state; 
         } else {
             this.bottomVal = state; 
+        }
+    }
+
+    setMovingHeight() {
+        if (this.localState[LIGHT_TYPE.TOP] === LIGHT_STATE.ON) {
+            this.movingHeight[LIGHT_TYPE.TOP] = -height/2;
+        }
+
+        if (this.localState[LIGHT_TYPE.BOTTOM] === LIGHT_STATE.ON) {
+            this.movingHeight[LIGHT_TYPE.BOTTOM] = height/2;
         }
     }
 }

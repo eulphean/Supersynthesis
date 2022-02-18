@@ -1,9 +1,3 @@
-// const COL_WHITE = color('white');
-// const COL_WHITE_ALPHA = color(255, 255, 255, 100);
-// const COL_RED = color('red');
-// const COL_GREEN = color('green');
-// const COL_BLACK = color('black');
-
 let lightManager, meshManager; 
 let isUserInteracting = false; 
 
@@ -34,9 +28,6 @@ function drawCenterLine() {
 
 function mousePressed() {
     isUserInteracting = true; 
-}
-
-function mouseDragged() {
 }
 
 function mouseReleased() {

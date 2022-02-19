@@ -5,13 +5,15 @@
   Description: A class responsible for handling all the lights. This class is the most critical class
   in this project. 
 */
-import Light, {LIGHT_STATE, LIGHT_TYPE, GROW_STATE} from './Light'
+import Light, {GROW_STATE} from './Light'
+import LightConfigStore, { LIGHT_TYPE, LIGHT_STATE } from "../stores/LightConfigStore";
 
 const NUM_LIGHTS = 24
 // TODO: Convert this to BPM. 
 // TODO: This should come from the user interaction. 
 const TIME_ON = 100; // 100 ms
 
+// TODO: IT SHOULD SUBSCRIBE TO THE LIGHTCONFIGSTORE
 export default class LightManager {
     constructor(s) {
         this.p5 = s; 
@@ -35,10 +37,11 @@ export default class LightManager {
         for (let i = 0; i < NUM_LIGHTS; i++) {
             let xPos = i * lightIncrement; 
             let l = new Light(this.p5, xPos, this.p5.height/2, lightWidth);
+            // Set the 
+            let configState = LightConfigStore.getState(i); 
+            l.setHeight(configState);
             this.lights.push(l);
         }
-
-        console.log(this.lights);
     }
     
     draw(isUserInteracting, meshEllipsePos) {
@@ -61,16 +64,20 @@ export default class LightManager {
         // CORE CORE CORE ALGORITHM>!
         this.updateLightConfig(meshEllipsePos);
 
+
         for (let i = 0; i < this.lights.length; i++) {
             let light = this.lights[i];
-            if (light.localState[LIGHT_TYPE.TOP] === LIGHT_STATE.ON) {
+            // Use the state from the store because this is the source of truth of 
+            // the incoming light data. 
+            let lightConfigState = LightConfigStore.getState(this.gliderIdx);
+
+            if (lightConfigState[LIGHT_TYPE.TOP] === LIGHT_STATE.ON) {
                 light.setDrawState(LIGHT_TYPE.TOP, LIGHT_STATE.ON);
             }
             // We want to be showing the ones that are currently off in the 
             // interaction part because they are actually shrinking, so we
             // don't disable the draw state on this. 
-
-            if (light.localState[LIGHT_TYPE.BOTTOM] === LIGHT_STATE.ON) {
+            if (lightConfigState[LIGHT_TYPE.BOTTOM] === LIGHT_STATE.ON) {
                 light.setDrawState(LIGHT_TYPE.BOTTOM, LIGHT_STATE.ON);
             }
             // We want to be showing the ones that are currently off in the 
@@ -88,16 +95,17 @@ export default class LightManager {
     updateLightConfig(meshEllipsePos) {
         for (let i = 0; i < this.lights.length; i++) {
             let light = this.lights[i];
+            
             let d = meshEllipsePos.dist(light.pos);
             if (meshEllipsePos['y'] < this.p5.height/2) {
                 // Have we crossed a certain threshold? 
                 if (d > this.p5.height / 2) {
-                    // Just update the local state. Based on the current local state,
-                    // draw states will be updated automatically.
-                    light.localState[LIGHT_TYPE.TOP] = LIGHT_STATE.ON;
+                    // Update the config states. 
+                    LightConfigStore.setState(i, LIGHT_TYPE.TOP, LIGHT_STATE.ON);
                     light.growState[LIGHT_TYPE.TOP] = GROW_STATE.GROW; 
                 } else {
-                    light.localState[LIGHT_TYPE.TOP] = LIGHT_STATE.OFF;
+                    // Update the config states. 
+                    LightConfigStore.setState(i, LIGHT_TYPE.TOP, LIGHT_STATE.OFF);
                     light.growState[LIGHT_TYPE.TOP] = GROW_STATE.SHRINK;
                 }
             } else {
@@ -105,10 +113,10 @@ export default class LightManager {
                 if (d > this.p5.height / 2) {
                     // Just update the local state. Based on the current local state,
                     // draw states will be updated automatically.
-                    light.localState[LIGHT_TYPE.BOTTOM] = LIGHT_STATE.ON;
+                    LightConfigStore.setState(i, LIGHT_TYPE.BOTTOM, LIGHT_STATE.ON);
                     light.growState[LIGHT_TYPE.BOTTOM] = GROW_STATE.GROW; 
                 } else {
-                    light.localState[LIGHT_TYPE.BOTTOM] = LIGHT_STATE.OFF;
+                    LightConfigStore.setState(i, LIGHT_TYPE.BOTTOM, LIGHT_STATE.ON);
                     light.growState[LIGHT_TYPE.BOTTOM] = GROW_STATE.SHRINK;
                 }
             }
@@ -119,7 +127,6 @@ export default class LightManager {
         // TODO: Wait for the grow animation to finish for the lights,
         // then start the beating the lights based on the bpm. Don't really
         // need to do this. 
-
         // Are lights on?
         if (!this.allLightsOff) {
             this.turnOffAllLights(); 
@@ -133,16 +140,17 @@ export default class LightManager {
         if (elapsedTime > TIME_ON) {
             // Get the current light. 
             let light = this.lights[this.gliderIdx];
+            let lightConfigState = LightConfigStore.getState(this.gliderIdx);
 
             // Are we going right? 
             if (this.direction) {
-                if (light.localState[LIGHT_TYPE.TOP] === LIGHT_STATE.ON) {
+                if (lightConfigState[LIGHT_TYPE.TOP] === LIGHT_STATE.ON) {
                     light.setDrawState(LIGHT_TYPE.TOP, LIGHT_STATE.ON);
                     this.curTime = Date.now();
                 }
                 this.gliderIdx += 1;
             } else {
-                if (light.localState[LIGHT_TYPE.BOTTOM] === LIGHT_STATE.ON) {
+                if (lightConfigState[LIGHT_TYPE.BOTTOM] === LIGHT_STATE.ON) {
                     light.setDrawState(LIGHT_TYPE.BOTTOM, LIGHT_STATE.ON);
                     this.curTime = Date.now();
                 }
@@ -150,12 +158,10 @@ export default class LightManager {
             }
 
             // We have reached the right most point, start the bottom row. 
-            if (this.gliderIdx == NUM_LIGHTS) {
+            if (this.gliderIdx === NUM_LIGHTS) {
                 this.gliderIdx = NUM_LIGHTS - 1;
                 this.direction = false; 
             }
-
-            console.log(this.gliderIdx);
 
             if (this.gliderIdx < 0) {
                 // Turn off all the lights and start again. 
@@ -174,16 +180,6 @@ export default class LightManager {
 
         // Keeps track of the lights. 
         this.allLightsOff = true; 
-    }
-
-    // NOTE: This config will come from the database. 
-    // On user interaction, this config will be edited. 
-    createNewLightConfig() {
-        console.log('Fresh config received');
-        this.resetSystem();
-        for (let i = 0; i < this.lights.length; i++) {
-            this.lights[i].setOriginalState(); 
-        }
     }
 
     resetSystem() {

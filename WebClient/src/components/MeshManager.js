@@ -5,7 +5,8 @@
   Description: A class responsible for drawing the connections from the ellipse to all
   the moving lights on the canvas. 
 */
-import { LIGHT_TYPE, LIGHT_STATE } from "./Light";
+
+import LightConfigStore, { LIGHT_TYPE, LIGHT_STATE } from "../stores/LightConfigStore";
 
 // Handles all the code related to interaction with the canvas.
 const EASING = 0.015;  
@@ -19,42 +20,31 @@ export default class MeshManager {
         if (isUserInteracting) {    
             this.ellipsePos['x'] += (this.p5.mouseX - this.ellipsePos['x']) * EASING;
             this.ellipsePos['y'] += (this.p5.mouseY - this.ellipsePos['y']) * EASING; 
-                       // Calculate new ellipse position. 
-            if (this.ellipsePos['x'] > this.p5.width) {
-                this.ellipsePos['x'] = this.p5.width;
-            } 
 
-            if (this.ellipsePos['x'] < 0) {
-                this.ellipsePos['x'] = 0;
-            } 
-
-            if (this.ellipsePos['y'] > this.p5.height) {
-                this.ellipsePos['y'] = this.p5.height;
-            } 
-
-            if (this.ellipsePos['y'] < 0) {
-                this.ellipsePos['y'] = 0;
-            } 
-        
+            // Make sure the ellipse doesn't go outside the boundary.
+            this.containEllipse();
 
             // Draw pull lines for top and bottom lights.
             for (let i = 0; i < lights.length; i++) {
                 let light = lights[i];
 
+                // Use the config state values to check which lines to draw.
+                let lightConfigState = LightConfigStore.getState(i);
+
                 // Use the local state to draw the lines. 
-                if (light.drawState[LIGHT_TYPE.TOP] === LIGHT_STATE.ON) {
+                if (lightConfigState[LIGHT_TYPE.TOP] === LIGHT_STATE.ON) {
                     let pos = light.topPos;
-                    if (light.movingHeight[LIGHT_TYPE.TOP] < this.p5.height/2 && 
-                            light.movingHeight[LIGHT_TYPE.TOP] > 0) {
+                    if (light.lightHeight[LIGHT_TYPE.TOP] < this.p5.height/2 && 
+                            light.lightHeight[LIGHT_TYPE.TOP] > 0) {
                         this.drawLine(pos, this.ellipsePos, i);
                     }
                 }
 
                 // Use the local state to draw the lines.
-                if (light.drawState[LIGHT_TYPE.BOTTOM] === LIGHT_STATE.ON) {
+                if (lightConfigState[LIGHT_TYPE.BOTTOM] === LIGHT_STATE.ON) {
                     let pos = light.bottomPos;
-                    if (light.movingHeight[LIGHT_TYPE.BOTTOM] < this.p5.height/2 && 
-                        light.movingHeight[LIGHT_TYPE.BOTTOM] > 0) {
+                    if (light.lightHeight[LIGHT_TYPE.BOTTOM] < this.p5.height/2 && 
+                        light.lightHeight[LIGHT_TYPE.BOTTOM] > 0) {
                         this.drawLine(pos, this.ellipsePos, i);
                     }
                 }
@@ -63,6 +53,25 @@ export default class MeshManager {
             // Draw ellipse tracking the mouse. 
             this.drawEllipse();
         }        
+    }
+    
+    // Calculate new ellipse position. 
+    containEllipse() {
+        if (this.ellipsePos['x'] > this.p5.width) {
+        this.ellipsePos['x'] = this.p5.width;
+        } 
+
+        if (this.ellipsePos['x'] < 0) {
+            this.ellipsePos['x'] = 0;
+        } 
+
+        if (this.ellipsePos['y'] > this.p5.height) {
+            this.ellipsePos['y'] = this.p5.height;
+        } 
+
+        if (this.ellipsePos['y'] < 0) {
+            this.ellipsePos['y'] = 0;
+        } 
     }
 
     drawEllipse() {

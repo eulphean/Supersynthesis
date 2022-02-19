@@ -4,17 +4,7 @@
   Date: 02/19/2022
   Description: A class representing each light that is painted on the canvas. 
 */
-
-export const LIGHT_TYPE = {
-    TOP: 'TOP',
-    BOTTOM: 'BOTTOM'
-};
-
-export const LIGHT_STATE = {
-    ON: 1,
-    OFF: 0
-};
-
+import { LIGHT_TYPE, LIGHT_STATE } from "../stores/LightConfigStore";
 export const GROW_STATE = {
     NONE: 0,
     GROW: 1,
@@ -39,17 +29,8 @@ export default class Light {
         this.topPos = this.p5.createVector(newX, yPos - this.p5.height/2);
         // Point at the bottom.
         this.bottomPos = this.p5.createVector(newX, yPos + this.p5.height/2);        
-        
-        // Create original config.
-        // TODO: This config will come from the database.  
-        this.originalState = {
-            'TOP': -1,
-            'BOTTOM': -1
-        }; 
-        this.localState = {
-            'TOP': -1,
-            'BOTTOM': -1
-        }
+
+        // Is this getting draw or not? 
         this.drawState = {
             'TOP': -1,
             'BOTTOM': -1
@@ -58,14 +39,11 @@ export default class Light {
             'TOP': GROW_STATE.NONE,
             'BOTTOM': GROW_STATE.NONE
         }
-        // Object to control the height of the lights. 
-        this.movingHeight = {
+        this.lightHeight = {
             'TOP': 0,
             'BOTTOM': 0
         };
-        // Sets an original state and copies it into Local State
-        this.setOriginalState();
-        this.setMovingHeight();
+
         // Colors. 
         this.lightColor = this.p5.color('white');
         this.lightPointColor = this.p5.color('green'); // Only debug.
@@ -81,15 +59,16 @@ export default class Light {
 
         // Am I supposed to draw this top light? 
         if (this.drawState[LIGHT_TYPE.TOP] === LIGHT_STATE.ON) {
-            this.p5.rect(newX, this.pos['y'], this.lightWidth, -this.movingHeight['TOP']);
+            this.p5.rect(newX, this.pos['y'], this.lightWidth, -this.lightHeight['TOP']);
         }
 
         // Am I supposed to draw this bottom light?
         if (this.drawState[LIGHT_TYPE.BOTTOM] === LIGHT_STATE.ON) {
-            this.p5.rect(newX, this.pos['y'], this.lightWidth, this.movingHeight['BOTTOM']);    
+            this.p5.rect(newX, this.pos['y'], this.lightWidth, this.lightHeight['BOTTOM']);    
         }
     }
 
+    // Grow & Shrink the height of the light.
     handleGrowState(lightType) {
         switch (this.growState[lightType]) {
             case GROW_STATE.NONE: {
@@ -98,16 +77,16 @@ export default class Light {
             }
 
             case GROW_STATE.GROW: {
-                if (this.movingHeight[lightType] < this.p5.height/2) {
-                    this.movingHeight[lightType] += GROW_FACTOR;
+                if (this.lightHeight[lightType] < this.p5.height/2) {
+                    this.lightHeight[lightType] += GROW_FACTOR;
                     this.mapPos(lightType);
                 }
                 break;
             }
 
             case GROW_STATE.SHRINK: {
-                if (this.movingHeight[lightType] > 0) {
-                    this.movingHeight[lightType] -= GROW_FACTOR; 
+                if (this.lightHeight[lightType] > 0) {
+                    this.lightHeight[lightType] -= GROW_FACTOR; 
                     this.mapPos(lightType);
                 }
                 break;
@@ -116,14 +95,13 @@ export default class Light {
             default: 
                 break;
         }
-
     }
 
     mapPos(lightType) {
         if (lightType === LIGHT_TYPE.TOP) {
-            this.topPos['y'] = this.p5.map(this.movingHeight[LIGHT_TYPE.TOP], 0, this.p5.height/2, this.p5.height/2, 0);
+            this.topPos['y'] = this.p5.map(this.lightHeight[LIGHT_TYPE.TOP], 0, this.p5.height/2, this.p5.height/2, 0);
         } else {
-            this.bottomPos['y'] = this.p5.map(this.movingHeight[LIGHT_TYPE.BOTTOM], 0, this.p5.height/2, this.p5.height/2, this.p5.height);
+            this.bottomPos['y'] = this.p5.map(this.lightHeight[LIGHT_TYPE.BOTTOM], 0, this.p5.height/2, this.p5.height/2, this.p5.height);
         }
     }
 
@@ -137,28 +115,9 @@ export default class Light {
         return this.pos['x'] + this.lightWidth/2; 
     }
 
-    // Store temporary state in local state. 
-    setLocalState(lightType, lightState) {
-        this.localState[lightType] = lightState;
-    }
-
     // Only the draw state is stored here. 
     setDrawState(lightType, lightState) {
         this.drawState[lightType] = lightState;
-    }
-
-    setOriginalState() {
-        // TODO: GET THIS FROM THE DATABASE. 
-        let topVal = this.p5.int(this.p5.random(0, 2)); // Integer (0 or 1)
-        let bottomVal = this.p5.int(this.p5.random(0, 2)); // Integer (0 or 1)   
-        this.originalState = {
-            'TOP': topVal,
-            'BOTTOM' : bottomVal
-        } 
-        this.localState = {
-            'TOP': topVal,
-            'BOTTOM' : bottomVal
-        }
     }
 
     updateGrowState(isTop, state) {
@@ -169,21 +128,22 @@ export default class Light {
         }
     }
 
-    setMovingHeight() {
-        if (this.localState[LIGHT_TYPE.TOP] === LIGHT_STATE.ON) {
-            this.movingHeight[LIGHT_TYPE.TOP] = this.p5.height/2;
+    // Set the height of the light based on its original configuration.
+    setHeight(configState) {
+        if (configState[LIGHT_TYPE.TOP] === LIGHT_STATE.ON) {
+            this.lightHeight[LIGHT_TYPE.TOP] = this.p5.height/2;
         }
 
-        if (this.localState[LIGHT_TYPE.TOP] === LIGHT_STATE.OFF) {
-            this.movingHeight[LIGHT_TYPE.TOP] = 0;
+        if (configState[LIGHT_TYPE.TOP] === LIGHT_STATE.OFF) {
+            this.lightHeight[LIGHT_TYPE.TOP] = 0;
         }
 
-        if (this.localState[LIGHT_TYPE.BOTTOM] === LIGHT_STATE.ON) {
-            this.movingHeight[LIGHT_TYPE.BOTTOM] = this.p5.height/2;
+        if (configState[LIGHT_TYPE.BOTTOM] === LIGHT_STATE.ON) {
+            this.lightHeight[LIGHT_TYPE.BOTTOM] = this.p5.height/2;
         }
 
-        if (this.localState[LIGHT_TYPE.BOTTOM] === LIGHT_STATE.OFF) {
-            this.movingHeight[LIGHT_TYPE.BOTTOM] = 0;
+        if (configState[LIGHT_TYPE.BOTTOM] === LIGHT_STATE.OFF) {
+            this.lightHeight[LIGHT_TYPE.BOTTOM] = 0;
         }
     }
 }

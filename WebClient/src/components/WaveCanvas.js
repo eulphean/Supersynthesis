@@ -47,11 +47,11 @@ var sketch = (s) => {
     isUserInteracting = false; 
   };
 
-  s.keyPressed = () => {
-    if (s.keyCode == 32) {
-        lightManager.createNewLightConfig(); 
-    }
-  };
+  // s.keyPressed = () => {
+  //   if (s.keyCode == 32) {
+  //       lightManager.createNewLightConfig(); 
+  //   }
+  // };
 };
 
 // s.windowResized = () => {
@@ -75,7 +75,7 @@ class WaveCanvas extends React.Component {
     this.state={
 
     };
-
+    
     this.containerRef = React.createRef();
     this.sketchRef = React.createRef(); 
   }

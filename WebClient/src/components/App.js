@@ -1,3 +1,10 @@
+/*
+  Name: App.js
+  Author: Amay Kataria
+  Date: 02/19/2022
+  Description: Entry point component for the application. 
+*/
+
 import React from 'react'
 import Radium from 'radium'
 import Websocket from './Websocket'

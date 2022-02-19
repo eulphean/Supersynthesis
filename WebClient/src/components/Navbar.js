@@ -1,3 +1,9 @@
+/*
+  Name: BottomBar.js
+  Author: Amay Kataria
+  Date: 02/19/2022
+  Description: React component for the top navigation bar on the webpage.
+*/
 import React from 'react'
 import Radium from 'radium'
 import { ReactComponent as About } from '../svg/about.svg'

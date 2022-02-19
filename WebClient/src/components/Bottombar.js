@@ -1,3 +1,9 @@
+/*
+  Name: BottomBar.js
+  Author: Amay Kataria
+  Date: 02/19/2022
+  Description: React component for the bottom bar on the page. This has the send button. 
+*/
 import React from 'react'
 import Radium from 'radium'
 import {color, fontFamily, fontSize, padding} from './CommonStyles'

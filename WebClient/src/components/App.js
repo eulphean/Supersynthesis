@@ -2,17 +2,21 @@ import React from 'react'
 import Radium from 'radium'
 import Websocket from './Websocket'
 
+import Navbar from './Navbar';
+import WaveCanvas from './WaveCanvas';
+import Bottombar from './Bottombar';
+
 const styles = {
   container: {
     position: 'fixed',
-    top: '0px',
-    bottom: '0px',
-    left: '0px',
-    right: '0px',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     display: 'flex',
     flexDirection: 'column',
-    backgroundColor: 'black',
-    color: 'white'
+    color: 'white',
+    height: '100vh'
   },
 
   button: {
@@ -36,8 +40,9 @@ class App extends React.Component {
   render() {
     return (
       <div style={styles.container}>
-        <button onClick={this.onClick.bind(this)} 
-          style={styles.button}>Press Me</button>
+        <Navbar />
+        <WaveCanvas />
+        <Bottombar />
       </div>
     );
   }

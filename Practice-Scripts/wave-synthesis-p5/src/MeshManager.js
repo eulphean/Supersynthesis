@@ -1,5 +1,5 @@
 // Handles all the code related to interaction with the canvas.
-const EASING = 0.05;  
+const EASING = 0.015;  
 class MeshManager {
     constructor() {
         this.ellipsePos = createVector(0, 0);
@@ -14,14 +14,23 @@ class MeshManager {
             // Draw pull lines for top and bottom lights.
             for (let i = 0; i < lights.length; i++) {
                 let light = lights[i];
-                if (light.configState[LIGHT_TYPE.TOP] === LIGHT_STATE.ON) {
+
+                // Use the local state to draw the lines. 
+                if (light.drawState[LIGHT_TYPE.TOP] === LIGHT_STATE.ON) {
                     let pos = light.topPos;
-                    this.drawLine(pos, this.ellipsePos);
+                    if (light.movingHeight[LIGHT_TYPE.TOP] < height/2 && 
+                            light.movingHeight[LIGHT_TYPE.TOP] > 0) {
+                        this.drawLine(pos, this.ellipsePos, i);
+                    }
                 }
 
-                if (light.configState[LIGHT_TYPE.BOTTOM] === LIGHT_STATE.ON) {
+                // Use the local state to draw the lines.
+                if (light.drawState[LIGHT_TYPE.BOTTOM] === LIGHT_STATE.ON) {
                     let pos = light.bottomPos;
-                    this.drawLine(pos, this.ellipsePos);
+                    if (light.movingHeight[LIGHT_TYPE.BOTTOM] < height/2 && 
+                        light.movingHeight[LIGHT_TYPE.BOTTOM] > 0) {
+                        this.drawLine(pos, this.ellipsePos, i);
+                    }
                 }
             }
 
@@ -37,8 +46,8 @@ class MeshManager {
         ellipse(this.ellipsePos['x'], this.ellipsePos['y'], 30);  
     }
 
-    drawLine(startPoint, endPoint) {
-        stroke(color(255, 255, 255, 200));
+    drawLine(startPoint, endPoint, i) {
+        stroke(color(255, 255, 255, (i+1)*5));
         strokeWeight(2);
         line(startPoint['x'], startPoint['y'], endPoint['x'], endPoint['y']);
     }

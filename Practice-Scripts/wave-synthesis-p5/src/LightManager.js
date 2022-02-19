@@ -51,36 +51,58 @@ class LightManager {
     }
 
     handleUserInteracting(meshEllipsePos) {       
-        // TODO: Use a combination of the ellipse' position on the screen,
-        // current light config, and the velocity with which the ellipse
-        // is moved on the screen to create a new config.
-        // this.updateLightConfig(meshEllipsePos);
+        // CORE CORE CORE ALGORITHM>!
+        this.updateLightConfig(meshEllipsePos);
+
         for (let i = 0; i < this.lights.length; i++) {
             let light = this.lights[i];
             if (light.localState[LIGHT_TYPE.TOP] === LIGHT_STATE.ON) {
                 light.setDrawState(LIGHT_TYPE.TOP, LIGHT_STATE.ON);
             }
+            // We want to be showing the ones that are currently off in the 
+            // interaction part because they are actually shrinking, so we
+            // don't disable the draw state on this. 
 
             if (light.localState[LIGHT_TYPE.BOTTOM] === LIGHT_STATE.ON) {
                 light.setDrawState(LIGHT_TYPE.BOTTOM, LIGHT_STATE.ON);
             }
+            // We want to be showing the ones that are currently off in the 
+            // interaction part because they are actually shrinking, so we
+            // don't disable the draw state on this. 
         }
 
         // All lights are not off. 
         this.allLightsOff = false; 
     }
 
+    // TODO: Use a combination of the ellipse' position on the screen,
+    // current light config, and the velocity with which the ellipse
+    // is moved on the screen to create a new config.
     updateLightConfig(meshEllipsePos) {
         for (let i = 0; i < this.lights.length; i++) {
             let light = this.lights[i];
             let d = meshEllipsePos.dist(light.pos);
             if (meshEllipsePos['y'] < height/2) {
                 // Have we crossed a certain threshold? 
-                if (d > width / 2) {
-                    console.log('Light it up');
-                    // Draw that light.  
-                    light.setDrawState(LIGHT_TYPE.TOP, LIGHT_STATE.ON);   // Update the config.
-                    light.setMovingHeight();
+                if (d > height / 2) {
+                    // Just update the local state. Based on the current local state,
+                    // draw states will be updated automatically.
+                    light.localState[LIGHT_TYPE.TOP] = LIGHT_STATE.ON;
+                    light.growState[LIGHT_TYPE.TOP] = GROW_STATE.GROW; 
+                } else {
+                    light.localState[LIGHT_TYPE.TOP] = LIGHT_STATE.OFF;
+                    light.growState[LIGHT_TYPE.TOP] = GROW_STATE.SHRINK;
+                }
+            } else {
+                // Handle the bottom lights. 
+                if (d > height / 2) {
+                    // Just update the local state. Based on the current local state,
+                    // draw states will be updated automatically.
+                    light.localState[LIGHT_TYPE.BOTTOM] = LIGHT_STATE.ON;
+                    light.growState[LIGHT_TYPE.BOTTOM] = GROW_STATE.GROW; 
+                } else {
+                    light.localState[LIGHT_TYPE.BOTTOM] = LIGHT_STATE.OFF;
+                    light.growState[LIGHT_TYPE.BOTTOM] = GROW_STATE.SHRINK;
                 }
             }
         }
@@ -88,7 +110,8 @@ class LightManager {
 
     handleUserNotInteracting() {
         // TODO: Wait for the grow animation to finish for the lights,
-        // then start the beating the lights based on the bpm. 
+        // then start the beating the lights based on the bpm. Don't really
+        // need to do this. 
 
         // Are lights on?
         if (!this.allLightsOff) {
@@ -108,11 +131,13 @@ class LightManager {
             if (this.direction) {
                 if (light.localState[LIGHT_TYPE.TOP] === LIGHT_STATE.ON) {
                     light.setDrawState(LIGHT_TYPE.TOP, LIGHT_STATE.ON);
+                    this.curTime = Date.now();
                 }
                 this.gliderIdx += 1;
             } else {
                 if (light.localState[LIGHT_TYPE.BOTTOM] === LIGHT_STATE.ON) {
                     light.setDrawState(LIGHT_TYPE.BOTTOM, LIGHT_STATE.ON);
+                    this.curTime = Date.now();
                 }
                 this.gliderIdx -= 1;
             }
@@ -127,7 +152,6 @@ class LightManager {
                 // Turn off all the lights and start again. 
                 this.resetSystem();
             }
-            this.curTime = Date.now();
         }
     }
 
@@ -159,18 +183,3 @@ class LightManager {
         this.direction = true;
     }
 }
-
-    // growLights() {
-    //     for (let i = 0; i < lights.length; i++) {
-    //         let light = lights[i];
-    //         let curMousePos = createVector(dragPos['x'], dragPos['y']);
-    //         let d = curMousePos.dist(light.pos);
-    //         if (mouseY < height/2) {
-    //             if (d > 0.5*height) {
-    //                 light.grow(true);
-    //             } else {
-    //                 light.grow(false);
-    //             }
-    //         }
-    //     }
-    // }

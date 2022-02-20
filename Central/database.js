@@ -16,7 +16,7 @@ const pool = new Pool({
 
 module.exports = {    
     saveData: function(data) {
-        onWriteDatabase(data)
+        return onWriteDatabase(data)
     },
 
     readData: function(socket) {
@@ -24,34 +24,28 @@ module.exports = {
     }
 }
 
-function onDeletePreset(presetName) {
-    pool.query('DELETE FROM presets WHERE name=$1', [presetName], (error, result) => {
-        if (error) {
-            throw error; 
-        }
-
-        console.log(presetName + ' entry successfully deleted from the database.'); 
-    });
-}
-
-function onWriteDatabase(data) {
-    let index = data['index'];
-    let value = data['data'];
+function onWriteDatabase(payload) {
+    let index = payload['index'];
+    let value = payload['config'];
 
     // First READ THE DATABSE if something like this exists. 
     // If it does, then update the data, else make a new commit. 
-    pool.query('INSERT INTO entries (index, entry) VALUES ($1, $2)', [index, value], (error, result) => {
-        if (error) {
-            throw error;
-        }
+    let promise = new Promise((resolve, reject) => {
+        pool.query('INSERT INTO entries (index, config) VALUES ($1, $2)', [index, value], (error, result) => {
+            if (error) {
+                throw error;
+            }
 
-        console.log('Success: ' + index + ' is new entry in the database.');
+            console.log('Success: ' + index + ' is new entry in the database.');
+            resolve(payload);
+        });
     });
+    return promise; 
 }
 
 function onReadDatabase(socket) {
     console.log('Read database');
-    pool.query('SELECT * FROM presets', (error, result) => {
+    pool.query('SELECT * FROM entries ORDER BY index DESC LIMIT 1;', (error, result) => {
         if (error) {
             console.log('Some error');
             throw error; 
@@ -59,8 +53,18 @@ function onReadDatabase(socket) {
 
         if (result.rows.length > 0) { // Entry already exists..
             let entries = result.rows;
-            socket.emit('receivePresets', entries); 
-            console.log('Presets emitted'); 
+            if (entries.length > 0) {
+                // Only a single entry should be received. 
+                let payload = {
+                    'index' : entries[0]['index'],
+                    'config': entries[0]['config']
+                }
+                // We only need the last entry. 
+                socket.emit('receiveData', payload); 
+                console.log('Config data emitted for index: ' + payload['index']); 
+            } else {
+                console.log('Sorry: Nothing to emit. Database is empty!');
+            }
         }
     }); 
 }

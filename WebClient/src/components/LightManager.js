@@ -22,6 +22,9 @@ export default class LightManager {
         this.gliderIdx = 0;
         this.allLightsOff = false; 
         this.direction = true; // True - Right, False - Left
+
+        // Callback to trigger when new light updates are received.
+        LightConfigStore.subscribeLights(this.updateLights.bind(this));
     }
     
     setup() {
@@ -32,15 +35,26 @@ export default class LightManager {
     prepareLights() {
         // Distance between each tube. 
         let lightIncrement = (this.p5.width) / NUM_LIGHTS;
+
         // Width of each light is half the distance between each light.
         let lightWidth = lightIncrement / 2;
         for (let i = 0; i < NUM_LIGHTS; i++) {
             let xPos = i * lightIncrement; 
             let l = new Light(this.p5, xPos, this.p5.height/2, lightWidth);
-            // Set the 
+            // Set the height of each tube based on the light config. 
             let configState = LightConfigStore.getState(i); 
             l.setHeight(configState);
             this.lights.push(l);
+        }
+    }
+
+    // Fired when new light updates are received. 
+    updateLights() {
+        console.log('New lights received: Update the light heights.');
+        for (let i = 0; i < NUM_LIGHTS; i++) {
+            let l = this.lights[i]; 
+            let configState = LightConfigStore.getState(i);
+            l.setHeight(configState);
         }
     }
     
@@ -116,7 +130,7 @@ export default class LightManager {
                     LightConfigStore.setState(i, LIGHT_TYPE.BOTTOM, LIGHT_STATE.ON);
                     light.growState[LIGHT_TYPE.BOTTOM] = GROW_STATE.GROW; 
                 } else {
-                    LightConfigStore.setState(i, LIGHT_TYPE.BOTTOM, LIGHT_STATE.ON);
+                    LightConfigStore.setState(i, LIGHT_TYPE.BOTTOM, LIGHT_STATE.OFF);
                     light.growState[LIGHT_TYPE.BOTTOM] = GROW_STATE.SHRINK;
                 }
             }
@@ -150,6 +164,7 @@ export default class LightManager {
                 }
                 this.gliderIdx += 1;
             } else {
+                // We are definitely going left. 
                 if (lightConfigState[LIGHT_TYPE.BOTTOM] === LIGHT_STATE.ON) {
                     light.setDrawState(LIGHT_TYPE.BOTTOM, LIGHT_STATE.ON);
                     this.curTime = Date.now();

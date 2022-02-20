@@ -11,6 +11,8 @@ let appSocket;
 let piSocket; 
 let io; 
 
+const room = 'supersynth';
+
 module.exports = {
     socketConfig: function(server) {
         io = socket(server, {
@@ -44,21 +46,38 @@ function ping() {
 // All socket events are registered here. 
 function onWebClient(socket) {
     console.log('New Web Client connection: ' + socket.id); 
+    // Join the room 
+    socket.join(room); 
+    var memberSize = io.of('/app').adapter.rooms.get(room).size;
+    console.log(memberSize + ' members in supersynth.');
 
     // ------------------- Database communication -------------------- //
     socket.on('saveData', (data) => {
-        database.saveData(data);
+        database.saveData(data).then((payload) => {
+            // Convert the stringified json back to proper json.
+            let json = JSON.parse(payload['config']);
+            payload['config'] = json;
+            // Route the payload back to other connected clients.
+            socket.to(room).emit('receiveData', payload); 
+            var members = io.of('/app').adapter.rooms.get(room).size;
+            console.log(members-1 + ' members were sent an update.');
+        })
+
         // Wait for the callback of success, then send it. 
         let arr = [0, 1, 0, 1, 0, 0];
         piSocket.emit('wavedata', arr);
         // Route this data to the raspberry pi client.
     });
 
+    // Received a request to read data.
     socket.on('getData', () => {
         database.readData(socket); 
     });
     
-    socket.on('disconnect', () => console.log('Web client ' + socket.id + ' disconnected')); 
+    socket.on('disconnect', () => {
+        console.log('Web client ' + socket.id + ' disconnected');
+        socket.leave(room);
+    });
 }
 
 function onPiClient(socket) {

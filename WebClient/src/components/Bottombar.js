@@ -7,6 +7,8 @@
 import React from 'react'
 import Radium from 'radium'
 import {color, fontFamily, fontSize, padding} from './CommonStyles'
+import Websocket from './Websocket';
+import LightConfigStore from '../stores/LightConfigStore';
 
 const styles = {
     container: {
@@ -31,11 +33,6 @@ const styles = {
     info: {
         backgroundColor: color.bgBlack,
         padding: padding.verySmall,
-    },
-
-    button: {
-        backgroundColor: color.bgBlack,
-        padding: padding.verySmall,
     }
 };
 
@@ -43,18 +40,36 @@ class Navbar extends React.Component {
   constructor(props) {
     super(props); 
     this.state={
-
+      bpm: '',
+      index: ''
     }
+    LightConfigStore.subscribeInfo(this.onInfoUpdate.bind(this));
   }
  
   render() {
+    let bpm = this.state.bpm + 'bpm'
+    let states = '#' + this.state.index; 
     return (
         <div style={styles.container}>
-            <div style={styles.info}>51 states</div>
-            <div style={styles.info}>54bpm</div>
-            <div style={styles.button}>send</div>
+            <div style={styles.info}>{states}</div>
+            <div style={styles.info}>{bpm}</div>
+            <div onClick={this.onSend.bind(this)} style={styles.info}>Send</div>
         </div>      
     );
+  }
+
+  onInfoUpdate() {
+    let idx = LightConfigStore.configIndex;
+    let bpm = LightConfigStore.bpm; 
+    this.setState({
+      index: idx, 
+      bpm: bpm
+    });
+  }
+
+  onSend(event) {
+    event.stopPropagation();
+    Websocket.commitLightConfigData();
   }
 }
 

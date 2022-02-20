@@ -40,7 +40,11 @@ var sketch = (s) => {
   };
 
   s.mousePressed = () => {
-    isUserInteracting = true; 
+    if (s.mouseY > s.height || s.mouseY < 0) {
+      // Ignore. 
+    } else {
+      isUserInteracting = true; 
+    }
   };
 
   s.mouseReleased = () => {
@@ -71,11 +75,7 @@ const styles = {
 
 class WaveCanvas extends React.Component {
   constructor(props) {
-    super(props);
-    this.state={
-
-    };
-    
+    super(props);   
     this.containerRef = React.createRef();
     this.sketchRef = React.createRef(); 
   }
@@ -84,7 +84,6 @@ class WaveCanvas extends React.Component {
     console.log('Wave canvas mounted');    
     this.myP5 = new p5(sketch, this.sketchRef.current);
   }
-
   
   render() {
     return (

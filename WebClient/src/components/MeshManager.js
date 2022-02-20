@@ -29,26 +29,20 @@ export default class MeshManager {
             for (let i = 0; i < lights.length; i++) {
                 let light = lights[i];
 
-                // // Use the config state values to check which lines to draw.
-                // let lightConfigState = LightConfigStore.getState(i);
-
-                // // Use the local state to draw the lines. 
-                // if (lightConfigState[LIGHT_TYPE.TOP] === LIGHT_STATE.ON) {
-                //     let pos = light.topPos;
-                //     if (light.lightHeight[LIGHT_TYPE.TOP] < this.p5.height/2 && 
-                //             light.lightHeight[LIGHT_TYPE.TOP] > 0) {
-                //         this.drawLine(pos, this.ellipsePos, i);
-                //     }
-                // }
-
-                // // Use the local state to draw the lines.
-                // if (lightConfigState[LIGHT_TYPE.BOTTOM] === LIGHT_STATE.ON) {
-                //     let pos = light.bottomPos;
-                //     if (light.lightHeight[LIGHT_TYPE.BOTTOM] < this.p5.height/2 && 
-                //         light.lightHeight[LIGHT_TYPE.BOTTOM] > 0) {
-                //         this.drawLine(pos, this.ellipsePos, i);
-                //     }
-                // }
+                // Use the local state to draw the lines. 
+                if (this.ellipsePos['y'] < this.p5.height/2) {
+                    let pos = light.topPos;
+                    let height = light.getHeight(LIGHT_TYPE.TOP);
+                    if (height < this.p5.height/2 && height > 0) {
+                        this.drawLine(pos, this.ellipsePos, i);
+                    }
+                } else {
+                    let pos = light.bottomPos;
+                    let height = light.getHeight(LIGHT_TYPE.BOTTOM);
+                    if (height < this.p5.height/2 && height > 0) {
+                        this.drawLine(pos, this.ellipsePos, i);
+                    }
+                }
             }
 
             // Draw ellipse tracking the mouse. 
@@ -76,21 +70,23 @@ export default class MeshManager {
     }
 
     drawEllipse() {
-        // Outer ellipse boundary 
-        this.p5.fill(this.p5.color(255, 255, 255, 50));
-        this.p5.noStroke();
-        this.p5.ellipse(this.ellipsePos['x'], this.ellipsePos['y'], this.boundaryWidth);  
+        // // Outer ellipse boundary 
+        // this.p5.fill(this.p5.color(255, 255, 255, 50));
+        // this.p5.noStroke();
+        // this.p5.ellipse(this.ellipsePos['x'], this.ellipsePos['y'], this.boundaryWidth);  
 
         // Inner ellipse
-        this.p5.fill(this.p5.color(255, 255, 255, 200));
+        this.p5.fill(this.p5.color(255, 255, 255, 150));
         this.p5.strokeWeight(3);
         this.p5.stroke(this.p5.color('black'));
-        this.p5.ellipse(this.ellipsePos['x'], this.ellipsePos['y'], 30);  
+        this.p5.ellipse(this.ellipsePos['x'], this.ellipsePos['y'], 50);  
     }
 
     drawLine(startPoint, endPoint, i) {
-        this.p5.stroke(this.p5.color(255, 255, 255, (i+1)*5));
-        this.p5.strokeWeight(2);
+        let opacity = this.p5.map(i, 0, 24, 100, 200);
+        let weight = this.p5.map(i, 0, 25, 2, 4);
+        this.p5.stroke(this.p5.color(255, 255, 255, opacity));
+        this.p5.strokeWeight(weight);
         this.p5.line(startPoint['x'], startPoint['y'], endPoint['x'], endPoint['y']);
     }
 }

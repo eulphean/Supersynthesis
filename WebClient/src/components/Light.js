@@ -107,7 +107,7 @@ export default class Light {
                     if (curHeight < this.p5.height/2) {
                         curHeight += GROW_FACTOR;
                         LightConfigStore.setHeightState(this.curIdx, lightType, curHeight);
-                        // this.mapPos(lightType);
+                        this.mapPos(lightType, curHeight);
                     } else {
                         // Deactivate the current light. 
                         LightConfigStore.setGrowState(this.curIdx, lightType, GROW_STATE.NONE, false);
@@ -119,7 +119,7 @@ export default class Light {
                     if (curHeight > 0) {
                         curHeight -= GROW_FACTOR; 
                         LightConfigStore.setHeightState(this.curIdx, lightType, curHeight);
-                        // this.mapPos(lightType);
+                        this.mapPos(lightType, curHeight);
                     } else {
                         // Deactivate the current light. 
                         LightConfigStore.setGrowState(this.curIdx, lightType, GROW_STATE.NONE, false);
@@ -133,11 +133,11 @@ export default class Light {
         }
     }
 
-    mapPos(lightType) {
+    mapPos(lightType, height) {
         if (lightType === LIGHT_TYPE.TOP) {
-            this.topPos['y'] = this.p5.map(this.lightHeight[LIGHT_TYPE.TOP], 0, this.p5.height/2, this.p5.height/2, 0);
+            this.topPos['y'] = this.p5.map(height, 0, this.p5.height/2, this.p5.height/2, 0);
         } else {
-            this.bottomPos['y'] = this.p5.map(this.lightHeight[LIGHT_TYPE.BOTTOM], 0, this.p5.height/2, this.p5.height/2, this.p5.height);
+            this.bottomPos['y'] = this.p5.map(height, 0, this.p5.height/2, this.p5.height/2, this.p5.height);
         }
     }
 

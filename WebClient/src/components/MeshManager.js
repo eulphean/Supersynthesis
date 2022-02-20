@@ -28,26 +28,26 @@ export default class MeshManager {
             for (let i = 0; i < lights.length; i++) {
                 let light = lights[i];
 
-                // Use the config state values to check which lines to draw.
-                let lightConfigState = LightConfigStore.getState(i);
+                // // Use the config state values to check which lines to draw.
+                // let lightConfigState = LightConfigStore.getState(i);
 
-                // Use the local state to draw the lines. 
-                if (lightConfigState[LIGHT_TYPE.TOP] === LIGHT_STATE.ON) {
-                    let pos = light.topPos;
-                    if (light.lightHeight[LIGHT_TYPE.TOP] < this.p5.height/2 && 
-                            light.lightHeight[LIGHT_TYPE.TOP] > 0) {
-                        this.drawLine(pos, this.ellipsePos, i);
-                    }
-                }
+                // // Use the local state to draw the lines. 
+                // if (lightConfigState[LIGHT_TYPE.TOP] === LIGHT_STATE.ON) {
+                //     let pos = light.topPos;
+                //     if (light.lightHeight[LIGHT_TYPE.TOP] < this.p5.height/2 && 
+                //             light.lightHeight[LIGHT_TYPE.TOP] > 0) {
+                //         this.drawLine(pos, this.ellipsePos, i);
+                //     }
+                // }
 
-                // Use the local state to draw the lines.
-                if (lightConfigState[LIGHT_TYPE.BOTTOM] === LIGHT_STATE.ON) {
-                    let pos = light.bottomPos;
-                    if (light.lightHeight[LIGHT_TYPE.BOTTOM] < this.p5.height/2 && 
-                        light.lightHeight[LIGHT_TYPE.BOTTOM] > 0) {
-                        this.drawLine(pos, this.ellipsePos, i);
-                    }
-                }
+                // // Use the local state to draw the lines.
+                // if (lightConfigState[LIGHT_TYPE.BOTTOM] === LIGHT_STATE.ON) {
+                //     let pos = light.bottomPos;
+                //     if (light.lightHeight[LIGHT_TYPE.BOTTOM] < this.p5.height/2 && 
+                //         light.lightHeight[LIGHT_TYPE.BOTTOM] > 0) {
+                //         this.drawLine(pos, this.ellipsePos, i);
+                //     }
+                // }
             }
 
             // Draw ellipse tracking the mouse. 

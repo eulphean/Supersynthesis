@@ -159,8 +159,8 @@ class LightManager {
         // Top and Bottom lights.
         for (let i = 0; i < this.lights.length; i++) {
             let light = this.lights[i];
-            light.setDrawState(LIGHT_TYPE.TOP, LIGHT_TYPE.OFF);
-            light.setDrawState(LIGHT_TYPE.BOTTOM, LIGHT_TYPE.OFF);
+            light.setDrawState(LIGHT_TYPE.TOP, false);
+            light.setDrawState(LIGHT_TYPE.BOTTOM, false);
         }
 
         // Keeps track of the lights. 

@@ -4,17 +4,12 @@
   Date: 02/19/2022
   Description: A class representing each light that is painted on the canvas. 
 */
-import { LIGHT_TYPE, LIGHT_STATE } from "../stores/LightConfigStore";
-export const GROW_STATE = {
-    NONE: 0,
-    GROW: 1,
-    SHRINK: 2
-}
+import LightConfigStore, { LIGHT_TYPE, LIGHT_STATE, GROW_STATE } from "../stores/LightConfigStore";
 
 const GROW_FACTOR = 2.5;
 
 export default class Light {
-    constructor(s, xPos, yPos, lightWidth) {
+    constructor(s, i, xPos, yPos, lightWidth) {
         // Sketch object. 
         this.p5 = s; 
 
@@ -24,29 +19,19 @@ export default class Light {
         // Origin point at the center.
         this.pos = this.p5.createVector(xPos, yPos);
         
-        let newX = this.getNewPos() + this.lightWidth/2; // Keep this at the center of the light.
         // Point at the top. 
+        let newX = this.getNewPos() + this.lightWidth/2; // Keep this at the center of the light.
         this.topPos = this.p5.createVector(newX, yPos - this.p5.height/2);
         // Point at the bottom.
         this.bottomPos = this.p5.createVector(newX, yPos + this.p5.height/2);        
-
-        // Is this getting draw or not? 
-        this.drawState = {
-            'TOP': -1,
-            'BOTTOM': -1
-        }
-        this.growState = {
-            'TOP': GROW_STATE.NONE,
-            'BOTTOM': GROW_STATE.NONE
-        }
-        this.lightHeight = {
-            'TOP': 0,
-            'BOTTOM': 0
-        };
-
+        
         // Colors. 
         this.lightColor = this.p5.color('white');
         this.lightPointColor = this.p5.color('green'); // Only debug.
+
+        // Store the current light config. 
+        this.curIdx = i; 
+        this.setHeight(); 
     }
 
     draw() {
@@ -54,17 +39,19 @@ export default class Light {
         this.p5.fill(this.lightColor);
         this.p5.noStroke();
 
-        this.handleGrowState(LIGHT_TYPE.TOP);
-        this.handleGrowState(LIGHT_TYPE.BOTTOM);
+        //this.handleGrowState(LIGHT_TYPE.TOP);
+        //this.handleGrowState(LIGHT_TYPE.BOTTOM);
 
         // Am I supposed to draw this top light? 
-        if (this.drawState[LIGHT_TYPE.TOP] === LIGHT_STATE.ON) {
-            this.p5.rect(newX, this.pos['y'], this.lightWidth, -this.lightHeight['TOP']);
+        if (this.canDraw(LIGHT_TYPE.TOP)) {
+            let height = this.getHeight(LIGHT_TYPE.TOP);
+            this.p5.rect(newX, this.pos['y'], this.lightWidth, -height);
         }
 
         // Am I supposed to draw this bottom light?
-        if (this.drawState[LIGHT_TYPE.BOTTOM] === LIGHT_STATE.ON) {
-            this.p5.rect(newX, this.pos['y'], this.lightWidth, this.lightHeight['BOTTOM']);    
+        if (this.canDraw(LIGHT_TYPE.BOTTOM)) {
+            let height = this.getHeight(LIGHT_TYPE.BOTTOM);
+            this.p5.rect(newX, this.pos['y'], this.lightWidth, height);    
         }
     }
 
@@ -115,12 +102,24 @@ export default class Light {
         return this.pos['x'] + this.lightWidth/2; 
     }
 
-    // Only the draw state is stored here. 
-    setDrawState(lightType, lightState) {
-        this.drawState[lightType] = lightState;
+    getHeight(lightType) {
+        let heightState = LightConfigStore.getHeightState(this.curIdx);
+        return heightState[lightType];
     }
 
-    updateGrowState(isTop, state) {
+    // Should this light be drawn? 
+    canDraw(lightType) {
+        let drawState = LightConfigStore.getDrawState(this.curIdx);
+        return drawState[lightType]; // It's true or false
+    }
+
+    // Is this light on? 
+    isOn(lightType) {
+        let lightState = LightConfigStore.getLightState(this.curIdx);
+        return lightState[lightType] === LIGHT_STATE.ON; 
+    }
+
+    setGrowState(isTop, state) {
         if (isTop) {
             this.topVal = state; 
         } else {
@@ -128,22 +127,35 @@ export default class Light {
         }
     }
 
-    // Set the height of the light based on its original configuration.
-    setHeight(configState) {
-        if (configState[LIGHT_TYPE.TOP] === LIGHT_STATE.ON) {
-            this.lightHeight[LIGHT_TYPE.TOP] = this.p5.height/2;
+    setDrawState(lightType, state) {
+        LightConfigStore.setDrawState(this.curIdx, lightType, state); 
+    }
+
+    // Set light heights based on the light configurations.
+    // Call this functions when new configs are received. 
+    setHeight() {
+        let lightState = LightConfigStore.getLightState(this.curIdx);         
+        let onHeight = this.p5.height/2;
+        let offHeight = 0;
+
+        // TOP light. 
+        let lightType = LIGHT_TYPE.TOP; 
+        if (lightState[lightType] === LIGHT_STATE.ON) {
+            LightConfigStore.setHeightState(this.curIdx, lightType, onHeight);
         }
 
-        if (configState[LIGHT_TYPE.TOP] === LIGHT_STATE.OFF) {
-            this.lightHeight[LIGHT_TYPE.TOP] = 0;
+        if (lightState[lightType] === LIGHT_STATE.OFF) {
+            LightConfigStore.setHeightState(this.curIdx, lightType, offHeight);
         }
 
-        if (configState[LIGHT_TYPE.BOTTOM] === LIGHT_STATE.ON) {
-            this.lightHeight[LIGHT_TYPE.BOTTOM] = this.p5.height/2;
+        // BOTTOM light. 
+        lightType = LIGHT_TYPE.BOTTOM; 
+        if (lightState[lightType] === LIGHT_STATE.ON) {
+            LightConfigStore.setHeightState(this.curIdx, lightType, onHeight);
         }
 
-        if (configState[LIGHT_TYPE.BOTTOM] === LIGHT_STATE.OFF) {
-            this.lightHeight[LIGHT_TYPE.BOTTOM] = 0;
+        if (lightState[lightType] === LIGHT_STATE.OFF) {
+            LightConfigStore.setHeightState(this.curIdx, lightType, offHeight);
         }
     }
 }

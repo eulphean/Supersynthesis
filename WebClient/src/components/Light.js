@@ -38,13 +38,13 @@ export default class Light {
         setInterval(this.randomizeGrowState.bind(this), 3000); 
     }
 
-    draw(isUserInteracting) {
+    draw(isUserInteracting, isCurrentlyGrowing) {
         let newX = this.getNewPos();
         this.p5.fill(this.lightColor);
         this.p5.noStroke();
 
         // If user is interacting? Draw everything
-        if (isUserInteracting) {
+        if (isUserInteracting || isCurrentlyGrowing) {
             this.handleGrowState(LIGHT_TYPE.TOP);
             this.handleGrowState(LIGHT_TYPE.BOTTOM);
 
@@ -172,6 +172,11 @@ export default class Light {
         return lightState[lightType] === LIGHT_STATE.ON; 
     }
 
+    isGrowing(lightType) {
+        let v = LightConfigStore.getGrowState(this.curIdx)[lightType]['active'];
+        return v;
+    }
+
     updateGrowState(lightType) {
         let curLightState = LightConfigStore.getLightState(this.curIdx)[lightType];
         let curGrowState = LightConfigStore.getGrowState(this.curIdx)[lightType]; 
@@ -186,7 +191,7 @@ export default class Light {
                 if (curGrowState['state'] === GROW_STATE.SHRINK) {
                     LightConfigStore.setGrowState(this.curIdx, lightType, GROW_STATE.SHRINK, true);
                     // This light will not be turned on anymore.  
-                    LightConfigStore.setLightState(this.curIdx, lightType, LIGHT_STATE.OFF);
+                    LightConfigStore.setLightState(this.curIdx, lightType, LIGHT_STATE.OFF);                
                 } else {
                     // Pass, we can't grow a light that's already on. 
 
@@ -241,3 +246,14 @@ export default class Light {
         }
     }
 }
+
+
+    // Fired when new light updates are received. 
+    // updateLights() {
+    //     console.log('New lights received: Update the light heights.');
+    //     for (let i = 0; i < NUM_LIGHTS; i++) {
+    //         let l = this.lights[i]; 
+    //         // let configState = LightConfigStore.getState(i);
+    //         // l.setHeight(configState);
+    //     }
+    // }

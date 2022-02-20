@@ -59,7 +59,7 @@ export default class MeshManager {
     // Calculate new ellipse position. 
     containEllipse() {
         if (this.ellipsePos['x'] > this.p5.width) {
-        this.ellipsePos['x'] = this.p5.width;
+            this.ellipsePos['x'] = this.p5.width;
         } 
 
         if (this.ellipsePos['x'] < 0) {

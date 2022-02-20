@@ -19,8 +19,9 @@ export default class LightManager {
         this.lights = [];
         this.curTime = Date.now();
         this.gliderIdx = 0;
-        this.allLightsOff = false; 
         this.direction = true; // True - Right, False - Left
+        this.allLightsOff = false; 
+        this.isCurrentlyGrowing = false; 
     }
     
     setup() {
@@ -41,16 +42,6 @@ export default class LightManager {
             this.lights.push(l);
         }
     }
-
-    // Fired when new light updates are received. 
-    // updateLights() {
-    //     console.log('New lights received: Update the light heights.');
-    //     for (let i = 0; i < NUM_LIGHTS; i++) {
-    //         let l = this.lights[i]; 
-    //         // let configState = LightConfigStore.getState(i);
-    //         // l.setHeight(configState);
-    //     }
-    // }
     
     draw(isUserInteracting, meshEllipsePos, boundaryWidth) {
         // Is user interacting? Draw all the lights. 
@@ -58,13 +49,15 @@ export default class LightManager {
             // Control the lights. 
             this.handleUserInteracting(meshEllipsePos, boundaryWidth);
         } else {
+            // Reset this value here. 
+            this.isCurrentlyGrowing = false;  
             // Cycle the lights from left to right, then right to left. 
             this.handleUserNotInteracting(); 
-        } 
+        }
 
         // Draw the lights based on the state. 
         for (let i = 0; i < this.lights.length; i++) {
-            this.lights[i].draw(isUserInteracting);
+            this.lights[i].draw(isUserInteracting, this.isCurrentlyGrowing);
         }
     }
 
@@ -72,27 +65,7 @@ export default class LightManager {
         // Update the light configuration based on the ellipse. 
         this.updateLightConfig(meshEllipsePos, boundaryWidth);
 
-        for (let i = 0; i < this.lights.length; i++) {
-            let light = this.lights[i];
-
-            let lightType = LIGHT_TYPE.TOP; 
-            if (light.isOn(lightType)) {
-                light.updateDrawState(lightType, true);
-            }
-            // We want to be showing the ones that are currently off in the 
-            // interaction part because they are actually shrinking, so we
-            // don't disable the draw state on this. 
-            lightType = LIGHT_TYPE.BOTTOM; 
-            if (light.isOn(lightType)) {
-                light.updateDrawState(lightType, true);
-            }
-            // We want to be showing the ones that are currently off in the 
-            // interaction part because they are actually shrinking, so we
-            // don't disable the draw state on this. 
-        }
-
-        // All lights are not off. 
-        this.allLightsOff = false; 
+        this.allLightsOff = false;
     }
 
     updateLightConfig(meshEllipsePos, boundaryWidth) {
@@ -121,53 +94,57 @@ export default class LightManager {
     }
 
     handleUserNotInteracting() {
-        // TODO: Wait for the grow animation to finish for the lights,
-        // then start the beating the lights based on the bpm. Don't really
-        // need to do this. 
-        // Are lights on?
-        if (!this.allLightsOff) {
-            this.turnOffAllLights(); 
-            console.log('Switch all lights off.');
-            // Reset glider
-            this.gliderIdx = 0; 
-            this.curTime = Date.now();
+        // Are all lights completely grown out? 
+        // Are the Grow states on all lights set to none?
+        for (let i = 0; i < this.lights.length; i++) {
+            let light = this.lights[i];
+            let top = light.isGrowing(LIGHT_TYPE.TOP);
+            let bottom = light.isGrowing(LIGHT_TYPE.BOTTOM);
+            this.isCurrentlyGrowing = this.isCurrentlyGrowing || top || bottom; 
         }
 
-        let elapsedTime  = Date.now() - this.curTime;
-        if (elapsedTime > TIME_ON) {
-            // Get the current light. 
-            let light = this.lights[this.gliderIdx];
+        if (!this.isCurrentlyGrowing & !this.allLightsOff) {
+            this.resetSystem();
+        }
 
-            // Are we going right? 
-            if (this.direction) {
-                if (light.isOn(LIGHT_TYPE.TOP)) {
-                    light.updateDrawState(LIGHT_TYPE.TOP, true);
-                    this.curTime = Date.now();
+        if (!this.isCurrentlyGrowing) {
+            let elapsedTime  = Date.now() - this.curTime;
+            if (elapsedTime > TIME_ON) {
+                // Get the current light. 
+                let light = this.lights[this.gliderIdx];
+    
+                // Are we going right? 
+                if (this.direction) {
+                    if (light.isOn(LIGHT_TYPE.TOP)) {
+                        light.updateDrawState(LIGHT_TYPE.TOP, true);
+                        this.curTime = Date.now();
+                    }
+                    this.gliderIdx += 1;
+                } else {
+                    // We are definitely going left. 
+                    if (light.isOn(LIGHT_TYPE.BOTTOM)) {
+                        light.updateDrawState(LIGHT_TYPE.BOTTOM, true);
+                        this.curTime = Date.now();
+                    }
+                    this.gliderIdx -= 1;
                 }
-                this.gliderIdx += 1;
-            } else {
-                // We are definitely going left. 
-                if (light.isOn(LIGHT_TYPE.BOTTOM)) {
-                    light.updateDrawState(LIGHT_TYPE.BOTTOM, true);
-                    this.curTime = Date.now();
+    
+                // We have reached the right most point, start the bottom row. 
+                if (this.gliderIdx === NUM_LIGHTS) {
+                    this.gliderIdx = NUM_LIGHTS - 1;
+                    this.direction = false; 
                 }
-                this.gliderIdx -= 1;
-            }
-
-            // We have reached the right most point, start the bottom row. 
-            if (this.gliderIdx === NUM_LIGHTS) {
-                this.gliderIdx = NUM_LIGHTS - 1;
-                this.direction = false; 
-            }
-
-            if (this.gliderIdx < 0) {
-                // Turn off all the lights and start again. 
-                this.resetSystem();
+    
+                if (this.gliderIdx < 0) {
+                    // Turn off all the lights and start again. 
+                    this.resetSystem();
+                }
             }
         }
     }
 
     turnOffAllLights() {
+        console.log('Switch off all lights');
         // Top and Bottom lights.
         for (let i = 0; i < this.lights.length; i++) {
             let light = this.lights[i];
@@ -175,7 +152,6 @@ export default class LightManager {
             light.updateDrawState(LIGHT_TYPE.BOTTOM, false);
         }
 
-        // // Keeps track of the lights. 
         this.allLightsOff = true; 
     }
 

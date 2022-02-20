@@ -52,11 +52,11 @@ export default class LightManager {
     //     }
     // }
     
-    draw(isUserInteracting, meshEllipsePos) {
+    draw(isUserInteracting, meshEllipsePos, boundaryWidth) {
         // Is user interacting? Draw all the lights. 
         if (isUserInteracting) {
             // Control the lights. 
-            this.handleUserInteracting(meshEllipsePos);
+            this.handleUserInteracting(meshEllipsePos, boundaryWidth);
         } else {
             // Cycle the lights from left to right, then right to left. 
             this.handleUserNotInteracting(); 
@@ -64,27 +64,27 @@ export default class LightManager {
 
         // Draw the lights based on the state. 
         for (let i = 0; i < this.lights.length; i++) {
-            this.lights[i].draw();
+            this.lights[i].draw(isUserInteracting);
         }
     }
 
-    handleUserInteracting(meshEllipsePos) {       
-        // CORE CORE CORE ALGORITHM>!
-        //this.updateLightConfig(meshEllipsePos);
+    handleUserInteracting(meshEllipsePos, boundaryWidth) {       
+        // Update the light configuration based on the ellipse. 
+        this.updateLightConfig(meshEllipsePos, boundaryWidth);
 
         for (let i = 0; i < this.lights.length; i++) {
             let light = this.lights[i];
 
             let lightType = LIGHT_TYPE.TOP; 
             if (light.isOn(lightType)) {
-                light.setDrawState(lightType, LIGHT_STATE.ON);
+                light.updateDrawState(lightType, true);
             }
             // We want to be showing the ones that are currently off in the 
             // interaction part because they are actually shrinking, so we
             // don't disable the draw state on this. 
             lightType = LIGHT_TYPE.BOTTOM; 
             if (light.isOn(lightType)) {
-                light.setDrawState(lightType, LIGHT_STATE.ON);
+                light.updateDrawState(lightType, true);
             }
             // We want to be showing the ones that are currently off in the 
             // interaction part because they are actually shrinking, so we
@@ -95,35 +95,29 @@ export default class LightManager {
         this.allLightsOff = false; 
     }
 
-    updateLightConfig(meshEllipsePos) {
-        // for (let i = 0; i < this.lights.length; i++) {
-        //     let light = this.lights[i];
-            
-        //     let d = meshEllipsePos.dist(light.pos);
-        //     if (meshEllipsePos['y'] < this.p5.height/2) {
-        //         // Have we crossed a certain threshold? 
-        //         if (d > this.p5.height / 2) {
-        //             // Update the config states. 
-        //             LightConfigStore.setState(i, LIGHT_TYPE.TOP, LIGHT_STATE.ON);
-        //             light.growState[LIGHT_TYPE.TOP] = GROW_STATE.GROW; 
-        //         } else {
-        //             // Update the config states. 
-        //             LightConfigStore.setState(i, LIGHT_TYPE.TOP, LIGHT_STATE.OFF);
-        //             light.growState[LIGHT_TYPE.TOP] = GROW_STATE.SHRINK;
-        //         }
-        //     } else {
-        //         // Handle the bottom lights. 
-        //         if (d > this.p5.height / 2) {
-        //             // Just update the local state. Based on the current local state,
-        //             // draw states will be updated automatically.
-        //             LightConfigStore.setState(i, LIGHT_TYPE.BOTTOM, LIGHT_STATE.ON);
-        //             light.growState[LIGHT_TYPE.BOTTOM] = GROW_STATE.GROW; 
-        //         } else {
-        //             LightConfigStore.setState(i, LIGHT_TYPE.BOTTOM, LIGHT_STATE.OFF);
-        //             light.growState[LIGHT_TYPE.BOTTOM] = GROW_STATE.SHRINK;
-        //         }
-        //     }
-        // }
+    updateLightConfig(meshEllipsePos, boundaryWidth) {
+        for (let i = 0; i < this.lights.length; i++) {
+            let light = this.lights[i];
+
+            // Distance from the ellipse to the light's position. 
+            let d = meshEllipsePos.dist(light.pos);
+
+            // Is the ellipse above the half-way line? 
+            if (meshEllipsePos['y'] < this.p5.height/2) {
+                // Handle the top lights. 
+                // Have we crossed the threshold? 
+                if (d < boundaryWidth/2) {
+                    // This light is activated, grow or shrink. 
+                    light.updateGrowState(LIGHT_TYPE.TOP);
+                }
+            } else { // Is the ellipse below the half-way line? 
+                // Handle the bottom lights. 
+                if (d < boundaryWidth/2) {
+                    // This light is activated, grow or shrink. 
+                    light.updateGrowState(LIGHT_TYPE.BOTTOM);
+                }
+            }
+        }
     }
 
     handleUserNotInteracting() {
@@ -147,14 +141,14 @@ export default class LightManager {
             // Are we going right? 
             if (this.direction) {
                 if (light.isOn(LIGHT_TYPE.TOP)) {
-                    light.setDrawState(LIGHT_TYPE.TOP, true);
+                    light.updateDrawState(LIGHT_TYPE.TOP, true);
                     this.curTime = Date.now();
                 }
                 this.gliderIdx += 1;
             } else {
                 // We are definitely going left. 
                 if (light.isOn(LIGHT_TYPE.BOTTOM)) {
-                    light.setDrawState(LIGHT_TYPE.BOTTOM, true);
+                    light.updateDrawState(LIGHT_TYPE.BOTTOM, true);
                     this.curTime = Date.now();
                 }
                 this.gliderIdx -= 1;
@@ -177,8 +171,8 @@ export default class LightManager {
         // Top and Bottom lights.
         for (let i = 0; i < this.lights.length; i++) {
             let light = this.lights[i];
-            light.setDrawState(LIGHT_TYPE.TOP, false);
-            light.setDrawState(LIGHT_TYPE.BOTTOM, false);
+            light.updateDrawState(LIGHT_TYPE.TOP, false);
+            light.updateDrawState(LIGHT_TYPE.BOTTOM, false);
         }
 
         // // Keeps track of the lights. 

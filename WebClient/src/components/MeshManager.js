@@ -14,6 +14,7 @@ export default class MeshManager {
     constructor(s) {
         this.p5 = s; 
         this.ellipsePos = this.p5.createVector(0, 0);
+        this.boundaryWidth = this.p5.height/2;
     }
 
     draw(isUserInteracting, lights) {
@@ -75,6 +76,12 @@ export default class MeshManager {
     }
 
     drawEllipse() {
+        // Outer ellipse boundary 
+        this.p5.fill(this.p5.color(255, 255, 255, 50));
+        this.p5.noStroke();
+        this.p5.ellipse(this.ellipsePos['x'], this.ellipsePos['y'], this.boundaryWidth);  
+
+        // Inner ellipse
         this.p5.fill(this.p5.color(255, 255, 255, 200));
         this.p5.strokeWeight(3);
         this.p5.stroke(this.p5.color('black'));

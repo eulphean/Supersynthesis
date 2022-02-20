@@ -3,6 +3,7 @@
 // Date: 02/19/2022
 // Description: This data store is responsible to hold bpm, all 48 lights and number of entries.
 // This data will be stored in the database. Components that need this data will subscribe to this store.  
+
 export const LIGHT_TYPE = {
     TOP: 'TOP',
     BOTTOM: 'BOTTOM'
@@ -107,8 +108,9 @@ class LightConfigStore {
     getGrowState(i) {
         return this.lightConfig[i]['grow'];
     }
-    setGrowState(i, lightType, state) {
-        this.lightConfig[i]['grow'][lightType]['state'] = state; 
+    setGrowState(i, lightType, growState, activeState) {
+        this.lightConfig[i]['grow'][lightType]['state'] = growState;
+        this.lightConfig[i]['grow'][lightType]['active'] = activeState;
     }
 
     // GET/SET light's draw state. 

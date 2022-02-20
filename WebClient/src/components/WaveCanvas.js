@@ -27,7 +27,7 @@ var sketch = (s) => {
 
   s.draw = () => {
     s.background(s.color(0, 0, 0));  
-    lightManager.draw(isUserInteracting, meshManager.ellipsePos);
+    lightManager.draw(isUserInteracting, meshManager.ellipsePos, meshManager.boundaryWidth);
     s.drawCenterLine();
     meshManager.draw(isUserInteracting, lightManager.lights); 
   };

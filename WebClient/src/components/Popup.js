@@ -206,7 +206,8 @@ const styles={
         flexDirection: 'column',
         justifyContent: 'center',
         fontFamily: fontFamily.josefin,
-        fontSize: fontSize.lessSmall,
+        letterSpacing: '1.5px',
+        fontSize: fontSize.small,
         color: color.fgWhite
     },
 
@@ -257,23 +258,31 @@ const styles={
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        marginBottom: padding.big,
-        marginTop: padding.big
+        marginTop: padding.veryBig,
+        fontFamily: fontFamily.josefin,
+        letterSpacing: '1.5px',
     },
 
     footer: {
         display: 'flex',
         alignItems: 'center',
         marginTop: padding.verySmall,
-        fontSize: fontSize.verySmall,
-        letterSpacing: '2.0px',
+        fontSize: fontSize.small,
         '@media (min-width: 750px)': {  
             fontSize: fontSize.small,
         }
     },
 
+    copyright: {
+        marginTop: padding.veryBig,
+        fontSize: fontSize.verySmall,
+        marginBottom: padding.small
+    },
+
     link: {
-        textDecoration: 'underline'
+        backgroundColor: color.fgWhite,
+        color: color.bgBlack,
+        padding: padding.tiny
     }
 }
 
@@ -393,10 +402,7 @@ class Popup extends React.Component {
                         Timothy Kwasny
                     </a>
                 </div>
-                <div style={styles.footer}>
-                    <span style={styles.developed}>©</span>
-                    <span style={styles.developed}>&nbsp;2022</span>
-                </div>
+                <div style={styles.copyright}>© Amay Kataria 2022</div>
             </div>
         )
     }

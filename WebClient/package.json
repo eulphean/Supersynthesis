@@ -5,10 +5,10 @@
   "homepage": "https://supersynthesis.art",
   "dependencies": {
     "gh-pages": "^2.1.1",
+    "p5": "^1.4.1",
     "radium": "^0.26.0",
     "react": "^16.13.1",
     "react-animations": "^1.0.0",
-    "p5": "^1.4.1",
     "react-dom": "^16.12.0",
     "react-scripts": "3.4.0",
     "socket.io-client": "^4.0.0"

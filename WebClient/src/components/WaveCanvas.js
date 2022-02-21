@@ -66,7 +66,8 @@ const styles = {
     backgroundColor: color.bgBlack,
     height: '82vh',
     margin: 0,
-    padding: 0
+    padding: 0,
+    zIndex: 1
   }
 };
 

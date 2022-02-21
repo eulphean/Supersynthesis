@@ -6,6 +6,7 @@
 */
 import React from 'react'
 import Radium from 'radium'
+import Popup from './Popup'
 import { ReactComponent as About } from '../svg/about.svg'
 import {color, fontFamily, fontSize, padding} from './CommonStyles'
 
@@ -32,6 +33,7 @@ const styles = {
         height: '10vh',
         paddingLeft: padding.small,
         paddingRight: padding.small,
+        zIndex: 1
     },
 
     title: {
@@ -62,19 +64,19 @@ class Navbar extends React.Component {
   constructor(props) {
     super(props); 
     this.state={
-
     }
+
+    this.popupRef = React.createRef(); 
   }
 
   render() {
     let aboutStyle = [styles.iconContainer, styles.simpleRotation];
     return (
       <div style={styles.block}>
+        <Popup ref={this.popupRef}/>
         <div style={styles.container}>
           <div style={styles.title}>supersynthesis</div>
-          <div style={aboutStyle} 
-            onClick={this.handleAbout.bind(this)}
-          >
+          <div style={aboutStyle} onClick={this.handleAbout.bind(this)}>
             <About style={styles.icon} />
           </div>
         </div>
@@ -84,6 +86,7 @@ class Navbar extends React.Component {
 
   handleAbout() {
     console.log('Create a popup.');
+    this.popupRef.current.showPopup();
   }
 }
 

@@ -27,7 +27,8 @@ const styles = {
         color: color.fbWhite,
         fontFamily: fontFamily.josefin,
         fontSize: fontSize.lessBig,
-        letterSpacing: '2px'
+        letterSpacing: '2px',
+        zIndex: 1
     },
 
     info: {

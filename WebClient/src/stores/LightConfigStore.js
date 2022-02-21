@@ -30,7 +30,7 @@ class LightConfigStore {
 
         // Default values. 
         this.configIndex = 0; 
-        this.bpm = 0;
+        this.bpm = 150;
         this.lightConfig = [];
 
         // Default light config for 24 lights. 
@@ -38,7 +38,6 @@ class LightConfigStore {
     }
 
     subscribeLights(listener) {
-        console.log('Subscribe Lights');
         this.lightSubscribers.push(listener); 
         const removeListener = () => {
             this.lightSubscribers = this.lightSubscribers.filter((s) => listener !== s);
@@ -131,6 +130,17 @@ class LightConfigStore {
 
     getRandomInt(max) {
         return Math.floor(Math.random() * max);
+    }
+
+    getBpm() {
+        return this.bpm;
+    }
+    setBpm(bpm) {
+        this.bpm = bpm; 
+        // Trigger info subscribers. 
+        for (let i = 0; i < this.infoSubscribers.length; i++) {
+            this.infoSubscribers[i]();
+        }
     }
 
     // Increment the config index because this will be a new entry.

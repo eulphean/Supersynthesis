@@ -11,10 +11,11 @@ import {color} from './CommonStyles'
 import p5 from 'p5'
 import LightManager from './LightManager'
 import MeshManager from './MeshManager'
+import BpmManager from './BpmManager'
 
 var sketch = (s) => {
   let isUserInteracting = false;
-  let lightManager, meshManager; 
+  let lightManager, meshManager, bpmManager;
   s.setup = () => {
     let canvasContainer = s.select('#canvasContainer');
     let height = canvasContainer.height;
@@ -22,6 +23,7 @@ var sketch = (s) => {
 
     lightManager = new LightManager(s);
     meshManager = new MeshManager(s);
+    bpmManager = new BpmManager(s); 
     lightManager.setup();
   };
 
@@ -30,6 +32,7 @@ var sketch = (s) => {
     lightManager.draw(isUserInteracting, meshManager.ellipsePos, meshManager.boundaryWidth);
     s.drawCenterLine();
     meshManager.draw(isUserInteracting, lightManager.lights); 
+    bpmManager.update(isUserInteracting, meshManager.ellipsePos, lightManager.lights);
   };
 
   s.drawCenterLine = () => {
@@ -50,12 +53,6 @@ var sketch = (s) => {
   s.mouseReleased = () => {
     isUserInteracting = false; 
   };
-
-  // s.keyPressed = () => {
-  //   if (s.keyCode == 32) {
-  //       lightManager.createNewLightConfig(); 
-  //   }
-  // };
 };
 
 // s.windowResized = () => {

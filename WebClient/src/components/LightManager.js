@@ -6,12 +6,9 @@
   in this project. 
 */
 import Light from './Light'
-import { LIGHT_TYPE, LIGHT_STATE, GROW_STATE } from "../stores/LightConfigStore";
+import LightConfigStore, { LIGHT_TYPE  } from "../stores/LightConfigStore";
 
 const NUM_LIGHTS = 24
-// TODO: Convert this to BPM. 
-// TODO: This should come from the user interaction. 
-const TIME_ON = 100; // 100 ms
 
 export default class LightManager {
     constructor(s) {
@@ -22,11 +19,19 @@ export default class LightManager {
         this.direction = true; // True - Right, False - Left
         this.allLightsOff = false; 
         this.isCurrentlyGrowing = false; 
+        this.timeOn = 0; 
     }
     
     setup() {
         // Prepare the light collection.
         this.prepareLights();
+        LightConfigStore.subscribeInfo(this.updateTimeOn.bind(this));
+    }
+
+    updateTimeOn() {
+        let newBpm = LightConfigStore.getBpm();
+        this.timeOn = (60 * 1000)/newBpm;
+        console.log('TimeOn: ' + this.timeOn);
     }
 
     prepareLights() {
@@ -103,13 +108,14 @@ export default class LightManager {
             this.isCurrentlyGrowing = this.isCurrentlyGrowing || top || bottom; 
         }
 
+        // A clean reset to the system. 
         if (!this.isCurrentlyGrowing & !this.allLightsOff) {
             this.resetSystem();
         }
 
         if (!this.isCurrentlyGrowing) {
             let elapsedTime  = Date.now() - this.curTime;
-            if (elapsedTime > TIME_ON) {
+            if (elapsedTime > this.timeOn) {
                 // Get the current light. 
                 let light = this.lights[this.gliderIdx];
     

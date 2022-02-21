@@ -6,7 +6,7 @@
   the moving lights on the canvas. 
 */
 
-import LightConfigStore, { LIGHT_TYPE, LIGHT_STATE } from "../stores/LightConfigStore";
+import { LIGHT_TYPE } from "../stores/LightConfigStore";
 
 // Handles all the code related to interaction with the canvas.
 const EASING = 0.015;  
@@ -79,7 +79,7 @@ export default class MeshManager {
         this.p5.fill(this.p5.color(255, 255, 255, 150));
         this.p5.strokeWeight(3);
         this.p5.stroke(this.p5.color('black'));
-        this.p5.ellipse(this.ellipsePos['x'], this.ellipsePos['y'], 50);  
+        this.p5.ellipse(this.ellipsePos['x'], this.ellipsePos['y'], 60);  
     }
 
     drawLine(startPoint, endPoint, i) {

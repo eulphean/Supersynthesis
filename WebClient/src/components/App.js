@@ -11,7 +11,7 @@ import Websocket from './Websocket'
 
 import Navbar from './Navbar';
 import WaveCanvas from './WaveCanvas';
-import Bottombar from './Bottombar';
+import BottomBar from './BottomBar';
 
 const styles = {
   container: {
@@ -49,7 +49,7 @@ class App extends React.Component {
       <div style={styles.container}>
         <Navbar />
         <WaveCanvas />
-        <Bottombar />
+        <BottomBar />
       </div>
     );
   }

@@ -36,7 +36,7 @@ const styles = {
     }
 };
 
-class Navbar extends React.Component {
+class BottomBar extends React.Component {
   constructor(props) {
     super(props); 
     this.state={
@@ -62,7 +62,7 @@ class Navbar extends React.Component {
     let idx = LightConfigStore.getConfigIndex();
     let bpm = LightConfigStore.getBpm(); 
     this.setState({
-      index: idx, 
+      index: idx + 1, 
       bpm: bpm
     });
   }
@@ -73,4 +73,4 @@ class Navbar extends React.Component {
   }
 }
 
-export default Radium(Navbar);
+export default Radium(BottomBar);

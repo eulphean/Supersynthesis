@@ -9,6 +9,20 @@ import Radium from 'radium'
 import { ReactComponent as About } from '../svg/about.svg'
 import {color, fontFamily, fontSize, padding} from './CommonStyles'
 
+const animation = {
+  rotate: Radium.keyframes({
+    '0%': {
+      transform: 'rotate(0deg)'
+    },
+    '50%': {
+      transform: 'rotate(180deg)',
+    },
+    '100%': {
+      transform: 'rotate(360deg)',
+    }
+  }),
+}
+
 const styles = {
     container: {
         display: 'flex',
@@ -30,8 +44,14 @@ const styles = {
     },
     
     iconContainer: {
-      marginTop: padding.kindaSmall
+      marginTop: padding.kindaSmall,
     },
+
+    simpleRotation: {
+      animation: 'x 30s ease-in-out infinite',
+      animationName: animation.rotate
+    },
+  
     icon: {
         width: '100%',
         height: '100%'
@@ -47,16 +67,23 @@ class Navbar extends React.Component {
   }
 
   render() {
+    let aboutStyle = [styles.iconContainer, styles.simpleRotation];
     return (
       <div style={styles.block}>
         <div style={styles.container}>
           <div style={styles.title}>supersynthesis</div>
-          <div style={styles.iconContainer}>
+          <div style={aboutStyle} 
+            onClick={this.handleAbout.bind(this)}
+          >
             <About style={styles.icon} />
           </div>
         </div>
       </div>
     );
+  }
+
+  handleAbout() {
+    console.log('Create a popup.');
   }
 }
 

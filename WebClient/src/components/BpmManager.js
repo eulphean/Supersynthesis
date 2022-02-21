@@ -7,6 +7,8 @@
 
 import LightConfigStore, { LIGHT_TYPE } from "../stores/LightConfigStore";
 
+const MAX_BPM = 250;
+const MIN_BPM = 100;
 export default class bpmManager {
     constructor(s) {
         this.p5 = s;
@@ -46,14 +48,15 @@ export default class bpmManager {
             // Calculate the new bpm. 
             this.curBpm = shouldAdd ? (this.curBpm + mapped) : (this.curBpm - mapped); 
             
-            if (this.curBpm < 100) {
-                this.curBpm = 100; 
+            if (this.curBpm < MIN_BPM) {
+                this.curBpm = MIN_BPM; 
             } 
 
-            if (this.curBpm > 250) {
-                this.curBpm = 250;
+            if (this.curBpm > MAX_BPM) {
+                this.curBpm = MAX_BPM;
             }
 
+            // Set BPM so all components can get the updates. 
             LightConfigStore.setBpm(Math.floor(this.curBpm));
         } else {
             // Keep snapshotting the time, so we can calculate

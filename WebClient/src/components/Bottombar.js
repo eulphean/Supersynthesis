@@ -59,8 +59,8 @@ class Navbar extends React.Component {
   }
 
   onInfoUpdate() {
-    let idx = LightConfigStore.configIndex;
-    let bpm = LightConfigStore.bpm; 
+    let idx = LightConfigStore.getConfigIndex();
+    let bpm = LightConfigStore.getBpm(); 
     this.setState({
       index: idx, 
       bpm: bpm

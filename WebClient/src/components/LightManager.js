@@ -28,10 +28,10 @@ export default class LightManager {
         LightConfigStore.subscribeInfo(this.updateTimeOn.bind(this));
     }
 
+    // New bpm received. 
     updateTimeOn() {
         let newBpm = LightConfigStore.getBpm();
         this.timeOn = (60 * 1000)/newBpm;
-        console.log('TimeOn: ' + this.timeOn);
     }
 
     prepareLights() {

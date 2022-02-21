@@ -142,6 +142,9 @@ class LightConfigStore {
             this.infoSubscribers[i]();
         }
     }
+    getConfigIndex() {
+        return this.configIndex;
+    }
 
     // Increment the config index because this will be a new entry.
     getPayloadForDatabase() {

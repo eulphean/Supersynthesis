@@ -41,6 +41,7 @@ const fadeInDuration = '0.5s';
 const slideInDuration = '2.0s'; 
 const fadeOutDuration = '1.5s';
 
+const aboutTheWork = 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.';
 const styles={
     overlay: {
         position: 'fixed',
@@ -172,14 +173,18 @@ const styles={
             paddingLeft: padding.extraMassive, 
             paddingRight: padding.extraMassive
         },
-        opacity: '0.8'
+        opacity: '0.8',
+        borderStyle: 'solid',
+        borderWidth: '1.5px',
+        borderColor: color.fgWhite
     },
 
     title: {
-        marginTop: padding.big,
+        marginTop: padding.lessSmall,
+        marginBottom: padding.small,
         textAlign: 'center',
-        // fontFamily: fontFamily.elliott,
-        fontSize: fontSize.veryBig,
+        fontFamily: fontFamily.airwaves,
+        fontSize: fontSize.huge,
         letterSpacing: '2.5px',
         lineHeight: '1.8',
        
@@ -199,10 +204,9 @@ const styles={
     body: {
         display: 'flex',
         flexDirection: 'column',
-        marginTop: padding.small,
         justifyContent: 'center',
-        // fontFamily: fontFamily.grotesk,
-        fontSize: fontSize.small,
+        fontFamily: fontFamily.josefin,
+        fontSize: fontSize.lessSmall,
         color: color.fgWhite
     },
 
@@ -254,49 +258,22 @@ const styles={
         flexDirection: 'column',
         alignItems: 'center',
         marginBottom: padding.big,
+        marginTop: padding.big
     },
 
     footer: {
         display: 'flex',
         alignItems: 'center',
-        color: color.fgWhite,
-        // fontFamily: fontFamily.grotesk,
+        marginTop: padding.verySmall,
         fontSize: fontSize.verySmall,
         letterSpacing: '2.0px',
-
-        '@media (min-width: 750px)': {  
-            fontSize: fontSize.small,
-        }
-    },
-    
-    footerFirst: {
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center'
-    },
-
-    footerSecond: {
-        marginTop: padding.tiny,
-    },
-
-    developed: {
-        fontSize: fontSize.verySmall,
-        // fontFamily: fontFamily.grotesk,
-        paddingLeft: padding.tiny, 
-        paddingRight: padding.tiny,
-        color: color.fgWhite,
-
         '@media (min-width: 750px)': {  
             fontSize: fontSize.small,
         }
     },
 
-    developer: {
-        marginLeft: padding.tiny
-    },
-
-    footerSpace: {
-        marginBottom: padding.extraBig
+    link: {
+        textDecoration: 'underline'
     }
 }
 
@@ -382,8 +359,8 @@ class Popup extends React.Component {
                 <div style={styles.stretchContainer}>
                     { iconButton }
                     <div style={bodyStyle}>
-                        Hi I am some text - I will be the info.
-                        I will be the boody.
+                        <div style={styles.title}>supersynthesis</div>
+                        <div style={styles.description}>{aboutTheWork}</div>                        
                     </div>
                     { footer }
                 </div>
@@ -392,30 +369,33 @@ class Popup extends React.Component {
     }
 
     getFooter() {
-        const jen = 'https://jennifertrainadorge.com/';
+        const tim = 'https://www.vaexhibitions.arts.columbia.edu/class-of-2021-first-years/timothy-kwasny';
         const amay = 'https://amaykataria.com';
         return (
             <div style={styles.footerContainer}>
-                <div style={styles.footerFirst}>
-                    <span style={styles.developed}>©&nbsp;</span>
+                <div style={styles.footer}>
+                    <span>Created by&nbsp;</span>
                     <a 
-                        style={styles.footer} 
-                        target='_blank' 
-                        rel="noopener noreferrer" 
-                        href={jen}>
-                        Jennifer Traina-Dorge
-                    </a>
-                    <span style={styles.developed}>&nbsp;2020</span>
-                </div>
-                <div style={[styles.footer, styles.footerSecond]}>
-                    <span style={styles.developed}>Developed by </span>
-                    <a 
-                        style={styles.developer} 
+                        style={styles.link} 
                         target='_blank' 
                         rel="noopener noreferrer" 
                         href={amay}>
                         Amay Kataria
                     </a>
+                </div>
+                <div style={styles.footer}>
+                    <span>Sound by&nbsp;</span>
+                    <a 
+                        style={styles.link} 
+                        target='_blank' 
+                        rel="noopener noreferrer" 
+                        href={tim}>
+                        Timothy Kwasny
+                    </a>
+                </div>
+                <div style={styles.footer}>
+                    <span style={styles.developed}>©</span>
+                    <span style={styles.developed}>&nbsp;2022</span>
                 </div>
             </div>
         )

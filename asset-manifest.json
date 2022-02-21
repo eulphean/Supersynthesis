@@ -1,24 +1,24 @@
 {
   "files": {
-    "main.css": "/supersynthesis/static/css/main.06e97ea4.chunk.css",
-    "main.js": "/supersynthesis/static/js/main.e1514336.chunk.js",
-    "main.js.map": "/supersynthesis/static/js/main.e1514336.chunk.js.map",
-    "runtime-main.js": "/supersynthesis/static/js/runtime-main.522b51db.js",
-    "runtime-main.js.map": "/supersynthesis/static/js/runtime-main.522b51db.js.map",
-    "static/js/2.2a01df87.chunk.js": "/supersynthesis/static/js/2.2a01df87.chunk.js",
-    "static/js/2.2a01df87.chunk.js.map": "/supersynthesis/static/js/2.2a01df87.chunk.js.map",
-    "index.html": "/supersynthesis/index.html",
-    "precache-manifest.e73a8d3db336ed09eee0563bb77400b1.js": "/supersynthesis/precache-manifest.e73a8d3db336ed09eee0563bb77400b1.js",
-    "service-worker.js": "/supersynthesis/service-worker.js",
-    "static/css/main.06e97ea4.chunk.css.map": "/supersynthesis/static/css/main.06e97ea4.chunk.css.map",
-    "static/js/2.2a01df87.chunk.js.LICENSE.txt": "/supersynthesis/static/js/2.2a01df87.chunk.js.LICENSE.txt",
-    "static/media/about.ea00a3b0.svg": "/supersynthesis/static/media/about.ea00a3b0.svg",
-    "static/media/stylesheet.css": "/supersynthesis/static/media/josefinsans-semibold-webfont.f1b2a5a6.woff2"
+    "main.css": "/static/css/main.4c993556.chunk.css",
+    "main.js": "/static/js/main.e1514336.chunk.js",
+    "main.js.map": "/static/js/main.e1514336.chunk.js.map",
+    "runtime-main.js": "/static/js/runtime-main.38b3c250.js",
+    "runtime-main.js.map": "/static/js/runtime-main.38b3c250.js.map",
+    "static/js/2.2a01df87.chunk.js": "/static/js/2.2a01df87.chunk.js",
+    "static/js/2.2a01df87.chunk.js.map": "/static/js/2.2a01df87.chunk.js.map",
+    "index.html": "/index.html",
+    "precache-manifest.5f311a9d85c42ca669e681f044269605.js": "/precache-manifest.5f311a9d85c42ca669e681f044269605.js",
+    "service-worker.js": "/service-worker.js",
+    "static/css/main.4c993556.chunk.css.map": "/static/css/main.4c993556.chunk.css.map",
+    "static/js/2.2a01df87.chunk.js.LICENSE.txt": "/static/js/2.2a01df87.chunk.js.LICENSE.txt",
+    "static/media/about.ea00a3b0.svg": "/static/media/about.ea00a3b0.svg",
+    "static/media/stylesheet.css": "/static/media/josefinsans-semibold-webfont.f1b2a5a6.woff2"
   },
   "entrypoints": [
-    "static/js/runtime-main.522b51db.js",
+    "static/js/runtime-main.38b3c250.js",
     "static/js/2.2a01df87.chunk.js",
-    "static/css/main.06e97ea4.chunk.css",
+    "static/css/main.4c993556.chunk.css",
     "static/js/main.e1514336.chunk.js"
   ]
 }

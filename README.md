@@ -1,2 +1,2 @@
-# Wave
-Commissioned by MuGallery, this is the repository for the light installation.
+# Supersynthesis
+Commissioned by MuGallery, this is all the code for an interactive light installation.

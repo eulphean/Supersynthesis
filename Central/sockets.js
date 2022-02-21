@@ -4,7 +4,7 @@
 // Description: Helper module to connect all socket based communication. 
 
 var socket = require('socket.io');
-var database = require('./Database.js');
+var database = require('./database.js');
 
 // Global variables. 
 let appSocket; 

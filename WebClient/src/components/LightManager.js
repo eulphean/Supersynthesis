@@ -25,13 +25,19 @@ export default class LightManager {
     setup() {
         // Prepare the light collection.
         this.prepareLights();
+        LightConfigStore.setMaxHeight(this.p5.height/2);
         LightConfigStore.subscribeInfo(this.updateTimeOn.bind(this));
+        LightConfigStore.subscribeLights(this.updateLights.bind(this));
     }
 
     // New bpm received. 
     updateTimeOn() {
         let newBpm = LightConfigStore.getBpm();
         this.timeOn = (60 * 1000)/newBpm;
+    }
+
+    updateLights() {
+        this.resetSystem();
     }
 
     prepareLights() {

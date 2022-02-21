@@ -33,6 +33,9 @@ class LightConfigStore {
         this.bpm = 150;
         this.lightConfig = [];
 
+        // Helper value to create default heights. 
+        this.maxLightHeight = 0;
+
         // Default light config for 24 lights. 
         this.prepareDefaultLightConfig();
     }
@@ -55,17 +58,19 @@ class LightConfigStore {
         return removeListener;
     }
 
+    setMaxHeight(height) {
+        this.maxLightHeight = height; 
+    }
+
     // Default config for 24 lights. 
     prepareDefaultLightConfig() {
         console.log('Preparing default config.');
         for (let i = 0; i < NUM_LIGHTS; i++) {
-            let topVal = this.getRandomInt(2);
-            let bottomVal = this.getRandomInt(2); 
             // Create a state object.
             let stateObject = {
                 'light': {
-                    'TOP': topVal, 
-                    'BOTTOM': bottomVal
+                    'TOP': 1, 
+                    'BOTTOM': 1
                 },
                 'draw': {
                     'TOP': false,
@@ -88,7 +93,6 @@ class LightConfigStore {
             }
             this.lightConfig.push(stateObject); 
         }
-        console.log(this.lightConfig);
     }
 
     getFullConfig(i) {
@@ -148,56 +152,98 @@ class LightConfigStore {
 
     // Increment the config index because this will be a new entry.
     getPayloadForDatabase() {
-        // Bad assumption that this call will be successful. 
-        // this.configIndex += 1; 
-        // this.json = {}
-        // this.json['bpm'] = this.bpm; 
-        // this.json['lights'] = this.lightConfig;
-        // this.json['time'] = Date();
+        //Bad assumption that this call will be successful. 
+        this.configIndex += 1; 
+        let dbConfig = this.filterConfig();
+        this.json = {}
+        this.json['bpm'] = this.bpm; 
+        this.json['lights'] = dbConfig;
+        this.json['time'] = Date();
 
-        // console.log(this.lightConfig);
-        // let payload = {
-        //     'index' : this.configIndex, 
-        //     'config': JSON.stringify(this.json)
-        // }
+        let payload = {
+            'index' : this.configIndex, 
+            'config': JSON.stringify(this.json)
+        }
 
-        // // Trigger info subscribers. 
-        //    for (let i = 0; i < this.infoSubscribers.length; i++) {
-        //     this.infoSubscribers[i]();
-        // }
+        // Trigger info subscribers for new data. 
+        for (let i = 0; i < this.infoSubscribers.length; i++) {
+            this.infoSubscribers[i]();
+        }
 
-        // console.log('Sending data with index: ' + this.configIndex);
-        // return payload;
+        return payload;
     }
 
     setPayloadFromDatabase(payload) {
-        // console.log('Overwriting current config.');
+        console.log('Overwriting current config.');
 
-        // this.configIndex = payload['index'];
-        // console.log('Current Index: ' + this.configIndex);
+        // Get current index. 
+        this.configIndex = payload['index'];
 
-        // // Config elements. 
-        // let config = payload['config'];
-        // this.bpm = config['bpm'];
+        // Config items. 
+        let config = payload['config'];
+        this.bpm = config['bpm'];
 
-        // // Trigger info subscribers. 
-        // for (let i = 0; i < this.infoSubscribers.length; i++) {
-        //     this.infoSubscribers[i]();
-        // }
+        // Trigger info subscribers. 
+        for (let i = 0; i < this.infoSubscribers.length; i++) {
+            this.infoSubscribers[i]();
+        }
+        
+        // Light data is an array. Update the current light
+        // config with this incoming data. 
+        let lightData = config['lights'];
+        this.updateLightConfig(lightData);
 
-        // console.log(payload);
-        // // Light data is an array. Update the current light
-        // // config with this incoming data. 
-        // let lightData = config['lights'];
-        // for (let i = 0; i < lightData.length; i++) {
-        //     let configState = lightData[i];
-        //     this.lightConfig[i] = configState;
-        // }
+        // Trigger light subscribers.
+        for (let i = 0; i < this.lightSubscribers.length; i++) {
+            this.lightSubscribers[i]();
+        }
+    }
 
-        // // Trigger light subscribers.
-        // for (let i = 0; i < this.lightSubscribers.length; i++) {
-        //     this.lightSubscribers[i]();
-        // }
+    // Extract the config we need for the database. 
+    filterConfig() {
+        let dbConfig = []; 
+        this.lightConfig.forEach(c => {
+            let d = c['light']
+            dbConfig.push(d);
+        });
+        return dbConfig; 
+    }
+
+    updateLightConfig(lightData) {
+        // Empty the current light config. 
+        this.lightConfig = []; 
+        
+        // Create a new config. 
+        for (let i = 0; i < lightData.length; i++) {
+            let data = lightData[i];
+            let stateObj = {
+                'light': {
+                    'TOP': data[LIGHT_TYPE.TOP], 
+                    'BOTTOM': data[LIGHT_TYPE.BOTTOM]
+                },
+                // Create the draw states from the incoming light state. 
+                'draw': {
+                    'TOP': data[LIGHT_TYPE.TOP] === LIGHT_STATE.ON,
+                    'BOTTOM': data[LIGHT_TYPE.BOTTOM] === LIGHT_STATE.ON
+                },
+                'grow': {
+                    'TOP': {
+                        'state': GROW_STATE.NONE,
+                        'active': false
+                    },
+                    'BOTTOM': {
+                        'state': GROW_STATE.NONE,
+                        'active': false
+                    }
+                },
+                // Create the height state from the incoming light state. 
+                'height': {
+                    'TOP': data[LIGHT_TYPE.TOP] === LIGHT_STATE.ON ? this.maxLightHeight : 0,
+                    'BOTTOM': data[LIGHT_TYPE.BOTTOM] === LIGHT_STATE.ON ? this.maxLightHeight : 0
+                }
+            }
+            this.lightConfig.push(stateObj);
+        }
     }
 }
 

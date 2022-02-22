@@ -26,11 +26,11 @@ const animation = {
 
 const styles = {
     container: {
+        position: 'relative',
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        height: '10vh',
         paddingLeft: padding.small,
         paddingRight: padding.small,
         zIndex: 1
@@ -71,10 +71,12 @@ class Navbar extends React.Component {
 
   render() {
     let aboutStyle = [styles.iconContainer, styles.simpleRotation];
+    let visibleHeight = window.innerHeight; 
+    let heightStyle = {height: visibleHeight * 0.1 + 'px'}; 
     return (
       <div style={styles.block}>
         <Popup ref={this.popupRef}/>
-        <div style={styles.container}>
+        <div style={[styles.container, heightStyle]}>
           <div style={styles.title}>supersynthesis</div>
           <div style={aboutStyle} onClick={this.handleAbout.bind(this)}>
             <About style={styles.icon} />

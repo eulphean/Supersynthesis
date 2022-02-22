@@ -12,11 +12,7 @@ import LightConfigStore from '../stores/LightConfigStore';
 
 const styles = {
     container: {
-        position: 'fixed',
-        height: '8vh',
-        left: '0',
-        right: '0',
-        bottom: '0',
+        position: 'relative',
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -28,7 +24,7 @@ const styles = {
         fontFamily: fontFamily.josefin,
         fontSize: fontSize.lessBig,
         letterSpacing: '2px',
-        zIndex: 1
+        zIndex: 1,
     },
 
     info: {
@@ -50,12 +46,15 @@ class BottomBar extends React.Component {
   render() {
     let bpm = this.state.bpm + 'bpm'
     let states = '#' + this.state.index; 
+
+    let visibleHeight = window.innerHeight; 
+    let heightStyle = {height: visibleHeight * 0.1 + 'px'}; 
     return (
-        <div style={styles.container}>
-            <div style={styles.info}>{states}</div>
-            <div style={styles.info}>{bpm}</div>
-            <div onClick={this.onSend.bind(this)} style={styles.info}>Send</div>
-        </div>      
+      <div style={[styles.container, heightStyle]}>
+          <div style={styles.info}>{states}</div>
+          <div style={styles.info}>{bpm}</div>
+          <div onClick={this.onSend.bind(this)} style={styles.info}>Send</div>
+      </div>      
     );
   }
 

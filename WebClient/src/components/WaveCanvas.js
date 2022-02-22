@@ -66,10 +66,9 @@ var sketch = (s) => {
 };
 
 const styles = {
-  // TODO: Is this height logic going to scale?
   container: {
+    position: 'relative',
     backgroundColor: color.bgBlack,
-    height: '82vh',
     margin: 0,
     padding: 0,
     zIndex: 1
@@ -89,10 +88,13 @@ class WaveCanvas extends React.Component {
   }
   
   render() {
+    let visibleHeight = window.innerHeight; 
+    let heightStyle = {height: visibleHeight * 0.8 + 'px'}; 
+    let containerStyle = [styles.container, heightStyle];
     return (
       <div id={'canvasContainer'} 
         ref={this.sketchRef} 
-        style={styles.container}>
+        style={containerStyle}>
       </div>
     );
   }

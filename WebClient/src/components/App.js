@@ -15,11 +15,12 @@ import BottomBar from './BottomBar';
 
 const styles = {
   container: {
-    position: 'fixed',
+    position: 'absolute',
     top: '0px',
     left: '0px',
     right: '0px',
     bottom: '0px',
+    overflow: 'hidden',
     display: 'flex',
     flexDirection: 'column',
     color: 'white',

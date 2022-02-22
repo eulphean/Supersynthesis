@@ -6,19 +6,27 @@
 from socketclient import SocketClient
 from oscclient import OSCClient
 import asyncio
+import sys
+from relay import Relay
 
 def myfunction(address, args):
     print("calback")
     print(address + args)
 
+def socketData(data):
+    # Update light state from here. 
+    pass 
+
 async def update():
     while True:
+        # Keep updating the lights from here. 
 
         # Give back the control to asyncio to process queued events. 
         await asyncio.sleep(0)
 
 # Initialize everything here. 
 async def main():
+    # Setup relay
     loop = asyncio.get_event_loop()
     t1 = loop.create_task(socketClient.startServer())
     t2 = loop.create_task(oscClient.setupServer(loop))
@@ -33,6 +41,16 @@ async def main():
         t3.cancel()
         print("All pending tasks cancelled")
 
+
+# Get the first argument. If it's debug,
+# we are doing this from Windows machine. 
+# Pass any other string if on a raspberry pi. 
+state = sys.argv[1]
+relay = ''
+if (state == 'debug'):
+    relay = Relay(True)
+else:
+    relay = Relay()
 socketClient = SocketClient()
 oscClient = OSCClient(myfunction)
 asyncio.run(main())

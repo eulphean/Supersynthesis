@@ -12,7 +12,7 @@ import LightConfigStore from '../stores/LightConfigStore';
 
 const styles = {
     container: {
-        position: 'absolute',
+        position: 'fixed',
         height: '8vh',
         left: '0',
         right: '0',

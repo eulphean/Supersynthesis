@@ -40,8 +40,8 @@ const styles = {
         backgroundColor: color.bgBlack,
         color: color.fbWhite,
         padding: padding.small,
-        fontFamily: fontFamily.airwaves,
-        fontSize: fontSize.veryBig,
+        fontFamily: fontFamily.heatwave,
+        fontSize: fontSize.lessBig,
         letterSpacing: '2px'
     },
     

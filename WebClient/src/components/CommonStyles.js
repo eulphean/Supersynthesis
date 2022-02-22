@@ -7,7 +7,9 @@ const fontSize = {
     extraSmall: '8px',
     kindaSmall: '10px',
     verySmall: '12px',
+    lessSmall: '14px',
     small: '16px',
+    lessBig: '18px',
     big: '20px',
     veryBig: '24px',
     extraBig: '28px',
@@ -60,6 +62,7 @@ const padding = {
 };
 
 const fontFamily = {
+    heatwave: 'heatwaveregular',
     airwaves: 'airwavesregular',
     josefin: 'josefin_sanssemibold'
 };

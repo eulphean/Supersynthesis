@@ -49,7 +49,7 @@ const styles={
         bottom: '0px',
         left: '0px',
         right: '0px',
-        background: color.fgWhite,
+        background: color.bgBlack,
         zIndex: '999'
     },
 
@@ -173,9 +173,9 @@ const styles={
             paddingLeft: padding.extraMassive, 
             paddingRight: padding.extraMassive
         },
-        opacity: '0.8',
+        opacity: '1.0',
         borderStyle: 'solid',
-        borderWidth: '1.5px',
+        borderWidth: '2px',
         borderColor: color.fgWhite
     },
 
@@ -183,8 +183,8 @@ const styles={
         marginTop: padding.lessSmall,
         marginBottom: padding.small,
         textAlign: 'center',
-        fontFamily: fontFamily.airwaves,
-        fontSize: fontSize.huge,
+        fontFamily: fontFamily.heatwave,
+        fontSize: fontSize.extraBig,
         letterSpacing: '2.5px',
         lineHeight: '1.8',
        
@@ -267,7 +267,7 @@ const styles={
         display: 'flex',
         alignItems: 'center',
         marginTop: padding.verySmall,
-        fontSize: fontSize.small,
+        fontSize: fontSize.lessSmall,
         '@media (min-width: 750px)': {  
             fontSize: fontSize.small,
         }

@@ -41,6 +41,7 @@ export default class LightManager {
     }
 
     prepareLights() {
+        this.lights = []; 
         // Distance between each tube. 
         let lightIncrement = (this.p5.width) / NUM_LIGHTS;
 

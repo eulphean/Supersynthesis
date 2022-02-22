@@ -53,12 +53,17 @@ var sketch = (s) => {
   s.mouseReleased = () => {
     isUserInteracting = false; 
   };
-};
 
-// s.windowResized = () => {
-//   let height = 0.95 * window.innerHeight;
-//   s.resizeCanvas(window.innerWidth, height); 
-// }
+  s.windowResized = () => {
+    console.log('Resized');
+    let canvasContainer = s.select('#canvasContainer');
+    let height = canvasContainer.height;
+    s.resizeCanvas(window.innerWidth, height); 
+
+    // Prepare the lights again. 
+    lightManager.prepareLights();
+  }
+};
 
 const styles = {
   // TODO: Is this height logic going to scale?

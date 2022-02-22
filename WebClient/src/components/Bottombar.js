@@ -6,6 +6,7 @@
 */
 import React from 'react'
 import Radium from 'radium'
+import { ORIENTATION } from './App';
 import {color, fontFamily, fontSize, padding} from './CommonStyles'
 import Websocket from './Websocket';
 import LightConfigStore from '../stores/LightConfigStore';
@@ -47,8 +48,7 @@ class BottomBar extends React.Component {
     let bpm = this.state.bpm + 'bpm'
     let states = '#' + this.state.index; 
 
-    let visibleHeight = window.innerHeight; 
-    let heightStyle = {height: visibleHeight * 0.1 + 'px'}; 
+    let heightStyle = this.getHeightStyle();
     return (
       <div style={[styles.container, heightStyle]}>
           <div style={styles.info}>{states}</div>
@@ -56,6 +56,45 @@ class BottomBar extends React.Component {
           <div onClick={this.onSend.bind(this)} style={styles.info}>Send</div>
       </div>      
     );
+  }
+
+  getHeightStyle() {
+    let height = this.getHeight();
+    let heightStyle = {
+      height: height + 'px'
+    };
+    return heightStyle; 
+  }
+
+  getHeight() {
+    let deviceHeight = window.innerHeight;
+    let deviceWidth = window.innerWidth;
+    let c = 0; 
+    if (this.props.orientation === ORIENTATION.PORTRAIT) {
+      if (deviceHeight < 900) {
+        c = 0.1
+      }
+
+      if (deviceHeight > 900 && deviceHeight < 1000) {
+        c = 0.075
+      }
+
+      if (deviceHeight > 1000) {
+        c = 0.06
+      }
+    }
+
+    if (this.props.orientation === ORIENTATION.LANDSCAPE) {
+      if (deviceWidth < 1000) {
+        c = 0.15; 
+      }
+
+      if (deviceWidth > 1000) {
+        c = 0.09; 
+      }
+    }
+
+    return deviceHeight * c; 
   }
 
   onInfoUpdate() {

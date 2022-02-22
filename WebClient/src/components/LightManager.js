@@ -25,7 +25,6 @@ export default class LightManager {
     setup() {
         // Prepare the light collection.
         this.prepareLights();
-        LightConfigStore.setMaxHeight(this.p5.height/2);
         LightConfigStore.subscribeInfo(this.updateTimeOn.bind(this));
         LightConfigStore.subscribeLights(this.updateLights.bind(this));
     }
@@ -42,6 +41,9 @@ export default class LightManager {
 
     prepareLights() {
         this.lights = []; 
+
+        // Set max height again since the canvas has been resized. 
+        LightConfigStore.setMaxHeight(this.p5.height/2);
         
         // Distance between each tube. 
         let lightIncrement = (this.p5.width) / NUM_LIGHTS;

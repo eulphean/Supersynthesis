@@ -13,6 +13,12 @@ import Navbar from './Navbar';
 import WaveCanvas from './WaveCanvas';
 import BottomBar from './BottomBar';
 
+// Enum to track the device orientation. 
+export const ORIENTATION = {
+  PORTRAIT: 0,
+  LANDSCAPE: 1
+}
+
 const styles = {
   container: {
     position: 'absolute',
@@ -42,51 +48,43 @@ class App extends React.Component {
     super(props); 
     window.addEventListener('resize', this.handleResize.bind(this));
     this.state = {
-      isLandscape: this.isLandscape(),
-      isPortrait: this.isPortrait()
-    }; 
+      orientation: ORIENTATION.PORTRAIT
+    };     
+  }
+
+  componentDidMount() {
+    this.evaluateOrientation();
   }
 
   render() {
     return (
       <div style={styles.container}>
-        <Navbar />
-        <WaveCanvas />
-        <BottomBar />
+        <Navbar orientation={this.state.orientation} />
+        <WaveCanvas orientation={this.state.orientation} />
+        <BottomBar orientation={this.state.orientation} />
       </div>
     );
   }
 
-  onClick(event) {
-    event.stopPropagation();
-    Websocket.saveEntry();
-    // Fire some data for the websocket. 
-  }
-
   handleResize() {
-    console.log('Resize triggered');
-    this.setState({
-      isLandscape: this.isLandscape(),
-      isPortrait: this.isPortrait()
-    });
+    // Resize triggered - evaluate orientation and render
+    // the components again be it. 
+    this.evaluateOrientation();
   }
 
-  isLandscape() {
-      let t = (window.innerHeight < window.innerWidth); 
-      if (t) {
-        console.log('App: Landscape'); 
-      }
-
-      return t; 
-  }
-
-  isPortrait() {
-    let t = (window.innerHeight > window.innerWidth);
+  evaluateOrientation() {
+    let t = (window.innerHeight < window.innerWidth); 
     if (t) {
-      console.log('App: Portrait'); 
+      console.log('App: Landscape');
+      this.setState({
+        orientation: ORIENTATION.LANDSCAPE
+      }); 
+    } else {
+      console.log('App: Portrait');
+      this.setState({
+        orientation: ORIENTATION.PORTRAIT
+      });
     }
-
-    return t; 
   }
 }
 

@@ -7,6 +7,7 @@
 import React from 'react'
 import Radium from 'radium'
 import Popup from './Popup'
+import { ORIENTATION } from './App'
 import { ReactComponent as About } from '../svg/about.svg'
 import {color, fontFamily, fontSize, padding} from './CommonStyles'
 
@@ -71,8 +72,7 @@ class Navbar extends React.Component {
 
   render() {
     let aboutStyle = [styles.iconContainer, styles.simpleRotation];
-    let visibleHeight = window.innerHeight; 
-    let heightStyle = {height: visibleHeight * 0.1 + 'px'}; 
+    let heightStyle = this.getHeightStyle(); 
     return (
       <div style={styles.block}>
         <Popup ref={this.popupRef}/>
@@ -84,6 +84,45 @@ class Navbar extends React.Component {
         </div>
       </div>
     );
+  }
+
+  getHeightStyle() {
+    let height = this.getHeight();
+    let heightStyle = {
+      height: height + 'px'
+    };
+    return heightStyle; 
+  }
+
+  getHeight() {
+    let deviceHeight = window.innerHeight;
+    let deviceWidth = window.innerWidth; 
+    let c = 0; 
+    if (this.props.orientation === ORIENTATION.PORTRAIT) {
+      if (deviceHeight < 900) {
+        c = 0.1
+      }
+
+      if (deviceHeight > 900 && deviceHeight < 1000) {
+        c = 0.075
+      }
+
+      if (deviceHeight > 1000) {
+        c = 0.06
+      }
+    }
+
+    if (this.props.orientation === ORIENTATION.LANDSCAPE) {
+      if (deviceWidth < 1000) {
+        c = 0.15; 
+      }      
+
+      if (deviceWidth > 1000) {
+        c = 0.09
+      }
+    }
+
+    return deviceHeight * c; 
   }
 
   handleAbout() {

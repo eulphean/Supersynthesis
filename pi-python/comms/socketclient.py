@@ -1,7 +1,12 @@
 import socketio
 
+HOST_ADDRESS = 'http://localhost:5000'
 # Socket handler. Implement all event methods here. 
 class PiSocket(socketio.AsyncClientNamespace):
+    def setCallback(self, cbk):
+        self.callback = cbk
+        print('set')
+
     async def on_connect(self):
         print("Socket connected")
 
@@ -10,24 +15,23 @@ class PiSocket(socketio.AsyncClientNamespace):
         pass
 
     async def on_time(self, data):
-        # pass
-        print("Socket data: " + data)
+        pass
+        #print("Socket data: " + data)
     
     async def on_wavedata(self, data):
         # pass
         print("Wave data: ")
-        print(data)
+        self.callback(data)
 
 class SocketClient:
-    def __init__(self):
+    def __init__(self, onSocketData):
         self.sio = socketio.AsyncClient()
-        self.sio.register_namespace(PiSocket('/pi'))
+        piSocket = PiSocket('/pi')
+        piSocket.setCallback(onSocketData)
+        self.sio.register_namespace(piSocket)
 
     async def startServer(self):
-        await self.sio.connect('http://localhost:5000', namespaces=['/pi'])
+        await self.sio.connect(HOST_ADDRESS, namespaces=['/pi'])
         await self.sio.wait()
-
-  # await self.emit('my_response', data)
- 
 
 

@@ -3,6 +3,7 @@
 // File: Socket.js
 // Description: Helper module to connect all socket based communication. 
 
+const { json } = require('express');
 var socket = require('socket.io');
 var database = require('./database.js');
 
@@ -61,11 +62,12 @@ function onWebClient(socket) {
             socket.to(room).emit('receiveData', payload); 
             var members = io.of('/app').adapter.rooms.get(room).size;
             console.log(members-1 + ' members were sent an update.');
-        })
 
-        // Wait for the callback of success, then send it. 
-        let arr = [0, 1, 0, 1, 0, 0];
-        piSocket.emit('wavedata', arr);
+            // Transmit parse this data and send it to the raspberry pi. 
+            // Wait for the callback of success, then send it.         
+            console.log(payload['config']);
+            piSocket.emit('wavedata', payload['config']);
+        });
         // Route this data to the raspberry pi client.
     });
 

@@ -10,12 +10,12 @@
 import io  from 'socket.io-client'
 import LightConfigStore from '../stores/LightConfigStore';
 
-// const localhostURL = "http://localhost:5000";
-const herokuURL = "https://supersynth.herokuapp.com";
+const localhostURL = "http://localhost:5000";
+//const herokuURL = "https://supersynth.herokuapp.com";
 
 class Websocket {
   constructor() {
-      this.siteURL = herokuURL + '/app'; 
+      this.siteURL = localhostURL + '/app'; 
 
       this.socket = io(this.siteURL, {
           reconnection: true,
@@ -24,7 +24,20 @@ class Websocket {
       });
 
       this.socket.once('connect', this.subscribe.bind(this));
+
+      this.commitSubscriber = '';
   }
+
+  subscribeInfo(listener) {
+    this.commitSubscriber = listener;
+    // this.commitSubscriber.push(listener);
+    // const removeListener = () => {
+    //     this.infoListeners = this.infoSubscribers.filter((s) => listener !== s);
+    // };
+
+    //return removeListener;
+  }
+
 
   subscribe() {
       console.log('Connected');
@@ -60,6 +73,9 @@ class Websocket {
   commitLightConfigData() {
     let payload = LightConfigStore.getPayloadForDatabase();
     this.socket.emit('saveData', payload);
+    if (this.commitSubscriber !== '') {
+      this.commitSubscriber(); 
+    }
   }
 }
 

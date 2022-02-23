@@ -7,6 +7,7 @@
 */
 import Light from './Light'
 import LightConfigStore, { LIGHT_TYPE  } from "../stores/LightConfigStore";
+import Websocket from './Websocket';
 
 const NUM_LIGHTS = 24
 
@@ -27,6 +28,10 @@ export default class LightManager {
         this.prepareLights();
         LightConfigStore.subscribeInfo(this.updateTimeOn.bind(this));
         LightConfigStore.subscribeLights(this.updateLights.bind(this));
+        Websocket.subscribeInfo(() => {
+            console.log('Data committed: ');
+            this.resetSystem();
+        })
     }
 
     // New bpm received. 

@@ -3,24 +3,23 @@
 # File: main.py
 # Description: Entry level python file that spawns co-routines for handling
 # incoming OSC data and websocket data and change the behavior of the lights. 
-from socketclient import SocketClient
-from oscclient import OSCClient
+from comms.socketclient import SocketClient
+from comms.oscclient import OSCClient
 import asyncio
 import sys
-from relay import Relay
+from lightsManager import LightsManager
 
 def myfunction(address, args):
     print("calback")
     print(address + args)
 
-def socketData(data):
-    # Update light state from here. 
-    pass 
+def onSocketData(data):
+    lightsManager.updateLightData(data)
 
 async def update():
     while True:
         # Keep updating the lights from here. 
-
+        lightsManager.update()
         # Give back the control to asyncio to process queued events. 
         await asyncio.sleep(0)
 
@@ -46,11 +45,8 @@ async def main():
 # we are doing this from Windows machine. 
 # Pass any other string if on a raspberry pi. 
 state = sys.argv[1]
-relay = ''
-if (state == 'debug'):
-    relay = Relay(True)
-else:
-    relay = Relay()
-socketClient = SocketClient()
+state = state == 'debug'
+lightsManager = LightsManager(state)
+socketClient = SocketClient(onSocketData)
 oscClient = OSCClient(myfunction)
 asyncio.run(main())

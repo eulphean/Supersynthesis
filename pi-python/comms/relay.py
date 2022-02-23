@@ -4,7 +4,7 @@
 # Description: Class that controls all the interaction with the relays on the raspberry pi.
 from gpiozero import LED
 from gpiozero.pins.pigpio import PiGPIOFactory
-import pd
+from comms.pd import send2pd
 
 # IP Address of the raspberry pi. 
 RASPI_IP = '192.168.0.10'
@@ -26,30 +26,24 @@ class Relay:
             self.initPins()
 
     def on(self, idx) -> None:
-        if (self.debug):
-            print("On, idx: " + str(idx))
-            led = self.relay[idx]
-            # Flipped by design.
-            led.on()
+        print("On, idx: " + str(idx))
+        led = self.relay[idx]
+        # Flipped by design.
+        led.on()
 
-            # Pure data message. 
-            message = '0 ' + str(idx) + ' ' + str(1) + ';'
-            pd.send2pd(message)
-        else:
-            pass
+        # Pure data message. 
+        message = '0 ' + str(idx) + ' ' + str(1) + ';'
+        send2pd(message)
 
     def off(self, idx) -> None:
-        if (self.debug):
-            print("Off, idx: " + str(idx))
-            led = self.relay[idx]
-            # Flipped by design.
-            led.off()
+        print("Off, idx: " + str(idx))
+        led = self.relay[idx]
+        # Flipped by design.
+        led.off()
 
-            # Pure data message. 
-            message = '0 ' + str(idx) + ' ' + str(0) + ';'
-            pd.send2pd(message)
-        else:
-            pass
+        # Pure data message. 
+        message = '0 ' + str(idx) + ' ' + str(0) + ';'
+        send2pd(message)
 
     def initPins(self):
         # Set the pins

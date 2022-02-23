@@ -10,12 +10,12 @@
 import io  from 'socket.io-client'
 import LightConfigStore from '../stores/LightConfigStore';
 
-// const localhostURL = "http://localhost:5000";
-const herokuURL = "https://supersynth.herokuapp.com";
+const localhostURL = "http://localhost:5000";
+//const herokuURL = "https://supersynth.herokuapp.com";
 
 class Websocket {
   constructor() {
-      this.siteURL = herokuURL + '/app'; 
+      this.siteURL = localhostURL + '/app'; 
 
       this.socket = io(this.siteURL, {
           reconnection: true,
@@ -48,17 +48,20 @@ class Websocket {
       console.log('Connected');
       // Subscribe to incoming events from the webserver here. 
       this.socket.on('time', this.logTime.bind(this));
-      this.socket.on('receiveData', (payload) => {
+      this.socket.on('initialFullPayload', (payload) => {
         LightConfigStore.setPayloadFromDatabase(payload); 
-      });
-      this.socket.on('testdata', (payload) => {
-        this.testDataSubscriber(payload);
-        // LightConfigStore.setPayloadFromDatabase(payload); 
+      }); 
+      // this.socket.on('testdata', (payload) => {
+      //   this.testDataSubscriber(payload);
+      //   // LightConfigStore.setPayloadFromDatabase(payload); 
+      // });
+      this.socket.on('updateLight', data => {
+        console.log(data);
       });
       
 
       // We are connected - trigger a request to receive data.
-      this.socket.emit('getData');
+      // this.socket.emit('getData');
   }
 
   // ----------------------- DATABASE CALLS --------------------- //

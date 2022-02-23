@@ -13,6 +13,7 @@ let piSocket;
 let io; 
 
 const room = 'supersynth';
+let intervalId = ''; 
 
 module.exports = {
     socketConfig: function(server) {
@@ -54,19 +55,80 @@ function onWebClient(socket) {
 
     // ------------------- Database communication -------------------- //
     socket.on('saveData', (data) => {
+        if (intervalId !== '') {
+            console.log('Clearing previous loop');
+            clearInterval(intervalId);
+        }
+
         database.saveData(data).then((payload) => {
             // Convert the stringified json back to proper json.
             let json = JSON.parse(payload['config']);
             payload['config'] = json;
+
+            // Time is milliseconds. 
+            let time = 60000 / json['bpm'];
+            console.log('starting a new loop with: ' + time + 'ms');
+            let topLights = [], bottomLights = [];
+            let lightData = payload['config']['lights'];
+            // Access lights. 
+            lightData.forEach(d => {
+                topLights.push(d['TOP']);
+                bottomLights.push(d['BOTTOM']);
+            });
+            // Start game loop
+            let i = -1;
+            let d = true; 
+            intervalId = setInterval(() => {
+                // Start with top lights
+                let v = topLights[i];
+                let piLoad = {
+                    idx: i,
+                    val: v,
+                    type: d === true ? 1 : 0
+                }
+
+                if (i===24) {
+                    d = false;
+                    i = 23; 
+                    // Payload to turn off.
+                    piLoad = {
+                        idx: -1,
+                        val: -1,
+                        type: -1
+                    }
+                } else if (i<0) {
+                    d = true;
+                    i = 0; 
+                    // Payload to turn off.
+                    piLoad = {
+                        idx: -1,
+                        val: -1,
+                        type: -1
+                    }
+                } else if (i==-1) {
+                    piLoad = {
+                        idx: -1,
+                        val: -1,
+                        type: -1
+                    }
+                }
+
+                console.log('Emit: '); console.log(piLoad);
+                piSocket.emit('testdata', piLoad);
+                socket.emit('testdata', piLoad)
+
+                i = (d === true) ? i+1 : i-1;
+            }, time)
+            // Here I want to 
             // Route the payload back to other connected clients.
-            socket.to(room).emit('receiveData', payload); 
-            var members = io.of('/app').adapter.rooms.get(room).size;
-            console.log(members-1 + ' members were sent an update.');
+            // socket.to(room).emit('receiveData', payload); 
+            // var members = io.of('/app').adapter.rooms.get(room).size;
+            // console.log(members-1 + ' members were sent an update.');
 
             // Transmit parse this data and send it to the raspberry pi. 
             // Wait for the callback of success, then send it.         
-            console.log(payload['config']);
-            piSocket.emit('wavedata', payload['config']);
+            // console.log(payload['config']);
+            // piSocket.emit('wavedata', payload['config']);
         });
         // Route this data to the raspberry pi client.
     });

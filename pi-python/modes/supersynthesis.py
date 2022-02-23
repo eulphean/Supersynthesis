@@ -44,45 +44,46 @@ class Supersynthesis(Common):
         self.curTime = time()
 
     def update(self) -> None:
-        elapsedTime = time() - self.curTime
+        pass
+        # elapsedTime = time() - self.curTime
 
-        # Glide from Right to Left or Left to Right.
-        if (elapsedTime > self.incrementTime and self.part == Part.Glide):
-            lightVal = 0
-            if (self.direction == Direction.Right):
-                lightVal = self.topLights[self.glider]
-                self.lightOn(lightVal)
-                self.glider += 1
-            elif (self.direction == Direction.Left):
-                lightVal = self.bottomLights[self.glider]
-                self.lightOn(lightVal)
-                self.glider -= 1
+        # # Glide from Right to Left or Left to Right.
+        # if (elapsedTime > self.incrementTime and self.part == Part.Glide):
+        #     lightVal = 0
+        #     if (self.direction == Direction.Right):
+        #         lightVal = self.topLights[self.glider]
+        #         self.lightOn(lightVal)
+        #         self.glider += 1
+        #     elif (self.direction == Direction.Left):
+        #         lightVal = self.bottomLights[self.glider]
+        #         self.lightOn(lightVal)
+        #         self.glider -= 1
         
-            # Have I reached the right-most point?
-            if (self.glider == self.numLights):
-                self.part = Part.Off
-                # Reset glider to starting pos. 
-                self.glider = self.numLights - 1 
+        #     # Have I reached the right-most point?
+        #     if (self.glider == self.numLights):
+        #         self.part = Part.Off
+        #         # Reset glider to starting pos. 
+        #         self.glider = self.numLights - 1 
                         
-            # Have I reached the left-most point?
-            if (self.glider < 0):
-                self.part = Part.Off
-                # Reset glider to starting pos.
-                self.glider = 0 
+        #     # Have I reached the left-most point?
+        #     if (self.glider < 0):
+        #         self.part = Part.Off
+        #         # Reset glider to starting pos.
+        #         self.glider = 0 
 
-        # Turn off all the lights. 
-        # Flip glide direction.
-        if (elapsedTime > self.incrementTime and self.part == Part.Off):
-            self.part = Part.Glide
-            if (self.direction == Direction.Right):
-                self.fullTurnOff(True)
-                self.direction = Direction.Left
-            else:
-                self.fullTurnOff()
-                self.direction = Direction.Right
+        # # Turn off all the lights. 
+        # # Flip glide direction.
+        # if (elapsedTime > self.incrementTime and self.part == Part.Off):
+        #     self.part = Part.Glide
+        #     if (self.direction == Direction.Right):
+        #         self.fullTurnOff(True)
+        #         self.direction = Direction.Left
+        #     else:
+        #         self.fullTurnOff()
+        #         self.direction = Direction.Right
             
-            # Reset time. 
-            self.curTime = time()
+        #     # Reset time. 
+        #     self.curTime = time()
 
     def lightOn(self, lightVal): 
         if (lightVal == 1):
@@ -116,3 +117,10 @@ class Supersynthesis(Common):
 
         self.begin()
         pass
+
+    def updateTestData(self, idx, val):        
+        if (val == 1):
+            self.switchOn(idx)
+        elif (val == -1):
+            self.fullTurnOff()
+            pass

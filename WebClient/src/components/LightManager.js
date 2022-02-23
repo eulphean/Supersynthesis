@@ -28,10 +28,34 @@ export default class LightManager {
         this.prepareLights();
         LightConfigStore.subscribeInfo(this.updateTimeOn.bind(this));
         LightConfigStore.subscribeLights(this.updateLights.bind(this));
+        Websocket.subscribeTestData(this.testDataLights.bind(this));
         Websocket.subscribeInfo(() => {
             console.log('Data committed: ');
             this.resetSystem();
         })
+    }
+
+    testDataLights(data) {
+        let idx = data['idx'];
+        let val = data['val'];
+        let type = data['type'];
+        if (val === 1) {
+            let light = this.lights[idx];
+            let lightType;
+            if (type === 1) {
+                lightType = LIGHT_TYPE.TOP;
+            } else {
+                lightType = LIGHT_TYPE.BOTTOM;
+            }
+            light.updateDrawState(lightType, true);
+        }
+
+        if (val === -1) {
+            this.lights.forEach(l => {
+                l.updateDrawState(LIGHT_TYPE.TOP, false);
+                l.updateDrawState(LIGHT_TYPE.BOTTOM, false);
+            })
+        }
     }
 
     // New bpm received. 
@@ -70,9 +94,9 @@ export default class LightManager {
             this.handleUserInteracting(meshEllipsePos, boundaryWidth);
         } else {
             // Reset this value here. 
-            this.isCurrentlyGrowing = false;  
+            // this.isCurrentlyGrowing = false;  
             // Cycle the lights from left to right, then right to left. 
-            this.handleUserNotInteracting(); 
+            // this.handleUserNotInteracting(); 
         }
 
         // Draw the lights based on the state. 

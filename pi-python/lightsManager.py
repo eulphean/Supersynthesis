@@ -20,9 +20,13 @@ class LightsManager:
         self.supersynthesis.update()
 
     def updateLightData(self, data)->None: 
-        onTime = self.getTimeFromBpm(data['bpm'])
-        topLights, bottomLights = self.getLightArraysFromData(data['lights'])
-        self.supersynthesis.updateLightData(onTime, topLights, bottomLights)
+        #test data
+        self.supersynthesis.updateTestData(data['idx'], data['val'])
+
+        # Wave data
+        # onTime = self.getTimeFromBpm(data['bpm'])
+        # topLights, bottomLights = self.getLightArraysFromData(data['lights'])
+        # self.supersynthesis.updateLightData(onTime, topLights, bottomLights)
     
     def getLightArraysFromData(self, lightData):
         topLights = []

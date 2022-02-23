@@ -12,7 +12,6 @@ var sockets = require('./sockets.js');
 // ------------------ Express webserver ---------------- //
 var app = express(); 
 app.use(cors());
-app.use(express.static('./Client')); // Client index.html to be read. 
 app.use(express.json());
 var server = require('http').createServer(app); 
 

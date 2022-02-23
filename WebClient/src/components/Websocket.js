@@ -55,7 +55,7 @@ class Websocket {
       //   this.testDataSubscriber(payload);
       //   // LightConfigStore.setPayloadFromDatabase(payload); 
       // });
-      this.socket.on('updateLight', data => {
+      this.socket.on('lightData', data => {
         console.log(data);
       });
       

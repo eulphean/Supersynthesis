@@ -10,8 +10,6 @@ import { ORIENTATION } from './App';
 import {color, fontFamily, fontSize, padding} from './CommonStyles'
 import Websocket from './Websocket';
 import LightConfigStore from '../stores/LightConfigStore';
-import BpmManager from './BpmManager';
-import LightManager from './LightManager';
 import UserInteractionStore from '../stores/UserInteractionStore';
 
 const styles = {

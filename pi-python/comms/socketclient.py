@@ -1,7 +1,7 @@
 import socketio
 
-HOST_ADDRESS = 'http://localhost:5000'
-# HOST_HEROKU = 'https://supersynth.herokuapp.com'
+#HOST_ADDRESS = 'http://localhost:5000'
+HOST_HEROKU = 'https://supersynth.herokuapp.com'
 # Socket handler. Implement all event methods here. 
 class AppSocket(socketio.AsyncClientNamespace):
     async def on_connect(self):
@@ -34,7 +34,7 @@ class SocketClient:
         self.sio.register_namespace(appSocket)
 
     async def startServer(self):
-        await self.sio.connect(HOST_ADDRESS, namespaces=['/app'])
+        await self.sio.connect(HOST_HEROKU, namespaces=['/app'])
         await self.sio.wait()
 
 

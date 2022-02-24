@@ -7,7 +7,6 @@
 
 import React from 'react'
 import Radium from 'radium'
-import Websocket from './Websocket'
 
 import Navbar from './Navbar';
 import WaveCanvas from './WaveCanvas';

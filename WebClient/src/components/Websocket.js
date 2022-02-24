@@ -10,12 +10,12 @@
 import io  from 'socket.io-client'
 import LightConfigStore from '../stores/LightConfigStore';
 
-const localhostURL = "http://localhost:5000";
-//const herokuURL = "https://supersynth.herokuapp.com";
+//const localhostURL = "http://localhost:5000";
+const herokuURL = "https://supersynth.herokuapp.com";
 
 class Websocket {
   constructor() {
-      this.siteURL = localhostURL + '/app'; 
+      this.siteURL = herokuURL + '/app'; 
 
       this.socket = io(this.siteURL, {
           reconnection: true,

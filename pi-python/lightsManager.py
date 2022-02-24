@@ -3,39 +3,69 @@
 # File: manager.py
 # Description: Central lights manager that manages what state we are in. 
 from modes.supersynthesis import Supersynthesis
+from modes.supersynth import Supersynth
+from modes.shm import SHM
+from score.autoscore import Autoscore
 from comms.relay import Relay
+from enum import Enum
 
-NUM_LIGHTS = 24
+class State(Enum):
+    Supersynthesis = 1
+    Supersynth = 2
+    Autoscore = 3
+    SHM = 4
 
 class LightsManager: 
     def __init__(self, debugState)->None: 
         # Initialize the relay. 
         self.relay = Relay(debugState)
-        self.supersynthesis = Supersynthesis(self.relay, NUM_LIGHTS)
-        # We need to keep track of what mode we are in. 
-        # This should be called on a mode switch.
+        # Default state is supersynthesis. 
+        self.state = State.Supersynthesis
+        # Supersynthesis mode. 
+        self.supersynthesis = Supersynthesis(self.relay)
+        # Supersynth mode. 
+        self.supersynth = Supersynth(self.relay)
+        # Autoscore mode. 
+        self.autoscore = Autoscore(self.relay)
+        # Simple Harmonic Motion
+        self.shm = SHM(self.relay)
+        # Call this when I want to set the mode to supersynthesis. 
         self.supersynthesis.begin()
 
     def update(self):
-        self.supersynthesis.update()
-
-    def updateLightData(self, data)->None: 
-        state = data['state']
-        self.supersynthesis.updateLights(state)
-
-        # Wave data
-        # onTime = self.getTimeFromBpm(data['bpm'])
-        # topLights, bottomLights = self.getLightArraysFromData(data['lights'])
-        # self.supersynthesis.updateLightData(onTime, topLights, bottomLights)
+        # Update only if the current state needs it. 
+        if (self.state == State.Autoscore):
+            self.autoscore.update()
+        elif (self.state == State.SHM):
+            self.shm.update()
     
-    def getLightArraysFromData(self, lightData):
-        topLights = []
-        bottomLights = []
-        for d in lightData:
-            topLights.append(d['TOP'])
-            bottomLights.append(d['BOTTOM'])
-        return topLights, bottomLights
+    # This function should only process the data if it's
+    # in Supersynthesis mode. 
+    def processLightData(self, socketData)->None: 
+        if (self.state == State.Supersynthesis):
+            state = socketData['state']
+            # Extract state and pass it to supersynthesis.
+            self.supersynthesis.updateLights(state)
+        else:
+            pass
+    
+    def processOscData(self, address, args): 
+        # Set the right state. 
+        if (address == '/push0'):
+            self.state = State.Supersynthesis
+            self.supersynthesis.begin()
+        elif (address == '/push1'):
+            self.state = State.Supersynth
+            self.supersynth.begin()
+        elif (address == '/push2'):
+            self.state = State.Autoscore  
+            self.autoscore.begin()          
+        elif (address == '/push3'):
+            self.state = State.SHM
+            self.shm.begin()
 
-    def getTimeFromBpm(self, bpm):
-        return 60000 / bpm
-
+        # Is the address coming from the supersynth multipush. 
+        if ('supersynth' in address):
+            # Check if it's a valid state before forwarding the message.
+            if (self.state == State.Supersynth):
+                self.supersynth.updateLights(address, args)

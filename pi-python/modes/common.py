@@ -11,13 +11,15 @@ class Direction(Enum):
     Right = 1
     Left = 2
 
+NUM_LIGHTS = 24
+
 class Common:
-    def __init__(self, relay, numLights) -> None:
+    def __init__(self, relay) -> None:
         # Save a handle of the relay.
         self.relay = relay
 
         # Maximum number of lights.
-        self.numLights = numLights
+        self.numLights = NUM_LIGHTS
 
         # Snapshot of current time. 
         self.curTime = time()

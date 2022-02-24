@@ -8,7 +8,13 @@ HOST_PORT = 8000
 class OSCClient: 
     def __init__(self, callback): 
         self.dispatcher = Dispatcher()
-        self.dispatcher.map("/push*", callback)
+        # Main interface functions. 
+        self.dispatcher.map("/push0", callback) # supersynthesis
+        self.dispatcher.map("/push1", callback) # supersynth
+        self.dispatcher.map("/push2", callback) # autoscore
+        self.dispatcher.map("/push3", callback) # shm
+        self.dispatcher.map("/supersynth*", callback)
+
 
     async def setupServer(self, eventLoop):
         server = AsyncIOOSCUDPServer((HOST_IP, HOST_PORT), self.dispatcher, eventLoop)

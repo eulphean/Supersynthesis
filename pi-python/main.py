@@ -9,12 +9,11 @@ import asyncio
 import sys
 from lightsManager import LightsManager
 
-def myfunction(address, args):
-    print("calback")
-    print(address + args)
+def onOscData(address, args):
+    lightsManager.processOscData(address, args)
 
 def onSocketData(data):
-    lightsManager.updateLightData(data)
+    lightsManager.processLightData(data)
 
 async def update():
     while True:
@@ -40,7 +39,6 @@ async def main():
         t3.cancel()
         print("All pending tasks cancelled")
 
-
 # Get the first argument. If it's debug,
 # we are doing this from Windows machine. 
 # Pass any other string if on a raspberry pi. 
@@ -48,5 +46,5 @@ state = sys.argv[1]
 state = state == 'debug'
 lightsManager = LightsManager(state)
 socketClient = SocketClient(onSocketData)
-oscClient = OSCClient(myfunction)
+oscClient = OSCClient(onOscData)
 asyncio.run(main())

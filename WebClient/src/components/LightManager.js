@@ -70,15 +70,29 @@ export default class LightManager {
             this.handleUserInteracting(meshEllipsePos, boundaryWidth);
         } else {
             // Reset this value here. 
-            // this.isCurrentlyGrowing = false;  
+            this.isCurrentlyGrowing = false;  
             // Cycle the lights from left to right, then right to left. 
             // this.handleUserNotInteracting(); 
+            for (let i = 0; i < this.lights.length; i++) {
+                let light = this.lights[i];
+                let top = light.isGrowing(LIGHT_TYPE.TOP);
+                let bottom = light.isGrowing(LIGHT_TYPE.BOTTOM);
+                this.isCurrentlyGrowing = this.isCurrentlyGrowing || top || bottom; 
+            }
         }
 
         // Draw the lights based on the state. 
         for (let i = 0; i < this.lights.length; i++) {
             this.lights[i].draw(isUserInteracting, this.isCurrentlyGrowing);
         }
+
+        if (isUserInteracting || this.isCurrentlyGrowing) {
+            // Draw a center line. 
+            this.p5.stroke("black")
+            this.p5.strokeWeight(6)
+            this.p5.line(0, this.p5.height/2, this.p5.width, this.p5.height/2)
+        }
+        
     }
 
     handleUserInteracting(meshEllipsePos, boundaryWidth) {       
@@ -134,28 +148,6 @@ export default class LightManager {
 // }
 
 
-// testDataLights(data) {
-//     let idx = data['idx'];
-//     let val = data['val'];
-//     let type = data['type'];
-//     if (val === 1) {
-//         let light = this.lights[idx];
-//         let lightType;
-//         if (type === 1) {
-//             lightType = LIGHT_TYPE.TOP;
-//         } else {
-//             lightType = LIGHT_TYPE.BOTTOM;
-//         }
-//         light.updateDrawState(lightType, true);
-//     }
-
-//     if (val === -1) {
-//         this.lights.forEach(l => {
-//             l.updateDrawState(LIGHT_TYPE.TOP, false);
-//             l.updateDrawState(LIGHT_TYPE)
-//         })
-//     }
-// }
 
 // handleUserNotInteracting() {
 //     // Are all lights completely grown out? 

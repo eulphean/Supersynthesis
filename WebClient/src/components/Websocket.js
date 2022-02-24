@@ -33,7 +33,7 @@ class Websocket {
       this.socket.on('initialFullPayload', (payload) => {
         LightConfigStore.setPayloadFromDatabase(payload); 
       }); 
-      this.socket.on('lightData', data => {
+      this.socket.on('lightdata', data => {
         LightConfigStore.setLightTimerData(data);
       });
   }

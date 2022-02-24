@@ -8,7 +8,7 @@ const DIRECTION = {
     LEFT: 0
 }
 const OFF_TIME = 2000; // 250 milliseconds. 
-const TRIGGER_EVENT = 'lightData';
+const TRIGGER_EVENT = 'lightdata';
 
 class LightManager {
     constructor(io) {

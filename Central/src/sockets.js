@@ -9,7 +9,6 @@ var LightManager = require('./lightManager.js')
 
 // Global variables. 
 let appSocket; 
-let piSocket; 
 let io; 
 let lightManager;
 
@@ -25,7 +24,6 @@ module.exports = {
 
         // /app and /central are two seperate namespaces. 
         appSocket = io.of('/app').on('connection', onWebClient); // Connects all web instance to this. 
-        piSocket = io.of('/pi').on('connection', onPiClient); // Connects the raspberry pi (python) socket to this. 
         lightManager = new LightManager(io);
     },
 
@@ -40,7 +38,6 @@ module.exports = {
 function ping() {
     var t = new Date().toTimeString(); 
     appSocket.emit('time', t); 
-    piSocket.emit('time', t);
 }
 
 function onWebClient(socket) {
@@ -109,8 +106,4 @@ function onDisconnect() {
     if (count === 0) {
         lightManager.clearTimer();
     }
-}
-
-function onPiClient(socket) {
-    console.log('New Pi Client connection: ' + socket.id);
 }

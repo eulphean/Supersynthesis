@@ -1,9 +1,9 @@
 import socketio
 
-# HOST_ADDRESS = 'http://localhost:5000'
-HOST_HEROKU = 'https://supersynth.herokuapp.com'
+HOST_ADDRESS = 'http://localhost:5000'
+# HOST_HEROKU = 'https://supersynth.herokuapp.com'
 # Socket handler. Implement all event methods here. 
-class PiSocket(socketio.AsyncClientNamespace):
+class AppSocket(socketio.AsyncClientNamespace):
     def setCallback(self, cbk):
         self.callback = cbk
         print('set')
@@ -23,6 +23,11 @@ class PiSocket(socketio.AsyncClientNamespace):
         # pass
         print("Wave data: ")
         self.callback(data)
+    
+    async def on_lightdata(self, data):
+        print('New Data')
+        # pass
+        self.callback(data)
 
     async def on_testdata(self, data):
         # pass
@@ -31,12 +36,12 @@ class PiSocket(socketio.AsyncClientNamespace):
 class SocketClient:
     def __init__(self, onSocketData):
         self.sio = socketio.AsyncClient()
-        piSocket = PiSocket('/pi')
-        piSocket.setCallback(onSocketData)
-        self.sio.register_namespace(piSocket)
+        appSocket = AppSocket('/app')
+        appSocket.setCallback(onSocketData)
+        self.sio.register_namespace(appSocket)
 
     async def startServer(self):
-        await self.sio.connect(HOST_HEROKU, namespaces=['/pi'])
+        await self.sio.connect(HOST_ADDRESS, namespaces=['/app'])
         await self.sio.wait()
 
 

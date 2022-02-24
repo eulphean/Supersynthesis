@@ -20,8 +20,8 @@ class LightsManager:
         self.supersynthesis.update()
 
     def updateLightData(self, data)->None: 
-        #test data
-        self.supersynthesis.updateTestData(data['idx'], data['val'])
+        state = data['state']
+        self.supersynthesis.updateLights(state)
 
         # Wave data
         # onTime = self.getTimeFromBpm(data['bpm'])

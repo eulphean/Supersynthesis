@@ -124,3 +124,14 @@ class Supersynthesis(Common):
         elif (val == -1):
             self.fullTurnOff()
             pass
+    
+    def updateLights(self, state):
+        if (state == 'NONE'):
+            self.fullTurnOff()    
+            return
+        else:
+            el = state.pop()
+            idx = el['idx']
+            val = el['val']
+            if (val == 1):
+                self.switchOn(idx)

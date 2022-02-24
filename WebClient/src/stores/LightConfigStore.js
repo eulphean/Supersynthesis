@@ -31,7 +31,10 @@ class LightConfigStore {
         // Default values. 
         this.configIndex = 0; 
         this.bpm = 150;
+        // Maintains the config for 24 lights (top & bottom) - used for interactive state. 
         this.lightConfig = [];
+        // Maintains the config for 24 lights (NO top or bottom) - used for non-interactive state. 
+        this.drawConfig = []; 
 
         // Helper value to create default heights. 
         this.maxLightHeight = 0;
@@ -66,15 +69,14 @@ class LightConfigStore {
     prepareDefaultLightConfig() {
         console.log('Preparing default config.');
         for (let i = 0; i < NUM_LIGHTS; i++) {
-            // Create a state object.
+            // All lights are off by default. 
+            this.drawConfig.push(false); 
+
+            // Create a state object for lights ()
             let stateObject = {
                 'light': {
                     'TOP': 1, 
                     'BOTTOM': 1
-                },
-                'draw': {
-                    'TOP': false,
-                    'BOTTOM': false
                 },
                 'grow': {
                     'TOP': {
@@ -118,10 +120,10 @@ class LightConfigStore {
 
     // GET/SET light's draw state. 
     getDrawState(i) {
-        return this.lightConfig[i]['draw'];
+        return this.drawConfig[i];
     }
-    setDrawState(i, lightType, state) {
-        this.lightConfig[i]['draw'][lightType] = state;
+    setDrawState(i, state) {
+        this.drawConfig[i] = state;
     }
 
     // GET/SET light's heights. 
@@ -130,10 +132,6 @@ class LightConfigStore {
     }
     setHeightState(i, lightType, height) {
         this.lightConfig[i]['height'][lightType] = height; 
-    }
-
-    getRandomInt(max) {
-        return Math.floor(Math.random() * max);
     }
 
     getBpm() {
@@ -199,6 +197,22 @@ class LightConfigStore {
         }
     }
 
+    setLightTimerData(payload) {
+        let lightState = payload['state'];
+        // Turn off all the lights. 
+        if (lightState === 'NONE') {
+            for (let i = 0; i < this.drawConfig.length; i++) {
+                this.drawConfig[i] = false;
+            }
+        } else {
+            for (let i = 0; i < lightState.length; i++) {
+                let s = lightState[i];
+                let idx = s['idx']; let val = s['val'] === LIGHT_STATE.ON;
+                this.drawConfig[idx] = val; 
+            }
+        }
+    }
+
     // Extract the config we need for the database. 
     filterConfig() {
         let dbConfig = []; 
@@ -220,11 +234,6 @@ class LightConfigStore {
                 'light': {
                     'TOP': data[LIGHT_TYPE.TOP], 
                     'BOTTOM': data[LIGHT_TYPE.BOTTOM]
-                },
-                // Create the draw states from the incoming light state. 
-                'draw': {
-                    'TOP': data[LIGHT_TYPE.TOP] === LIGHT_STATE.ON,
-                    'BOTTOM': data[LIGHT_TYPE.BOTTOM] === LIGHT_STATE.ON
                 },
                 'grow': {
                     'TOP': {

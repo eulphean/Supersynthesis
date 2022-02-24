@@ -31,16 +31,18 @@ var sketch = (s) => {
   s.draw = () => {
     s.background(s.color(0, 0, 0));  
     lightManager.draw(isUserInteracting, meshManager.ellipsePos, meshManager.boundaryWidth);
-    s.drawCenterLine();
+    s.drawCenterLine(isUserInteracting);
     meshManager.draw(isUserInteracting, lightManager.lights); 
     bpmManager.update(isUserInteracting, meshManager.ellipsePos, lightManager.lights);
   };
 
-  s.drawCenterLine = () => {
-    // Draw a center line. 
-    s.stroke("black")
-    s.strokeWeight(6)
-    s.line(0, s.height/2, s.width, s.height/2)
+  s.drawCenterLine = (isUserInteracting) => {
+    if (isUserInteracting) {
+      // Draw a center line. 
+      s.stroke("black")
+      s.strokeWeight(6)
+      s.line(0, s.height/2, s.width, s.height/2)
+    }
   };
 
   s.mousePressed = () => {

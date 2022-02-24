@@ -24,25 +24,7 @@ class Websocket {
       });
 
       this.socket.once('connect', this.subscribe.bind(this));
-
-      this.commitSubscriber = '';
-      this.testDataSubscriber = '';
   }
-
-  subscribeTestData(listener) {
-    this.testDataSubscriber = listener; 
-  }
-
-  subscribeInfo(listener) {
-    this.commitSubscriber = listener;
-    // this.commitSubscriber.push(listener);
-    // const removeListener = () => {
-    //     this.infoListeners = this.infoSubscribers.filter((s) => listener !== s);
-    // };
-
-    //return removeListener;
-  }
-
 
   subscribe() {
       console.log('Connected');
@@ -51,17 +33,9 @@ class Websocket {
       this.socket.on('initialFullPayload', (payload) => {
         LightConfigStore.setPayloadFromDatabase(payload); 
       }); 
-      // this.socket.on('testdata', (payload) => {
-      //   this.testDataSubscriber(payload);
-      //   // LightConfigStore.setPayloadFromDatabase(payload); 
-      // });
       this.socket.on('lightData', data => {
-        console.log(data);
+        LightConfigStore.setLightTimerData(data);
       });
-      
-
-      // We are connected - trigger a request to receive data.
-      // this.socket.emit('getData');
   }
 
   // ----------------------- DATABASE CALLS --------------------- //
@@ -86,9 +60,6 @@ class Websocket {
   commitLightConfigData() {
     let payload = LightConfigStore.getPayloadForDatabase();
     this.socket.emit('saveData', payload);
-    if (this.commitSubscriber !== '') {
-      this.commitSubscriber(); 
-    }
   }
 }
 

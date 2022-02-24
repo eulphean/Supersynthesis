@@ -49,10 +49,13 @@ function onWebClient(socket) {
     // Subscribe to all the callbacks.
     socket.on('saveData', onSaveData); 
     socket.on('getData', onReadData);
-    socket.on('disconnect', onDisconnect);
+    socket.on('disconnect', (socket) => {
+        console.log('DC'); console.log(socket);
+        onDisconnect(socket);
+    });
 
-    // Add yourself to the room. 
-    // io.of('/app') // Use to get all the clients in the room with this namespace. 
+    let count = io.of('/app').sockets.size;
+    console.log('Members connected: ' + count);
 
     let promiseConfig = database.readData();
     Promise.all([promiseConfig]).then((values) => {
@@ -60,7 +63,7 @@ function onWebClient(socket) {
         // Do we have a valid config to work with? 
         if (payload.length > 0) {
             let configPayload = payload[0];
-            sendFullConfigToClient(socket, configPayload);
+            sendFullConfigToClient(configPayload);
             // Does timer exist? 
             if (lightManager.doesTimerExist()) {
                 console.log('Timer already exists. Do nothing!!');
@@ -77,20 +80,21 @@ function onSaveData(data) {
     database.saveData(data).then(payload => {
         if (lightManager.doesTimerExist()) { // At this time, timer will absolutely exist!!
             // Parse the payload back into object. 
-            payload = JSON.parse(payload['config']);
+            let parsedPayload = JSON.parse(payload['config']);
+            let configPayload = {'index': payload['index'], 'config': parsedPayload};
+            sendFullConfigToClient(configPayload);
             console.log("New payload from client. Recreate timer.");
             // Start a fresh timer.
-            lightManager.setupTimer(payload); 
+            lightManager.setupTimer(parsedPayload); 
         } else {
             console.log('GRAVE ISSUE: TIMER DID NOT EXIST');
         }
     });
 }
 
-// Only a single emit should happen for the entire duration of the 
-// client. That too when it's connected.
-function sendFullConfigToClient(socket, payload) {    
-    socket.emit('initialFullPayload', payload);
+// Sending full payload to the clients. 
+function sendFullConfigToClient(payload) {    
+    io.of('/app').emit('initialFullPayload', payload);
 }
 
 function onReadData() {
@@ -99,7 +103,12 @@ function onReadData() {
 }
 
 function onDisconnect() {
-    console.log('Web client ' + socket.id + ' disconnected');
+    let count = io.of('/app').sockets.size;
+    console.log('Web client disconnected.');
+    console.log('Connected clients: ' + count);
+    if (count === 0) {
+        lightManager.clearTimer();
+    }
 }
 
 function onPiClient(socket) {

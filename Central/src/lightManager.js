@@ -97,6 +97,7 @@ class LightManager {
         if (this.timerId !== '') {
             console.log('Cleaning previous timer: ' + this.timerId);
             clearTimeout(this.timerId); 
+            this.timerId = '';
         }
     }
 

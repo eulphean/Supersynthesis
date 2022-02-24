@@ -27,6 +27,7 @@ export default class Light {
         
         // Colors. 
         this.lightColor = this.p5.color('white');
+        this.lightBgColor = this.p5.color(255, 255, 255, 25);
         this.lightPointColor = this.p5.color('green'); // Only debug.
 
         // Store the current light config. 
@@ -48,26 +49,30 @@ export default class Light {
             this.handleGrowState(LIGHT_TYPE.TOP);
             this.handleGrowState(LIGHT_TYPE.BOTTOM);
 
+            // Top lights
+            this.p5.fill(this.lightBgColor);
+            this.p5.rect(newX, this.pos['y'], this.lightWidth, -this.p5.height/2);
+
             let height = this.getHeight(LIGHT_TYPE.TOP);
+            this.p5.fill(this.lightColor);
             this.p5.rect(newX, this.pos['y'], this.lightWidth, -height);
 
+            // Bottom lights
+            this.p5.fill(this.lightBgColor);
+            this.p5.rect(newX, this.pos['y'], this.lightWidth, this.p5.height/2);
+
             height = this.getHeight(LIGHT_TYPE.BOTTOM);
+            this.p5.fill(this.lightColor);
             this.p5.rect(newX, this.pos['y'], this.lightWidth, height);  
         } else {
-             // Am I supposed to draw this top light? 
-            if (this.canDraw(LIGHT_TYPE.TOP)) {
-                // let height = this.getHeight(LIGHT_TYPE.TOP);
-                this.p5.rect(newX, this.pos['y'], this.lightWidth, -this.p5.height/2);
-            }
-
-            // Am I supposed to draw this bottom light?
-            if (this.canDraw(LIGHT_TYPE.BOTTOM)) {
-                // let height = this.getHeight(LIGHT_TYPE.BOTTOM);
-                this.p5.rect(newX, this.pos['y'], this.lightWidth, this.p5.height/2);    
+            this.p5.fill(this.lightBgColor);
+            this.p5.rect(newX, 0, this.lightWidth, this.p5.height);
+            // Draw solid light
+            if (this.canDraw()) {
+                this.p5.fill(this.lightColor);
+                this.p5.rect(newX, 0, this.lightWidth, this.p5.height);
             }
         }
-
-        // this.drawLightPoint();
     }
     
     randomizeGrowState() {
@@ -160,10 +165,9 @@ export default class Light {
         return heightState[lightType];
     }
 
-    // Should this light be drawn? 
-    canDraw(lightType) {
+    canDraw() {
         let drawState = LightConfigStore.getDrawState(this.curIdx);
-        return drawState[lightType]; // It's true or false. 
+        return drawState; // It's true or false. 
     }
 
     // Is this light on? 
@@ -247,7 +251,11 @@ export default class Light {
     }
 }
 
-
+    // // Should this light be drawn? 
+    // canDraw(lightType) {
+    //     let drawState = LightConfigStore.getDrawState(this.curIdx);
+    //     return drawState[lightType]; // It's true or false. 
+    // }
     // Fired when new light updates are received. 
     // updateLights() {
     //     console.log('New lights received: Update the light heights.');
@@ -257,3 +265,16 @@ export default class Light {
     //         // l.setHeight(configState);
     //     }
     // }
+
+
+                //  // Am I supposed to draw this top light? 
+                //  if (this.canDraw(LIGHT_TYPE.TOP)) {
+                //     // let height = this.getHeight(LIGHT_TYPE.TOP);
+                //     this.p5.rect(newX, this.pos['y'], this.lightWidth, -this.p5.height/2);
+                // }
+    
+                // // Am I supposed to draw this bottom light?
+                // if (this.canDraw(LIGHT_TYPE.BOTTOM)) {
+                //     // let height = this.getHeight(LIGHT_TYPE.BOTTOM);
+                //     this.p5.rect(newX, this.pos['y'], this.lightWidth, this.p5.height/2);    
+                // }

@@ -25,8 +25,8 @@ const NUM_LIGHTS = 24;
 class LightConfigStore {
     constructor() {
         // Listeners for this database. 
-        this.lightSubscribers = []; 
         this.infoSubscribers = [];
+        this.bpmSubscriber = '';
 
         // Default values. 
         this.configIndex = 0; 
@@ -43,15 +43,6 @@ class LightConfigStore {
         this.prepareDefaultLightConfig();
     }
 
-    subscribeLights(listener) {
-        this.lightSubscribers.push(listener); 
-        const removeListener = () => {
-            this.lightSubscribers = this.lightSubscribers.filter((s) => listener !== s);
-        };
-
-        return removeListener;
-    }
-
     subscribeInfo(listener) {
         this.infoSubscribers.push(listener);
         const removeListener = () => {
@@ -59,6 +50,10 @@ class LightConfigStore {
         };
 
         return removeListener;
+    }
+    
+    subscribeBpmUpdates(listener) {
+        this.bpmSubscriber = listener;
     }
 
     setMaxHeight(height) {
@@ -137,12 +132,8 @@ class LightConfigStore {
     getBpm() {
         return this.bpm;
     }
-    setBpm(bpm) {
-        this.bpm = bpm; 
-        // Trigger info subscribers. 
-        for (let i = 0; i < this.infoSubscribers.length; i++) {
-            this.infoSubscribers[i]();
-        }
+    setLocalBpm(localBpm) {
+        this.bpmSubscriber(localBpm);
     }
     getConfigIndex() {
         return this.configIndex;
@@ -154,7 +145,7 @@ class LightConfigStore {
         this.configIndex += 1; 
         let dbConfig = this.filterConfig();
         this.json = {}
-        this.json['bpm'] = this.bpm; 
+        this.json['bpm'] = this.bpm; // Get the current bpm that has been set by the user. 
         this.json['lights'] = dbConfig;
         this.json['time'] = Date();
 
@@ -190,11 +181,6 @@ class LightConfigStore {
         // config with this incoming data. 
         let lightData = config['lights'];
         this.updateLightConfig(lightData);
-
-        // Trigger light subscribers.
-        for (let i = 0; i < this.lightSubscribers.length; i++) {
-            this.lightSubscribers[i]();
-        }
     }
 
     setLightTimerData(payload) {

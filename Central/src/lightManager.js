@@ -8,7 +8,7 @@ const DIRECTION = {
     LEFT: 0
 }
 const OFF_TIME = 2000; // 250 milliseconds. 
-const TRIGGER_EVENT = 'lightdata';
+const TRIGGER_EVENT = 'lightData';
 
 class LightManager {
     constructor(io) {
@@ -42,6 +42,7 @@ class LightManager {
 
     handleInterval() {
         let lightPayload = this.getLightPayload();
+        // We added a type to the payload for 
         this.io.of('/app').emit(TRIGGER_EVENT, lightPayload); 
         // If state is none, we need to turn off the lights. Thus, we use OFF_TIME. 
         let timeToWait = lightPayload['state'] === 'NONE' ? OFF_TIME : this.intervalTime; 

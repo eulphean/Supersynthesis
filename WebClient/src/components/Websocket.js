@@ -30,22 +30,14 @@ class Websocket {
       console.log('Connected');
       // Subscribe to incoming events from the webserver here. 
       this.socket.on('time', this.logTime.bind(this));
-      this.socket.on('initialFullPayload', (payload) => {
+      // Show up when user starts interacting.
+      this.socket.on('fullPayload', (payload) => {
         LightConfigStore.setPayloadFromDatabase(payload); 
       }); 
-      this.socket.on('lightdata', data => {
+      // Shows the data when user is not interacting
+      this.socket.on('lightData', data => {
         LightConfigStore.setLightTimerData(data);
       });
-  }
-
-  // ----------------------- DATABASE CALLS --------------------- //
-  saveEntry() {
-    let payload = {
-      'index': 0,
-      'data': 'Hi this is fresh data'
-    }
-
-    this.socket.emit('saveData', payload);
   }
 
   // -------------------- DON'T CHANGE THESE -------------------    

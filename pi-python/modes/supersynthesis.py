@@ -26,3 +26,7 @@ class Supersynthesis(Common):
             val = el['val']
             if (val == 1):
                 self.switchOn(idx)
+
+    def resetLights(self):
+        self.lightsOn(0, 23)
+        self.lightsOff(0, 23)

@@ -14,7 +14,10 @@ class AppSocket(socketio.AsyncClientNamespace):
     async def on_time(self, data):
         pass
     
-    async def on_lightdata(self, data):
+    async def on_lightData(self, data):
+        self.callback(data)
+    
+    async def on_fullPayload(self, data):
         self.callback(data)
 
     def registerCallback(self, cbk):

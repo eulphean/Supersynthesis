@@ -12,9 +12,10 @@ const MIN_BPM = 100;
 export default class bpmManager {
     constructor(s) {
         this.p5 = s;
-        this.curBpm = LightConfigStore.bpm; 
-        this.bpmSubscribers = []; 
+        this.curBpm = LightConfigStore.bpm;
         this.curTime = ''; 
+        
+        this.bpmListener = '';
     }
 
     // Simple BPM calculator.
@@ -56,8 +57,8 @@ export default class bpmManager {
                 this.curBpm = MAX_BPM;
             }
 
-            // Set BPM so all components can get the updates. 
-            LightConfigStore.setBpm(Math.floor(this.curBpm));
+            // Send updates to component subscribed for the event. 
+            LightConfigStore.setLocalBpm(Math.floor(this.curBpm));
         } else {
             // Keep snapshotting the time, so we can calculate
             // the elapsed time. 

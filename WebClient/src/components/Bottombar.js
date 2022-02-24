@@ -10,6 +10,9 @@ import { ORIENTATION } from './App';
 import {color, fontFamily, fontSize, padding} from './CommonStyles'
 import Websocket from './Websocket';
 import LightConfigStore from '../stores/LightConfigStore';
+import BpmManager from './BpmManager';
+import LightManager from './LightManager';
+import UserInteractionStore from '../stores/UserInteractionStore';
 
 const styles = {
     container: {
@@ -31,6 +34,11 @@ const styles = {
     info: {
         backgroundColor: color.bgBlack,
         padding: padding.verySmall,
+        cursor: 'default'
+    },
+
+    button: {
+      cursor: 'pointer'
     }
 };
 
@@ -38,24 +46,37 @@ class BottomBar extends React.Component {
   constructor(props) {
     super(props); 
     this.state={
-      bpm: '',
-      index: ''
+      curBpm: '',
+      originalBpm: '',
+      originalIndex: '',
+      isInteracting: false
     }
+  }
+
+  componentDidMount() {
     LightConfigStore.subscribeInfo(this.onInfoUpdate.bind(this));
+    LightConfigStore.subscribeBpmUpdates(this.onBpmUpdated.bind(this));
+    UserInteractionStore.subscribe(this.onInteractionUpdated.bind(this));
   }
  
   render() {
-    let bpm = this.state.bpm + 'bpm'
-    let states = '#' + this.state.index; 
+    let bpm = this.state.isInteracting ? this.state.curBpm : this.state.originalBpm;
+    let indices = this.state.isInteracting ? this.state.originalIndex + 1 : this.state.originalIndex; 
 
     let heightStyle = this.getHeightStyle();
     return (
       <div style={[styles.container, heightStyle]}>
-          <div style={styles.info}>{states}</div>
-          <div style={styles.info}>{bpm}</div>
-          <div onClick={this.onSend.bind(this)} style={styles.info}>Send</div>
+          <div style={styles.info}>{'#' + indices}</div>
+          <div style={styles.info}>{bpm + 'bpm'}</div>
+          <div onClick={this.onSend.bind(this)} style={[styles.info, styles.button]}>Send</div>
       </div>      
     );
+  }
+
+  onInteractionUpdated(val) {
+    this.setState({
+      isInteracting: val
+    });
   }
 
   getHeightStyle() {
@@ -97,12 +118,23 @@ class BottomBar extends React.Component {
     return deviceHeight * c; 
   }
 
-  onInfoUpdate() {
-    let idx = LightConfigStore.getConfigIndex();
-    let bpm = LightConfigStore.getBpm(); 
+  onBpmUpdated(newBpm) {
     this.setState({
-      index: idx + 1, 
-      bpm: bpm
+      curBpm: newBpm
+    });
+  }
+
+  onInfoUpdate() {
+    console.log('Info updated')
+    // Config will always store the source of truth value. 
+    // The one at the database. When new data is received, 
+    // reset current and original bpm.
+    let idx = LightConfigStore.getConfigIndex();
+    let oBpm = LightConfigStore.getBpm();
+    this.setState({
+      originalBpm: oBpm,
+      curBpm: oBpm,
+      originalIndex: idx
     });
   }
 

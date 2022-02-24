@@ -12,6 +12,7 @@ let appSocket;
 let io; 
 let lightManager;
 
+const FULL_PAYLOAD_EVENT = 'fullPayload'
 module.exports = {
     socketConfig: function(server) {
         io = socket(server, {
@@ -45,7 +46,6 @@ function onWebClient(socket) {
     
     // Subscribe to all the callbacks.
     socket.on('saveData', onSaveData); 
-    socket.on('getData', onReadData);
     socket.on('disconnect', (socket) => {
         console.log('DC'); console.log(socket);
         onDisconnect(socket);
@@ -60,7 +60,7 @@ function onWebClient(socket) {
         // Do we have a valid config to work with? 
         if (payload.length > 0) {
             let configPayload = payload[0];
-            sendFullConfigToClient(configPayload);
+            sendFullConfigToSender(configPayload, socket);
             // Does timer exist? 
             if (lightManager.doesTimerExist()) {
                 console.log('Timer already exists. Do nothing!!');
@@ -79,7 +79,7 @@ function onSaveData(data) {
             // Parse the payload back into object. 
             let parsedPayload = JSON.parse(payload['config']);
             let configPayload = {'index': payload['index'], 'config': parsedPayload};
-            sendFullConfigToClient(configPayload);
+            sendFullConfigToClients(configPayload);
             console.log("New payload from client. Recreate timer.");
             // Start a fresh timer.
             lightManager.setupTimer(parsedPayload); 
@@ -90,13 +90,13 @@ function onSaveData(data) {
 }
 
 // Sending full payload to the clients. 
-function sendFullConfigToClient(payload) {    
-    io.of('/app').emit('initialFullPayload', payload);
+function sendFullConfigToSender(payload, socket) { 
+    socket.emit(FULL_PAYLOAD_EVENT, payload);
 }
 
-function onReadData() {
-    console.log('Read data from DB: ');
-    database.readData(socket);
+// Sending full payload to the clients. 
+function sendFullConfigToClients(payload) { 
+    io.of('/app').emit(FULL_PAYLOAD_EVENT, payload);
 }
 
 function onDisconnect() {

@@ -7,7 +7,7 @@
 */
 import Light from './Light'
 import LightConfigStore, { LIGHT_TYPE  } from "../stores/LightConfigStore";
-import UserInteractionStore from '../stores/UserInteractionStore';
+import EditModeStore from '../stores/EditModeStore';
 
 const NUM_LIGHTS = 24
 
@@ -15,12 +15,6 @@ export default class LightManager {
     constructor(s) {
         this.p5 = s; 
         this.lights = [];
-        this.curTime = Date.now();
-        this.gliderIdx = 0;
-        this.direction = true; // True - Right, False - Left
-        this.allLightsOff = false; 
-        this.isCurrentlyGrowing = false; 
-        this.timeOn = 0; 
     }
     
     setup() {
@@ -47,49 +41,29 @@ export default class LightManager {
         }
     }
     
-    draw(isUserInteracting, meshEllipsePos, boundaryWidth) {
-        // Is user interacting? Draw all the lights. 
+    draw(meshEllipsePos, boundaryWidth) {
+        // Only
+        let isUserInteracting = EditModeStore.isUserInteracting; 
+        let isEditMode = EditModeStore.isEditMode; 
         if (isUserInteracting) {
-            // Control the lights. 
-            this.handleUserInteracting(meshEllipsePos, boundaryWidth);
-            UserInteractionStore.setInteraction(true);
-        } else {
-            // Reset this value here. 
-            this.isCurrentlyGrowing = false;  
-            // Cycle the lights from left to right, then right to left. 
-            // this.handleUserNotInteracting(); 
-            for (let i = 0; i < this.lights.length; i++) {
-                let light = this.lights[i];
-                let top = light.isGrowing(LIGHT_TYPE.TOP);
-                let bottom = light.isGrowing(LIGHT_TYPE.BOTTOM);
-                this.isCurrentlyGrowing = this.isCurrentlyGrowing || top || bottom; 
-            }
+            // Update the light configuration based on the user's finger. 
+            this.updateLightGrowConfig(meshEllipsePos, boundaryWidth);
         }
 
         // Draw the lights based on the state. 
         for (let i = 0; i < this.lights.length; i++) {
-            this.lights[i].draw(isUserInteracting, this.isCurrentlyGrowing);
+            this.lights[i].draw();
         }
 
-        if (isUserInteracting || this.isCurrentlyGrowing) {
+        if (isUserInteracting || isEditMode) {
             // Draw a center line. 
             this.p5.stroke("black")
             this.p5.strokeWeight(6)
             this.p5.line(0, this.p5.height/2, this.p5.width, this.p5.height/2)
-        } else {
-            UserInteractionStore.setInteraction(false);
         }
-        
     }
 
-    handleUserInteracting(meshEllipsePos, boundaryWidth) {       
-        // Update the light configuration based on the ellipse. 
-        this.updateLightConfig(meshEllipsePos, boundaryWidth);
-
-        this.allLightsOff = false;
-    }
-
-    updateLightConfig(meshEllipsePos, boundaryWidth) {
+    updateLightGrowConfig(meshEllipsePos, boundaryWidth) {
         for (let i = 0; i < this.lights.length; i++) {
             let light = this.lights[i];
 
@@ -114,3 +88,14 @@ export default class LightManager {
         }
     }
 }
+
+// // Reset this value here. 
+// this.isCurrentlyGrowing = false;  
+// // Cycle the lights from left to right, then right to left. 
+// // this.handleUserNotInteracting(); 
+// for (let i = 0; i < this.lights.length; i++) {
+//     let light = this.lights[i];
+//     let top = light.isGrowing(LIGHT_TYPE.TOP);
+//     let bottom = light.isGrowing(LIGHT_TYPE.BOTTOM);
+//     this.isCurrentlyGrowing = this.isCurrentlyGrowing || top || bottom; 
+// }

@@ -29,8 +29,8 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     color: 'white',
-    height: '100vh',
-    width: '100vw',
+    height: '100%',
+    width: '100%',
     zIndex: '1'
   },
 
@@ -74,15 +74,19 @@ class App extends React.Component {
   evaluateOrientation() {
     let t = (window.innerHeight < window.innerWidth); 
     if (t) {
-      console.log('App: Landscape');
-      this.setState({
-        orientation: ORIENTATION.LANDSCAPE
-      }); 
+      setTimeout(() => {
+        console.log('App: Landscape');
+        this.setState({
+          orientation: ORIENTATION.LANDSCAPE
+        }); 
+      }, 500);
     } else {
-      console.log('App: Portrait');
-      this.setState({
-        orientation: ORIENTATION.PORTRAIT
-      });
+      setTimeout(() => {
+        console.log('App: Portrait');
+        this.setState({
+          orientation: ORIENTATION.PORTRAIT
+        });
+      }, 500);
     }
   }
 }

@@ -10,12 +10,12 @@ import Radium from 'radium'
 import {color} from './CommonStyles'
 import p5 from 'p5'
 import { ORIENTATION } from './App'
+import EditModeStore from '../stores/EditModeStore'
 import LightManager from './LightManager'
 import MeshManager from './MeshManager'
 import BpmManager from './BpmManager'
 
 var sketch = (s) => {
-  let isUserInteracting = false;
   let lightManager, meshManager, bpmManager;
   s.setup = () => {
     let canvasContainer = s.select('#canvasContainer');
@@ -25,37 +25,40 @@ var sketch = (s) => {
     lightManager = new LightManager(s);
     meshManager = new MeshManager(s);
     bpmManager = new BpmManager(s); 
+
     lightManager.setup();
   };
 
   s.draw = () => {
     s.background(s.color(0, 0, 0));  
-    lightManager.draw(isUserInteracting, meshManager.ellipsePos, meshManager.boundaryWidth);
-    // s.drawCenterLine(isUserInteracting);
-    meshManager.draw(isUserInteracting, lightManager.lights); 
-    bpmManager.update(isUserInteracting, meshManager.ellipsePos, lightManager.lights);
+    lightManager.draw(meshManager.ellipsePos, meshManager.boundaryWidth);
+    meshManager.draw(lightManager.lights); 
+    bpmManager.update(meshManager.ellipsePos, lightManager.lights);
   };
 
   s.mousePressed = () => {
     if (s.mouseY > s.height || s.mouseY < 0) {
       // Ignore. 
     } else {
-      isUserInteracting = true; 
+      EditModeStore.setUserInteracting(true); 
+      EditModeStore.setEditMode(true);
     }
   };
 
   s.mouseReleased = () => {
-    isUserInteracting = false; 
-  };
+    EditModeStore.setUserInteracting(false); 
+  }
 
   s.windowResized = () => {
-    console.log('Canvas Resized.');
-    let canvasContainer = s.select('#canvasContainer');
-    let height = canvasContainer.height;
-    s.resizeCanvas(window.innerWidth, height); 
-
-    // Prepare the lights again. 
-    lightManager.prepareLights();
+    setTimeout(() => {
+      console.log('Canvas Resized.');
+      let canvasContainer = s.select('#canvasContainer');
+      let height = canvasContainer.height;
+      s.resizeCanvas(window.innerWidth, height); 
+  
+      // Prepare the lights again. 
+      lightManager.prepareLights();
+    }, 500);
   }
 };
 
@@ -78,7 +81,7 @@ class WaveCanvas extends React.Component {
 
   componentDidMount() {
     console.log('Wave canvas mounted');    
-    this.myP5 = new p5(sketch, this.sketchRef.current);
+    this.myP5 = new p5(sketch, this.sketchRef.current); 
   }
   
   render() {     

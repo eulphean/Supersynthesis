@@ -5,6 +5,7 @@
   Description: A class representing each light that is painted on the canvas. 
 */
 import LightConfigStore, { LIGHT_TYPE, LIGHT_STATE, GROW_STATE } from "../stores/LightConfigStore";
+import EditModeStore from "../stores/EditModeStore";
 
 const GROW_FACTOR = 2.5;
 
@@ -39,13 +40,14 @@ export default class Light {
         setInterval(this.randomizeGrowState.bind(this), 3000); 
     }
 
-    draw(isUserInteracting, isCurrentlyGrowing) {
+    draw() {
         let newX = this.getNewPos();
         this.p5.fill(this.lightColor);
         this.p5.noStroke();
-
-        // If user is interacting? Draw everything
-        if (isUserInteracting || isCurrentlyGrowing) {
+        
+        let isEditMode = EditModeStore.isEditMode;
+        let isUserInteracting = EditModeStore.isUserInteracting; 
+        if (isUserInteracting || isEditMode) {
             this.handleGrowState(LIGHT_TYPE.TOP);
             this.handleGrowState(LIGHT_TYPE.BOTTOM);
 

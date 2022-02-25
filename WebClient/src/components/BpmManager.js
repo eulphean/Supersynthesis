@@ -6,6 +6,7 @@
 */
 
 import LightConfigStore, { LIGHT_TYPE } from "../stores/LightConfigStore";
+import EditModeStore from "../stores/EditModeStore";
 
 const MAX_BPM = 250;
 const MIN_BPM = 100;
@@ -14,13 +15,15 @@ export default class bpmManager {
         this.p5 = s;
         this.curBpm = LightConfigStore.bpm;
         this.curTime = ''; 
-        
-        this.bpmListener = '';
     }
 
     // Simple BPM calculator.
-    update(isInteracting, ellipsePos, lights) {
-        if (isInteracting) { 
+    update(ellipsePos, lights) {
+        let isEditMode = EditModeStore.isEditMode; 
+        let isUserInteracting = EditModeStore.isUserInteracting;
+        // The user must be in Edit Mode and be interacting for the
+        // local bpm to be changing. 
+        if (isUserInteracting && isEditMode) { 
             let shouldAdd = false; 
             if (((ellipsePos['x'] > this.p5.width/2) && (ellipsePos['y'] < this.p5.height/2))
                 || ((ellipsePos['x'] < this.p5.width/2) && (ellipsePos['y'] > this.p5.height/2))){

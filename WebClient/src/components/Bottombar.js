@@ -10,7 +10,7 @@ import { ORIENTATION } from './App';
 import {color, fontFamily, fontSize, padding} from './CommonStyles'
 import Websocket from './Websocket';
 import LightConfigStore from '../stores/LightConfigStore';
-import UserInteractionStore from '../stores/UserInteractionStore';
+import EditModeStore from '../stores/EditModeStore';
 
 const styles = {
     container: {
@@ -47,34 +47,54 @@ class BottomBar extends React.Component {
       curBpm: '',
       originalBpm: '',
       originalIndex: '',
-      isInteracting: false
+      isEditMode: false
     }
   }
 
   componentDidMount() {
     LightConfigStore.subscribeInfo(this.onInfoUpdate.bind(this));
     LightConfigStore.subscribeBpmUpdates(this.onBpmUpdated.bind(this));
-    UserInteractionStore.subscribe(this.onInteractionUpdated.bind(this));
+    EditModeStore.subscribe(this.onEditModeUpdates.bind(this));
   }
  
   render() {
-    let bpm = this.state.isInteracting ? this.state.curBpm : this.state.originalBpm;
-    let indices = this.state.isInteracting ? this.state.originalIndex + 1 : this.state.originalIndex; 
-
+    let bpm = this.state.isEditMode ? this.state.curBpm : this.state.originalBpm;
+    let indices = this.state.isEditMode ? this.state.originalIndex + 1 : this.state.originalIndex; 
     let heightStyle = this.getHeightStyle();
+    let elements = this.state.isEditMode ? 
+      this.getEditModeElements(heightStyle, bpm) : 
+      this.getElements(heightStyle, indices, bpm);
+    return elements; 
+  }
+
+  getEditModeElements(heightStyle, bpm) {
     return (
       <div style={[styles.container, heightStyle]}>
-          <div style={styles.info}>{'#' + indices}</div>
+          <div onClick={this.onBack.bind(this)} style={[styles.info, styles.button]}>Back</div>
           <div style={styles.info}>{bpm + 'bpm'}</div>
           <div onClick={this.onSend.bind(this)} style={[styles.info, styles.button]}>Send</div>
-      </div>      
+      </div>   
     );
   }
 
-  onInteractionUpdated(val) {
-    this.setState({
-      isInteracting: val
-    });
+  getElements(heightStyle, indices, bpm) {
+    return (
+      <div style={[styles.container, heightStyle]}>
+        <div style={styles.info}>{'#' + indices}</div>
+        <div style={styles.info}>{bpm + 'bpm'}</div>
+        <div onClick={this.onEdit.bind(this)} style={[styles.info, styles.button]}>Edit</div>
+      </div>  
+    );
+  }
+
+  onEditModeUpdates() {
+    let isEditMode = EditModeStore.isEditMode; 
+    // Don't re-render if we are already in the state. 
+    if (this.state.isEditMode !== isEditMode) {
+      this.setState({
+        isEditMode: isEditMode
+      });
+    }
   }
 
   getHeightStyle() {
@@ -116,10 +136,13 @@ class BottomBar extends React.Component {
     return deviceHeight * c; 
   }
 
-  onBpmUpdated(newBpm) {
-    this.setState({
-      curBpm: newBpm
-    });
+  onBpmUpdated() {
+    let newBpm = LightConfigStore.localBpm
+    if (newBpm !== this.state.curBpm) {
+      this.setState({
+        curBpm: newBpm
+      });
+    }
   }
 
   onInfoUpdate() {
@@ -131,14 +154,41 @@ class BottomBar extends React.Component {
     let oBpm = LightConfigStore.getBpm();
     this.setState({
       originalBpm: oBpm,
-      curBpm: oBpm,
       originalIndex: idx
     });
+
+    // Don't do double updates. This saved on Sending the date.
+    if (oBpm !== this.state.curBpm) {
+      console.log(oBpm); console.log(this.state.curBpm);
+      this.setState({
+        curBpm: oBpm
+      });
+    }
+
+    console.log(this.state);
   }
 
   onSend(event) {
     event.stopPropagation();
+    // Just before committing this. 
     Websocket.commitLightConfigData();
+  }
+
+  onBack(event) {
+    event.stopPropagation();
+    EditModeStore.setEditMode(false);
+    EditModeStore.setUserInteracting(false);
+    this.setState({
+      isEditMode: false
+    });
+  }
+
+  onEdit(event) {
+    event.stopPropagation();
+    EditModeStore.setEditMode(true);
+    this.setState({
+      isEditMode: true
+    });
   }
 }
 

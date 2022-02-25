@@ -47,6 +47,10 @@ const styles = {
     },
     
     iconContainer: {
+      display: 'flex',
+      justifyContent: 'center',
+      width: fontSize.huge,
+      height: fontSize.huge,
       marginTop: padding.kindaSmall,
     },
 

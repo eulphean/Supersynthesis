@@ -31,6 +31,7 @@ class LightConfigStore {
         // Default values. 
         this.configIndex = 0; 
         this.bpm = 150;
+        this.localBpm = 150; 
         // Maintains the config for 24 lights (top & bottom) - used for interactive state. 
         this.lightConfig = [];
         // Maintains the config for 24 lights (NO top or bottom) - used for non-interactive state. 
@@ -133,7 +134,10 @@ class LightConfigStore {
         return this.bpm;
     }
     setLocalBpm(localBpm) {
-        this.bpmSubscriber(localBpm);
+        if (this.localBpm !== localBpm) {
+            this.localBpm = localBpm;
+            this.bpmSubscriber();
+        }
     }
     getConfigIndex() {
         return this.configIndex;
@@ -145,18 +149,13 @@ class LightConfigStore {
         this.configIndex += 1; 
         let dbConfig = this.filterConfig();
         this.json = {}
-        this.json['bpm'] = this.bpm; // Get the current bpm that has been set by the user. 
+        this.json['bpm'] = this.localBpm; // Get the current bpm that has been set by the user. 
         this.json['lights'] = dbConfig;
         this.json['time'] = Date();
 
         let payload = {
             'index' : this.configIndex, 
             'config': JSON.stringify(this.json)
-        }
-
-        // Trigger info subscribers for new data. 
-        for (let i = 0; i < this.infoSubscribers.length; i++) {
-            this.infoSubscribers[i]();
         }
 
         return payload;
@@ -171,6 +170,7 @@ class LightConfigStore {
         // Config items. 
         let config = payload['config'];
         this.bpm = config['bpm'];
+
 
         // Trigger info subscribers. 
         for (let i = 0; i < this.infoSubscribers.length; i++) {

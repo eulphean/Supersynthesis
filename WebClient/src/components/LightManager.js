@@ -62,11 +62,11 @@ export default class LightManager {
                 } else {
                     this.var -= 1; 
                 }
-                if (this.var == 24) {
+                if (this.var === 24) {
                     this.var = 23;
                     this.dir = false; 
                 }
-                if (this.var == -1) {
+                if (this.var === -1) {
                     this.var = 0; 
                     this.dir = true;
                     this.showResetAnimation = false;

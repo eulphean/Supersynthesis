@@ -20,7 +20,7 @@ var sketch = (s) => {
   s.setup = () => {
     let canvasContainer = s.select('#canvasContainer');
     let height = canvasContainer.height;
-    let canvas = s.createCanvas(window.innerWidth, height);
+    s.createCanvas(window.innerWidth, height);
 
     lightManager = new LightManager(s);
     meshManager = new MeshManager(s);

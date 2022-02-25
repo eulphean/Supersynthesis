@@ -28,7 +28,7 @@ export default class Light {
         
         // Colors. 
         this.lightColor = this.p5.color('white');
-        this.lightBgColor = this.p5.color(255, 255, 255, 25);
+        this.lightBgColor = this.p5.color(255, 255, 255, 50);
         this.lightPointColor = this.p5.color('green'); // Only debug.
 
         // Store the current light config. 
@@ -42,6 +42,12 @@ export default class Light {
 
     specialDraw() {
         let newX = this.getNewPos();
+
+        // Background bars.
+        this.p5.fill(this.lightBgColor);
+        this.p5.rect(newX, 0, this.lightWidth, this.p5.height);
+
+        // Full light bars.
         this.p5.fill(this.lightColor);
         this.p5.rect(newX, 0, this.lightWidth, this.p5.height);
     }

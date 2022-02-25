@@ -15,11 +15,21 @@ export default class LightManager {
     constructor(s) {
         this.p5 = s; 
         this.lights = [];
+        this.showResetAnimation = false; 
+        this.curTime = 0; 
+        this.var = 0; 
+        this.dir = true; 
     }
     
     setup() {
         // Prepare the light collection.
         this.prepareLights();
+        LightConfigStore.subscribeInfo(this.newPayloadReceived.bind(this));
+    }
+
+    newPayloadReceived() {
+        this.showResetAnimation = true; 
+        this.curTime = Date.now(); 
     }
 
     prepareLights() {
@@ -42,24 +52,46 @@ export default class LightManager {
     }
     
     draw(meshEllipsePos, boundaryWidth) {
-        // Only
-        let isUserInteracting = EditModeStore.isUserInteracting; 
-        let isEditMode = EditModeStore.isEditMode; 
-        if (isUserInteracting) {
-            // Update the light configuration based on the user's finger. 
-            this.updateLightGrowConfig(meshEllipsePos, boundaryWidth);
-        }
+        if (this.showResetAnimation) {
+            if (this.var < this.lights.length) {
+                for (let i = 0; i < this.var; i++) {
+                    this.lights[i].specialDraw(); 
+                }
+                if (this.dir) {
+                    this.var += 1; 
+                } else {
+                    this.var -= 1; 
+                }
+                if (this.var == 24) {
+                    this.var = 23;
+                    this.dir = false; 
+                }
+                if (this.var == -1) {
+                    this.var = 0; 
+                    this.dir = true;
+                    this.showResetAnimation = false;
+                }
+            }
+        } else {
+            // Only
+            let isUserInteracting = EditModeStore.isUserInteracting; 
+            let isEditMode = EditModeStore.isEditMode; 
+            if (isUserInteracting) {
+                // Update the light configuration based on the user's finger. 
+                this.updateLightGrowConfig(meshEllipsePos, boundaryWidth);
+            }
 
-        // Draw the lights based on the state. 
-        for (let i = 0; i < this.lights.length; i++) {
-            this.lights[i].draw();
-        }
+            // Draw the lights based on the state. 
+            for (let i = 0; i < this.lights.length; i++) {
+                this.lights[i].draw();
+            }
 
-        if (isUserInteracting || isEditMode) {
-            // Draw a center line. 
-            this.p5.stroke("black")
-            this.p5.strokeWeight(6)
-            this.p5.line(0, this.p5.height/2, this.p5.width, this.p5.height/2)
+            if (isUserInteracting || isEditMode) {
+                // Draw a center line. 
+                this.p5.stroke("black")
+                this.p5.strokeWeight(6)
+                this.p5.line(0, this.p5.height/2, this.p5.width, this.p5.height/2)
+            }
         }
     }
 

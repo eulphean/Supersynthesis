@@ -10,6 +10,7 @@ import Popup from './Popup'
 import { ORIENTATION } from './App'
 import { ReactComponent as About } from '../svg/about.svg'
 import {color, fontFamily, fontSize, padding} from './CommonStyles'
+import EditModeStore from '../stores/EditModeStore'
 
 const animation = {
   rotate: Radium.keyframes({
@@ -34,7 +35,7 @@ const styles = {
         alignItems: 'center',
         paddingLeft: padding.small,
         paddingRight: padding.small,
-        zIndex: 1
+        zIndex: '1'
     },
 
     title: {
@@ -132,6 +133,7 @@ class Navbar extends React.Component {
   handleAbout() {
     console.log('Create a popup.');
     this.popupRef.current.showPopup();
+    EditModeStore.setIsPopupActive(true);
   }
 }
 

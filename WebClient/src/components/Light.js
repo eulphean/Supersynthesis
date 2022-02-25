@@ -40,6 +40,12 @@ export default class Light {
         setInterval(this.randomizeGrowState.bind(this), 3000); 
     }
 
+    specialDraw() {
+        let newX = this.getNewPos();
+        this.p5.fill(this.lightColor);
+        this.p5.rect(newX, 0, this.lightWidth, this.p5.height);
+    }
+
     draw() {
         let newX = this.getNewPos();
         this.p5.fill(this.lightColor);
@@ -252,31 +258,3 @@ export default class Light {
         }
     }
 }
-
-    // // Should this light be drawn? 
-    // canDraw(lightType) {
-    //     let drawState = LightConfigStore.getDrawState(this.curIdx);
-    //     return drawState[lightType]; // It's true or false. 
-    // }
-    // Fired when new light updates are received. 
-    // updateLights() {
-    //     console.log('New lights received: Update the light heights.');
-    //     for (let i = 0; i < NUM_LIGHTS; i++) {
-    //         let l = this.lights[i]; 
-    //         // let configState = LightConfigStore.getState(i);
-    //         // l.setHeight(configState);
-    //     }
-    // }
-
-
-                //  // Am I supposed to draw this top light? 
-                //  if (this.canDraw(LIGHT_TYPE.TOP)) {
-                //     // let height = this.getHeight(LIGHT_TYPE.TOP);
-                //     this.p5.rect(newX, this.pos['y'], this.lightWidth, -this.p5.height/2);
-                // }
-    
-                // // Am I supposed to draw this bottom light?
-                // if (this.canDraw(LIGHT_TYPE.BOTTOM)) {
-                //     // let height = this.getHeight(LIGHT_TYPE.BOTTOM);
-                //     this.p5.rect(newX, this.pos['y'], this.lightWidth, this.p5.height/2);    
-                // }

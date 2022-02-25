@@ -26,7 +26,7 @@ const styles = {
         fontFamily: fontFamily.josefin,
         fontSize: fontSize.lessBig,
         letterSpacing: '2px',
-        zIndex: 1,
+        zIndex: '1',
     },
 
     info: {
@@ -159,17 +159,16 @@ class BottomBar extends React.Component {
 
     // Don't do double updates. This saved on Sending the date.
     if (oBpm !== this.state.curBpm) {
-      console.log(oBpm); console.log(this.state.curBpm);
       this.setState({
         curBpm: oBpm
       });
     }
-
-    console.log(this.state);
   }
 
   onSend(event) {
     event.stopPropagation();
+    EditModeStore.setEditMode(false);
+    EditModeStore.setUserInteracting(false);
     // Just before committing this. 
     Websocket.commitLightConfigData();
   }

@@ -16,42 +16,55 @@ export default class MeshManager {
         this.p5 = s; 
         this.ellipsePos = this.p5.createVector(this.p5.width/3, this.p5.height/2);
         this.boundaryWidth = this.p5.height/2;
+        this.prevMouseX = 0;
+        this.prevMouseY = 0; 
     }
 
     draw(lights) {
         let isEditMode = EditModeStore.isEditMode; 
+        let isPopupActive = EditModeStore.isPopupActive;        
+        if (isEditMode) {
+            let mouseX, mouseY;
+            // Don't trap mouseX or mouseY if I'm in the popup. 
+            if (isPopupActive || this.p5.mouseY > this.p5.height || this.p5.mouseY < 0) {
+                mouseX = this.prevMouseX;
+                mouseY = this.prevMouseY; 
+            } else {
+                mouseX = this.p5.mouseX;
+                mouseY = this.p5.mouseY;
+            }
 
-        if (isEditMode) {    
-            if (this.p5.mouseY < this.p5.height) {
-                this.ellipsePos['x'] += (this.p5.mouseX - this.ellipsePos['x']) * EASING;
-                this.ellipsePos['y'] += (this.p5.mouseY - this.ellipsePos['y']) * EASING; 
-    
-                // Make sure the ellipse doesn't go outside the boundary.
-                this.containEllipse();
-    
-                // Draw pull lines for top and bottom lights.
-                for (let i = 0; i < lights.length; i++) {
-                    let light = lights[i];
-    
-                    // Use the local state to draw the lines. 
-                    if (this.ellipsePos['y'] < this.p5.height/2) {
-                        let pos = light.topPos;
-                        let height = light.getHeight(LIGHT_TYPE.TOP);
-                        if (height < this.p5.height/2 && height > 0) {
-                            this.drawLine(pos, this.ellipsePos, i);
-                        }
-                    } else {
-                        let pos = light.bottomPos;
-                        let height = light.getHeight(LIGHT_TYPE.BOTTOM);
-                        if (height < this.p5.height/2 && height > 0) {
-                            this.drawLine(pos, this.ellipsePos, i);
-                        }
+            this.ellipsePos['x'] += (mouseX - this.ellipsePos['x']) * EASING;
+            this.ellipsePos['y'] += (mouseY - this.ellipsePos['y']) * EASING; 
+
+            // Make sure the ellipse doesn't go outside the boundary.
+            this.containEllipse();
+
+            // Draw pull lines for top and bottom lights.
+            for (let i = 0; i < lights.length; i++) {
+                let light = lights[i];
+
+                // Use the local state to draw the lines. 
+                if (this.ellipsePos['y'] < this.p5.height/2) {
+                    let pos = light.topPos;
+                    let height = light.getHeight(LIGHT_TYPE.TOP);
+                    if (height < this.p5.height/2 && height > 0) {
+                        this.drawLine(pos, this.ellipsePos, i);
+                    }
+                } else {
+                    let pos = light.bottomPos;
+                    let height = light.getHeight(LIGHT_TYPE.BOTTOM);
+                    if (height < this.p5.height/2 && height > 0) {
+                        this.drawLine(pos, this.ellipsePos, i);
                     }
                 }
-    
-                // Draw ellipse tracking the mouse. 
-                this.drawEllipse();
             }
+
+            // Draw ellipse tracking the mouse. 
+            this.drawEllipse();
+
+            this.prevMouseX = mouseX;
+            this.prevMouseY = mouseY;
         }        
     }
     

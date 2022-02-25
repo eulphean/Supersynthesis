@@ -74,19 +74,15 @@ class App extends React.Component {
   evaluateOrientation() {
     let t = (window.innerHeight < window.innerWidth); 
     if (t) {
-      setTimeout(() => {
-        console.log('App: Landscape');
-        this.setState({
-          orientation: ORIENTATION.LANDSCAPE
-        }); 
-      }, 500);
+      console.log('App: Landscape');
+      this.setState({
+        orientation: ORIENTATION.LANDSCAPE
+      });
     } else {
-      setTimeout(() => {
-        console.log('App: Portrait');
-        this.setState({
+      console.log('App: Portrait');
+      this.setState({
           orientation: ORIENTATION.PORTRAIT
-        });
-      }, 500);
+      });
     }
   }
 }

@@ -8,6 +8,7 @@ class EditModeStore {
     constructor() {
         this.isEditMode = false; 
         this.isUserInteracting = false; 
+        this.isPopupActive = false; 
         this.subscribers = []; 
     }
 
@@ -25,6 +26,13 @@ class EditModeStore {
     setUserInteracting(val) {
         if (this.isUserInteracting !== val) {
             this.isUserInteracting = val; 
+            this.subscribers.forEach(s => s());
+        }
+    }
+
+    setIsPopupActive(val) {
+        if (this.isPopupActive !== val) {
+            this.isPopupActive = val; 
             this.subscribers.forEach(s => s());
         }
     }

@@ -10,6 +10,7 @@ import Radium from 'radium'
 import { color, padding, fontFamily, fontSize } from './CommonStyles.js'
 import { ReactComponent as Exit } from '../svg/close.svg'
 import { fadeOutUp, fadeOutDown, fadeInDown, fadeInUp } from 'react-animations'
+import EditModeStore from '../stores/EditModeStore.js'
 
 // Maintain the current popup state (to track animations)
 var PopupState = {
@@ -410,7 +411,6 @@ class Popup extends React.Component {
     showPopup() {
         // Adjust the scroll top.
         this.content.current.scrollTop = 0; 
-
         this.setState({
             isVisible: true,
             popupState: PopupState.Open,
@@ -419,10 +419,10 @@ class Popup extends React.Component {
 
     hidePopup(event) {
         event.stopPropagation(); 
-
         this.setState({
             popupState: PopupState.Close
         });
+        EditModeStore.setIsPopupActive(false);
     }
 
     handleOnTouch(event) {

@@ -20,7 +20,7 @@ var sketch = (s) => {
   s.setup = () => {
     let canvasContainer = s.select('#canvasContainer');
     let height = canvasContainer.height;
-    s.createCanvas(window.innerWidth, height);
+    let canvas = s.createCanvas(window.innerWidth, height);
 
     lightManager = new LightManager(s);
     meshManager = new MeshManager(s);
@@ -39,7 +39,7 @@ var sketch = (s) => {
   s.mousePressed = () => {
     if (s.mouseY > s.height || s.mouseY < 0) {
       // Ignore. 
-    } else {
+    } else if (!EditModeStore.isPopupActive) {
       EditModeStore.setUserInteracting(true); 
       EditModeStore.setEditMode(true);
     }
@@ -68,7 +68,7 @@ const styles = {
     backgroundColor: color.bgBlack,
     margin: 0,
     padding: 0,
-    zIndex: 1
+    zIndex: '1'
   }
 };
 

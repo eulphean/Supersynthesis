@@ -10,7 +10,7 @@ import Radium from 'radium'
 
 import Navbar from './Navbar';
 import WaveCanvas from './WaveCanvas';
-import BottomBar from './BottomBar';
+import BottomBar from './Bottombar';
 
 // Enum to track the device orientation. 
 export const ORIENTATION = {

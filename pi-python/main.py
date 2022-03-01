@@ -46,5 +46,5 @@ state = sys.argv[1]
 state = state == 'debug'
 lightsManager = LightsManager(state)
 socketClient = SocketClient(onSocketData)
-oscClient = OSCClient(onOscData)
+oscClient = OSCClient(state, onOscData)
 asyncio.run(main())

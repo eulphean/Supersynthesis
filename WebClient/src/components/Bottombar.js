@@ -36,10 +36,16 @@ const styles = {
     },
 
     button: {
-      cursor: 'pointer'
+      cursor: 'pointer',
+      borderStyle: 'solid',
+      borderWidth: '1.8px',
+      borderColor: color.fgWhite,
+      boxShadow:'0px 1px 1px black' 
     }
 };
 
+/* offset-x | offset-y | blur-radius | color */
+// box-shadow: 10px 5px 5px black;
 class BottomBar extends React.Component {
   constructor(props) {
     super(props); 

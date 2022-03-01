@@ -42,7 +42,7 @@ const fadeInDuration = '0.5s';
 const slideInDuration = '2.0s'; 
 const fadeOutDuration = '1.5s';
 
-const aboutTheWork = 'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.';
+const aboutTheWork = 'Supersynthesis is an interactive audio-visual public art installation that invites people to create a space for collective expression and participation. Accompanied with a physical installation, it utilizes the medium of light and sound to craft a communal experience where the audience activates the piece and the space around it by interacting with it through this online interface. Every audience response is blended into the previous response, thus synthesizing a progressively evolving wave of experience. In an increasingly fragmented society, this project aspires to create an inclusive-whole-living entity, to which anybody can leave a trace of their thought with freedom and creativity. By participating in Supersynthesis, one becomes part of a communal wave that’ll anonymously accumulate until the forthcoming eternity.';
 const styles={
     overlay: {
         position: 'fixed',

@@ -2,12 +2,14 @@ from pythonosc.osc_server import AsyncIOOSCUDPServer
 from pythonosc.dispatcher import Dispatcher
 
 # Ip Address of the host (for OSC). 
-HOST_IP = "192.168.0.11"
+HOST_WINDOWS = "192.168.0.11"
+HOST_PI = "192.168.0.10"
 HOST_PORT = 8000
 
 class OSCClient: 
-    def __init__(self, callback): 
+    def __init__(self, state, callback): 
         self.dispatcher = Dispatcher()
+        self.debugState = state
         # Main interface functions. 
         self.dispatcher.map("/push0", callback) # supersynthesis
         self.dispatcher.map("/push1", callback) # supersynth
@@ -17,12 +19,13 @@ class OSCClient:
 
 
     async def setupServer(self, eventLoop):
-        server = AsyncIOOSCUDPServer((HOST_IP, HOST_PORT), self.dispatcher, eventLoop)
-        await server.create_serve_endpoint()  # Create datagram endpoint and start serving
+        print('setup server')
+        hostIp = ''
+        if (self.debugState):
+            hostIp = HOST_WINDOWS
+        else:
+            hostIp = HOST_PI
 
-    def processSignal(self, address, args):
-        self.callback(address, args)
-        print(address + ', ' + str(args))
-        s = address.split('/')
-        lightIdx = int(s[2])
-        message = '0 ' + str(lightIdx) + ' ' + str(args) + ';'
+        print(hostIp)
+        server = AsyncIOOSCUDPServer((hostIp, HOST_PORT), self.dispatcher, eventLoop)
+        await server.create_serve_endpoint()  # Create datagram endpoint and start serving

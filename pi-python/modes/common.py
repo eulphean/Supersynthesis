@@ -44,7 +44,7 @@ class Common:
     # Turn all the lights from start to end index together.
     def lightsOn(self, startIdx, endIdx) -> None: 
         for x in range(startIdx, endIdx):   
-            self.switchOn(x)
+            self.switchOn(x, False)
         # Lights are on. 
         self.areLightsOn = True
 
@@ -55,8 +55,8 @@ class Common:
         # Lights are off. 
         self.areLightsOn = False
 
-    def switchOn(self, idx) -> None:
-        self.relay.on(idx)
+    def switchOn(self, idx, sound=True) -> None:
+        self.relay.on(idx, sound)
 
     def switchOff(self, idx) -> None:
         self.relay.off(idx)

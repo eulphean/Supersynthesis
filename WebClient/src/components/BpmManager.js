@@ -8,8 +8,8 @@
 import LightConfigStore, { LIGHT_TYPE } from "../stores/LightConfigStore";
 import EditModeStore from "../stores/EditModeStore";
 
-const MAX_BPM = 250;
-const MIN_BPM = 100;
+const MAX_BPM = 300;
+const MIN_BPM = 180;
 export default class bpmManager {
     constructor(s) {
         this.p5 = s;
@@ -47,7 +47,7 @@ export default class bpmManager {
             // Time that has elapsed. 
             let elapsedTime = Date.now() - this.curTime; 
             let v = this.p5.sin(elapsedTime /(sum)); 
-            let mapped =  this.p5.map(v, -1, 1, 0, 0.25);
+            let mapped =  this.p5.map(v, -1, 1, 0, 0.5);
             
             // Calculate the new bpm. 
             this.curBpm = shouldAdd ? (this.curBpm + mapped) : (this.curBpm - mapped); 

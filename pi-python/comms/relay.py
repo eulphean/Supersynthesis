@@ -25,15 +25,18 @@ class Relay:
             # Run with raspberry pi.
             self.initPins()
 
-    def on(self, idx) -> None:
+    def on(self, idx, sound) -> None:
         print("On, idx: " + str(idx))
         led = self.relay[idx]
         # Flipped by design.
         led.on()
 
-        # Pure data message. 
-        message = '0 ' + str(idx) + ' ' + str(1) + ';'
-        send2pd(message)
+        # Play a sound only if I want to it to be on.
+        if (sound):
+            print('Hello')
+            # Pure data message. 
+            message = '0 ' + str(idx) + ' ' + str(1) + ';'
+            send2pd(message)
 
     def off(self, idx) -> None:
         print("Off, idx: " + str(idx))
@@ -42,8 +45,8 @@ class Relay:
         led.off()
 
         # Pure data message. 
-        message = '0 ' + str(idx) + ' ' + str(0) + ';'
-        send2pd(message)
+        # message = '0 ' + str(idx) + ' ' + str(0) + ';'
+        # send2pd(message)
 
     def initPins(self):
         # Set the pins

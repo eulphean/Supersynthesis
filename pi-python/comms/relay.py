@@ -33,7 +33,6 @@ class Relay:
 
         # Play a sound only if I want to it to be on.
         if (sound):
-            print('Hello')
             # Pure data message. 
             message = '0 ' + str(idx) + ' ' + str(1) + ';'
             send2pd(message)

@@ -4,6 +4,7 @@
 # Description: The mode that is controlled by the website (supersynthesis.art).
 
 from modes.common import Common
+import time
 
 class Supersynthesis(Common):
     def __init__(self, relay): 
@@ -28,5 +29,6 @@ class Supersynthesis(Common):
                 self.switchOn(idx)
 
     def resetLights(self):
-        self.lightsOn(0, 23)
+        self.lightsOn(0, 23)    
+        time.sleep(0.5)
         self.lightsOff(0, 23)

@@ -7,8 +7,8 @@
 var Pool = require('pg').Pool;
 
 // ------------------ postgresql database ---------------------- // 
-const connString = process.env['DATABASE_URL'];
-//const connString = 'postgresql://localhost/supersynth?user=amaykataria&password=abc123';
+//const connString = process.env['DATABASE_URL'];
+const connString = 'postgresql://localhost/supersynth?user=amaykataria&password=abc123';
 console.log('Database Connection String: ' + connString); 
 const pool = new Pool({
     connectionString: connString
@@ -98,19 +98,3 @@ function onWriteDatabase(payload) {
     });
     return promise; 
 }
-
-            // if (result.rows.length > 0) { // Entry already exists..
-            //     let entries = result.rows;
-            //     if (entries.length > 0) {
-            //         // Only a single entry should be received. 
-            //         let payload = {
-            //             'index' : entries[0]['index'],
-            //             'config': entries[0]['config']
-            //         }
-            //         // We only need the last entry. 
-            //         socket.emit('receiveData', payload); 
-            //         console.log('Config data emitted for index: ' + payload['index']); 
-            //     } else {
-            //         console.log('Sorry: Nothing to emit. Database is empty!');
-            //     }
-            // }

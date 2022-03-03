@@ -3,12 +3,13 @@
 // File: lightManager.js
 // Description: Helper module to format the light data properly that is sent across multiple clients. 
 
+const EVENT_SEQUENCER_PAYLOAD = 'event_sequencer_payload';
+
 const DIRECTION = {
     RIGHT: 1,
     LEFT: 0
 }
 const OFF_TIME = 1000; // 250 milliseconds. 
-const TRIGGER_EVENT = 'lightData';
 
 class LightManager {
     constructor(io) {
@@ -43,7 +44,7 @@ class LightManager {
     handleInterval() {
         let lightPayload = this.getLightPayload();
         // We added a type to the payload for 
-        this.io.of('/app').emit(TRIGGER_EVENT, lightPayload); 
+        this.io.of('/app').emit(EVENT_SEQUENCER_PAYLOAD, lightPayload); 
         // If state is none, we need to turn off the lights. Thus, we use OFF_TIME. 
         let timeToWait = lightPayload['state'] === 'NONE' ? OFF_TIME : this.intervalTime; 
         this.updateCurIdx();
@@ -59,14 +60,14 @@ class LightManager {
 
         // Send top light state one by one. 
         if (this.direction === DIRECTION.RIGHT) {
-            let d = {'idx': this.curIdx, 'val': this.topLights[this.curIdx]};
+            let d = {'idx': this.curIdx, 'val': this.topLights[this.curIdx], 'type':'TOP'};
             this.lightState.push(d);
             return { state: this.lightState };
         } 
 
         // Send bottom light state one by one. 
         if (this.direction === DIRECTION.LEFT) {
-            let d = {'idx': this.curIdx, 'val': this.bottomLights[this.curIdx]};
+            let d = {'idx': this.curIdx, 'val': this.bottomLights[this.curIdx], 'type':'BOTTOM'};
             this.lightState.push(d);
             return { state: this.lightState };
         }

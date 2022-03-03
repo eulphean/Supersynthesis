@@ -5,8 +5,6 @@
   Description: A class responsible for drawing the connections from the ellipse to all
   the moving lights on the canvas. 
 */
-
-import { LIGHT_TYPE } from "../stores/LightConfigStore";
 import EditModeStore from "../stores/EditModeStore";
 
 // Handles all the code related to interaction with the canvas.
@@ -44,19 +42,10 @@ export default class MeshManager {
             for (let i = 0; i < lights.length; i++) {
                 let light = lights[i];
 
-                // Use the local state to draw the lines. 
-                if (this.ellipsePos['y'] < this.p5.height/2) {
-                    let pos = light.topPos;
-                    let height = light.getHeight(LIGHT_TYPE.TOP);
-                    if (height < this.p5.height/2 && height > 0) {
-                        this.drawLine(pos, this.ellipsePos, i);
-                    }
-                } else {
-                    let pos = light.bottomPos;
-                    let height = light.getHeight(LIGHT_TYPE.BOTTOM);
-                    if (height < this.p5.height/2 && height > 0) {
-                        this.drawLine(pos, this.ellipsePos, i);
-                    }
+                let pos = light.topPos;
+                let height = light.getHeight();
+                if (height < this.p5.height/2 && height > 0) {
+                    this.drawLine(pos, this.ellipsePos, i);
                 }
             }
 
@@ -108,3 +97,18 @@ export default class MeshManager {
         this.p5.line(startPoint['x'], startPoint['y'], endPoint['x'], endPoint['y']);
     }
 }
+
+                // // Use the local state to draw the lines. 
+                // if (this.ellipsePos['y'] < this.p5.height/2) {
+                //     let pos = light.topPos;
+                //     let height = light.getHeight(LIGHT_TYPE.TOP);
+                //     if (height < this.p5.height/2 && height > 0) {
+                //         this.drawLine(pos, this.ellipsePos, i);
+                //     }
+                // } else {
+                //     let pos = light.bottomPos;
+                //     let height = light.getHeight(LIGHT_TYPE.BOTTOM);
+                //     if (height < this.p5.height/2 && height > 0) {
+                //         this.drawLine(pos, this.ellipsePos, i);
+                //     }
+                // }

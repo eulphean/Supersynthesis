@@ -12,7 +12,11 @@ let appSocket;
 let io; 
 let lightManager;
 
-const FULL_PAYLOAD_EVENT = 'fullPayload'
+
+const EVENT_SAVE_PAYLOAD = 'event_save_payload';
+const EVENT_TIME = 'event_time';
+const EVENT_FULL_PAYLOAD = 'event_full_payload';
+
 module.exports = {
     socketConfig: function(server) {
         io = socket(server, {
@@ -38,16 +42,16 @@ module.exports = {
 // Helper function. 
 function ping() {
     var t = new Date().toTimeString(); 
-    appSocket.emit('time', t); 
+    appSocket.emit(EVENT_TIME , t); 
 }
 
 function onWebClient(socket) {
     console.log('New Web Client connection: ' + socket.id); 
     
     // Subscribe to all the callbacks.
-    socket.on('saveData', onSaveData); 
+    socket.on(EVENT_SAVE_PAYLOAD, onSaveData); 
     socket.on('disconnect', (socket) => {
-        console.log('DC'); console.log(socket);
+        console.log(socket);
         onDisconnect(socket);
     });
 
@@ -91,12 +95,12 @@ function onSaveData(data) {
 
 // Sending full payload to the clients. 
 function sendFullConfigToSender(payload, socket) { 
-    socket.emit(FULL_PAYLOAD_EVENT, payload);
+    socket.emit(EVENT_FULL_PAYLOAD, payload);
 }
 
 // Sending full payload to the clients. 
 function sendFullConfigToClients(payload) { 
-    io.of('/app').emit(FULL_PAYLOAD_EVENT, payload);
+    io.of('/app').emit(EVENT_FULL_PAYLOAD, payload);
 }
 
 function onDisconnect() {

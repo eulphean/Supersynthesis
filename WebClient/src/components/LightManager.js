@@ -6,7 +6,7 @@
   in this project. 
 */
 import Light from './Light'
-import LightConfigStore, { LIGHT_TYPE  } from "../stores/LightConfigStore";
+import LightConfigStore from "../stores/LightConfigStore";
 import EditModeStore from '../stores/EditModeStore';
 
 const NUM_LIGHTS = 24
@@ -24,19 +24,18 @@ export default class LightManager {
     setup() {
         // Prepare the light collection.
         this.prepareLights();
-        LightConfigStore.subscribeInfo(this.newPayloadReceived.bind(this));
     }
 
-    newPayloadReceived() {
-        this.showResetAnimation = true; 
-        this.curTime = Date.now(); 
-    }
+    // newPayloadReceived() {
+    //     this.showResetAnimation = true; 
+    //     this.curTime = Date.now(); 
+    // }
 
     prepareLights() {
         this.lights = []; 
 
         // Set max height again since the canvas has been resized. 
-        LightConfigStore.setMaxHeight(this.p5.height/2);
+        LightConfigStore.setMaxHeight(this.p5.height);
         
         // Distance between each tube. 
         let lightIncrement = (this.p5.width) / NUM_LIGHTS;
@@ -46,52 +45,15 @@ export default class LightManager {
         for (let i = 0; i < NUM_LIGHTS; i++) {
             let xPos = i * lightIncrement; 
             // Create a new light instance. 
-            let l = new Light(this.p5, i, xPos, this.p5.height/2, lightWidth);
+            let l = new Light(this.p5, i, xPos, this.p5.height, lightWidth);
             this.lights.push(l);
         }
     }
     
     draw(meshEllipsePos, boundaryWidth) {
-        if (this.showResetAnimation) {
-            if (this.var < this.lights.length) {
-                for (let i = 0; i < this.var; i++) {
-                    this.lights[i].specialDraw(); 
-                }
-                if (this.dir) {
-                    this.var += 1; 
-                } else {
-                    this.var -= 1; 
-                }
-                if (this.var === 24) {
-                    this.var = 23;
-                    this.dir = false; 
-                }
-                if (this.var === -1) {
-                    this.var = 0; 
-                    this.dir = true;
-                    this.showResetAnimation = false;
-                }
-            }
-        } else {
-            // Only
-            let isUserInteracting = EditModeStore.isUserInteracting; 
-            let isEditMode = EditModeStore.isEditMode; 
-            if (isUserInteracting) {
-                // Update the light configuration based on the user's finger. 
-                this.updateLightGrowConfig(meshEllipsePos, boundaryWidth);
-            }
-
-            // Draw the lights based on the state. 
-            for (let i = 0; i < this.lights.length; i++) {
-                this.lights[i].draw();
-            }
-
-            if (isUserInteracting || isEditMode) {
-                // Draw a center line. 
-                this.p5.stroke("black")
-                this.p5.strokeWeight(6)
-                this.p5.line(0, this.p5.height/2, this.p5.width, this.p5.height/2)
-            }
+        // Draw the lights based on the state. 
+        for (let i = 0; i < this.lights.length; i++) {
+            this.lights[i].draw();
         }
     }
 
@@ -108,13 +70,13 @@ export default class LightManager {
                 // Have we crossed the threshold? 
                 if (d < boundaryWidth/2) {
                     // This light is activated, grow or shrink. 
-                    light.updateGrowState(LIGHT_TYPE.TOP);
+                    light.updateGrowState();
                 }
             } else { // Is the ellipse below the half-way line? 
                 // Handle the bottom lights. 
                 if (d < boundaryWidth/2) {
                     // This light is activated, grow or shrink. 
-                    light.updateGrowState(LIGHT_TYPE.BOTTOM);
+                    light.updateGrowState();
                 }
             }
         }
@@ -131,3 +93,42 @@ export default class LightManager {
 //     let bottom = light.isGrowing(LIGHT_TYPE.BOTTOM);
 //     this.isCurrentlyGrowing = this.isCurrentlyGrowing || top || bottom; 
 // }
+
+
+// if (this.showResetAnimation) {
+//     if (this.var < this.lights.length) {
+//         for (let i = 0; i < this.var; i++) {
+//             this.lights[i].specialDraw(); 
+//         }
+//         if (this.dir) {
+//             this.var += 1; 
+//         } else {
+//             this.var -= 1; 
+//         }
+//         if (this.var === 24) {
+//             this.var = 23;
+//             this.dir = false; 
+//         }
+//         if (this.var === -1) {
+//             this.var = 0; 
+//             this.dir = true;
+//             this.showResetAnimation = false;
+//         }
+//     }
+// } else {
+
+
+    // if (isUserInteracting || isEditMode) {
+    //     // Draw a center line. 
+    //     this.p5.stroke("black")
+    //     this.p5.strokeWeight(6)
+    //     this.p5.line(0, this.p5.height/2, this.p5.width, this.p5.height/2)
+    // }
+
+            // // Only
+            // let isUserInteracting = EditModeStore.isUserInteracting; 
+            // let isEditMode = EditModeStore.isEditMode; 
+            // if (isUserInteracting) {
+            //     // Update the light configuration based on the user's finger. 
+            //     this.updateLightGrowConfig(meshEllipsePos, boundaryWidth);
+            // }

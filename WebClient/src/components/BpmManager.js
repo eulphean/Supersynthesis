@@ -5,7 +5,7 @@
   Description: A class responsible for handling the logic to calculate the bpm for the current configuration.
 */
 
-import LightConfigStore, { LIGHT_TYPE } from "../stores/LightConfigStore";
+import BpmStore from '../stores/BpmStore'
 import EditModeStore from "../stores/EditModeStore";
 
 const MAX_BPM = 300;
@@ -13,7 +13,7 @@ const MIN_BPM = 180;
 export default class bpmManager {
     constructor(s) {
         this.p5 = s;
-        this.curBpm = LightConfigStore.bpm;
+        this.curBpm = BpmStore.getDbBpm();
         this.curTime = ''; 
     }
 
@@ -36,10 +36,7 @@ export default class bpmManager {
             let sum = 0; 
             for (let i = 0; i < lights.length; i++) {
                 let light = lights[i];
-                if (light.isOn(LIGHT_TYPE.TOP)) {
-                    sum += 1; 
-                }
-                if (light.isOn(LIGHT_TYPE.BOTTOM)) {
+                if (light.isOn()) {
                     sum += 1; 
                 }
             }
@@ -61,7 +58,7 @@ export default class bpmManager {
             }
 
             // Send updates to component subscribed for the event. 
-            LightConfigStore.setLocalBpm(Math.floor(this.curBpm));
+            BpmStore.setLocalBpm(Math.floor(this.curBpm));
         } else {
             // Keep snapshotting the time, so we can calculate
             // the elapsed time. 

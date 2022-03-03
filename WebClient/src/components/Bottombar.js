@@ -11,6 +11,8 @@ import {color, fontFamily, fontSize, padding} from './CommonStyles'
 import Websocket from './Websocket';
 import LightConfigStore from '../stores/LightConfigStore';
 import EditModeStore from '../stores/EditModeStore';
+import BpmStore from '../stores/BpmStore';
+import ConfigIndexStore from '../stores/ConfigIndexStore';
 
 const styles = {
     container: {
@@ -50,22 +52,22 @@ class BottomBar extends React.Component {
   constructor(props) {
     super(props); 
     this.state={
-      curBpm: '',
-      originalBpm: '',
-      originalIndex: '',
+      localBpm: '',
+      dbBpm: '',
+      configIndex: '',
       isEditMode: false
     }
   }
 
   componentDidMount() {
-    LightConfigStore.subscribeInfo(this.onInfoUpdate.bind(this));
-    LightConfigStore.subscribeBpmUpdates(this.onBpmUpdated.bind(this));
+    BpmStore.subscribe(this.onBpmUpdated.bind(this));
+    ConfigIndexStore.subscribe(this.onConfigIndexUpdated.bind(this));
     EditModeStore.subscribe(this.onEditModeUpdates.bind(this));
   }
  
   render() {
-    let bpm = this.state.isEditMode ? this.state.curBpm : this.state.originalBpm;
-    let indices = this.state.isEditMode ? this.state.originalIndex + 1 : this.state.originalIndex; 
+    let bpm = this.state.isEditMode ? this.state.localBpm : this.state.dbBpm;
+    let indices = this.state.isEditMode ? this.state.configIndex + 1 : this.state.configIndex; 
     let heightStyle = this.getHeightStyle();
     let elements = this.state.isEditMode ? 
       this.getEditModeElements(heightStyle, bpm) : 
@@ -143,30 +145,29 @@ class BottomBar extends React.Component {
   }
 
   onBpmUpdated() {
-    let newBpm = LightConfigStore.localBpm
-    if (newBpm !== this.state.curBpm) {
+    let dbBpm = BpmStore.getDbBpm();
+    let localBpm = BpmStore.getLocalBpm();
+
+    // Update DB bpm.
+    if (dbBpm !== this.state.dbBpm) {
       this.setState({
-        curBpm: newBpm
+        dbBpm: dbBpm
+      });
+    }
+
+    // Update local bpm. 
+    if (localBpm !== this.state.localBpm) {
+      this.setState({
+        localBpm: localBpm
       });
     }
   }
 
-  onInfoUpdate() {
-    console.log('Info updated')
-    // Config will always store the source of truth value. 
-    // The one at the database. When new data is received, 
-    // reset current and original bpm.
-    let idx = LightConfigStore.getConfigIndex();
-    let oBpm = LightConfigStore.getBpm();
-    this.setState({
-      originalBpm: oBpm,
-      originalIndex: idx
-    });
-
-    // Don't do double updates. This saved on Sending the date.
-    if (oBpm !== this.state.curBpm) {
+  onConfigIndexUpdated() {
+    let newConfigIndex = ConfigIndexStore.getConfigIndex();
+    if (newConfigIndex !== this.state.configIndex) {
       this.setState({
-        curBpm: oBpm
+        configIndex: newConfigIndex
       });
     }
   }
@@ -198,3 +199,24 @@ class BottomBar extends React.Component {
 }
 
 export default Radium(BottomBar);
+
+
+// onInfoUpdate() {
+//   console.log('Info updated')
+//   // Config will always store the source of truth value. 
+//   // The one at the database. When new data is received, 
+//   // reset current and original bpm.
+//   let idx = LightConfigStore.getConfigIndex();
+//   let oBpm = LightConfigStore.getBpm();
+//   this.setState({
+//     originalBpm: oBpm,
+//     originalIndex: idx
+//   });
+
+//   // Don't do double updates. This saved on Sending the date.
+//   if (oBpm !== this.state.curBpm) {
+//     this.setState({
+//       curBpm: oBpm
+//     });
+//   }
+// }

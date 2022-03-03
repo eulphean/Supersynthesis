@@ -33,6 +33,8 @@ const styles = {
 
     info: {
         backgroundColor: color.bgBlack,
+        fontFamily: fontFamily.heatwave,
+        letterSpacing: '2px',
         padding: padding.verySmall,
         cursor: 'default'
     },
@@ -43,11 +45,13 @@ const styles = {
       borderWidth: '1.8px',
       borderColor: color.fgWhite,
       boxShadow:'0px 1px 1px black' 
+    },
+
+    disabled: {
+      backgroundColor: color.disabled
     }
 };
 
-/* offset-x | offset-y | blur-radius | color */
-// box-shadow: 10px 5px 5px black;
 class BottomBar extends React.Component {
   constructor(props) {
     super(props); 
@@ -62,16 +66,14 @@ class BottomBar extends React.Component {
   componentDidMount() {
     BpmStore.subscribe(this.onBpmUpdated.bind(this));
     ConfigIndexStore.subscribe(this.onConfigIndexUpdated.bind(this));
-    EditModeStore.subscribe(this.onEditModeUpdates.bind(this));
+    EditModeStore.subscribe(this.onEditModeUpdate.bind(this));
   }
  
   render() {
     let bpm = this.state.isEditMode ? this.state.localBpm : this.state.dbBpm;
-    let indices = this.state.isEditMode ? this.state.configIndex + 1 : this.state.configIndex; 
+    let indices = this.state.configIndex; 
     let heightStyle = this.getHeightStyle();
-    let elements = this.state.isEditMode ? 
-      this.getEditModeElements(heightStyle, bpm) : 
-      this.getElements(heightStyle, indices, bpm);
+    let elements = this.getElements(heightStyle, indices, bpm);
     return elements; 
   }
 
@@ -86,23 +88,39 @@ class BottomBar extends React.Component {
   }
 
   getElements(heightStyle, indices, bpm) {
+    let leftItem = this.getLeftItem(indices); 
+    let sendButton = this.getSendButton();
     return (
       <div style={[styles.container, heightStyle]}>
-        <div style={styles.info}>{'#' + indices}</div>
+        { leftItem }
         <div style={styles.info}>{bpm + 'bpm'}</div>
-        <div onClick={this.onEdit.bind(this)} style={[styles.info, styles.button]}>Edit</div>
+        { sendButton }
       </div>  
     );
   }
 
-  onEditModeUpdates() {
-    let isEditMode = EditModeStore.isEditMode; 
-    // Don't re-render if we are already in the state. 
-    if (this.state.isEditMode !== isEditMode) {
-      this.setState({
-        isEditMode: isEditMode
-      });
-    }
+  getLeftItem(indices) {
+    let item = this.state.isEditMode ? 
+      <div
+        onClick={this.onBack.bind(this)}
+        style={[styles.info, styles.button]}
+        >BACK
+        </div> : 
+      (<div style={styles.info}>{indices}</div>);
+    return item; 
+  }
+
+  getSendButton() {
+    let buttonStyle = [styles.info, styles.button];
+    buttonStyle = !this.state.isEditMode ? [buttonStyle, styles.disabled] : buttonStyle;
+    let onClick = !this.state.isEditMode ? () => {} : this.onSend.bind(this);
+    return (
+      <div 
+        onClick={onClick} 
+        style={buttonStyle}
+      >SEND
+      </div>
+    );
   }
 
   getHeightStyle() {
@@ -142,6 +160,16 @@ class BottomBar extends React.Component {
     }
 
     return deviceHeight * c; 
+  }
+
+  onEditModeUpdate() {
+    let isEditMode = EditModeStore.isEditMode; 
+    // Don't re-render if we are already in the state. 
+    if (this.state.isEditMode !== isEditMode) {
+      this.setState({
+        isEditMode: isEditMode        
+      });
+    }
   }
 
   onBpmUpdated() {
@@ -188,35 +216,6 @@ class BottomBar extends React.Component {
       isEditMode: false
     });
   }
-
-  onEdit(event) {
-    event.stopPropagation();
-    EditModeStore.setEditMode(true);
-    this.setState({
-      isEditMode: true
-    });
-  }
 }
 
 export default Radium(BottomBar);
-
-
-// onInfoUpdate() {
-//   console.log('Info updated')
-//   // Config will always store the source of truth value. 
-//   // The one at the database. When new data is received, 
-//   // reset current and original bpm.
-//   let idx = LightConfigStore.getConfigIndex();
-//   let oBpm = LightConfigStore.getBpm();
-//   this.setState({
-//     originalBpm: oBpm,
-//     originalIndex: idx
-//   });
-
-//   // Don't do double updates. This saved on Sending the date.
-//   if (oBpm !== this.state.curBpm) {
-//     this.setState({
-//       curBpm: oBpm
-//     });
-//   }
-// }

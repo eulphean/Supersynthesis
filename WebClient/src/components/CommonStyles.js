@@ -1,6 +1,7 @@
 const color = {
     bgBlack: 'black',
-    fgWhite: 'white'
+    fgWhite: 'white',
+    disabled: 'grey'
 };
 
 const fontSize = {

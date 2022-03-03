@@ -9,7 +9,7 @@ import BpmStore from '../stores/BpmStore'
 import EditModeStore from "../stores/EditModeStore";
 
 const MAX_BPM = 300;
-const MIN_BPM = 180;
+const MIN_BPM = 150;
 export default class bpmManager {
     constructor(s) {
         this.p5 = s;

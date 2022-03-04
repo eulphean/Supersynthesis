@@ -5,9 +5,8 @@
   Description: A class representing each light that is painted on the canvas. 
 */
 import LightConfigStore, { LIGHT_STATE, GROW_STATE } from "../stores/LightConfigStore";
+import SequencerStore from '../stores/SequencerStore';
 import EditModeStore from "../stores/EditModeStore";
-
-const GROW_FACTOR = 2.5;
 
 export default class Light {
     constructor(s, i, xPos, yPos, lightWidth) {
@@ -16,6 +15,8 @@ export default class Light {
 
         // Light's width. 
         this.lightWidth = lightWidth;
+
+        this.growFactor = this.p5.random(1.5, 2.5);
 
         // Origin point at the bottom of the canvas. 
         this.pos = this.p5.createVector(xPos, yPos);
@@ -26,9 +27,11 @@ export default class Light {
         
         // Colors. 
         this.lightActiveColor = this.p5.color('white');
-        this.lightInactiveColor = this.p5.color(255, 255, 255, 100);
-        this.lightBgColor = this.p5.color(255, 255, 255, 50);
+        this.lightInactiveColor = this.p5.color(255, 255, 255, 125);
+        this.lightBgColor = this.p5.color(255, 255, 255, 30);
         this.lightPointColor = this.p5.color('green'); // Only debug.
+        this.sequencerActiveColor = this.p5.color(255, 0, 0, 200);
+        this.sequencerInactiveColor = this.p5.color(255, 0, 0, 100);
 
         // Store the current light config. 
         this.curIdx = i; 
@@ -39,42 +42,101 @@ export default class Light {
         setInterval(this.randomizeGrowState.bind(this), 3000); 
     }
 
-    draw() {
+
+    draw(meshEllipsePos, boundaryWidth) {
+        let isEditMode = EditModeStore.isEditMode; 
         let newX = this.getNewPos();
-        // this.p5.fill(this.lightColor);
         this.p5.noStroke();
-        
-        // this.handleGrowState();
+
         // Draw the background lights.
         this.p5.fill(this.lightBgColor);        
         this.p5.rect(newX, this.pos['y'], this.lightWidth, -this.p5.height);
 
-        // Draw the actual light. 
-        let height = this.getHeight();
-        this.p5.fill(this.lightActiveColor);
-        this.p5.rect(newX, this.pos['y'], this.lightWidth, -height);  
+        if (isEditMode) {
+            this.updateLight(meshEllipsePos, boundaryWidth);            
+            // Draw the actual light. 
+            let height = this.getHeight();
+            this.p5.fill(this.lightActiveColor);
+            this.p5.rect(newX, this.pos['y'], this.lightWidth, -height);  
+        } else {
+            // Draw the actual lights from the DB config that are lighting. 
+            if (this.isOnFromDb()) {
+                this.p5.fill(this.lightInactiveColor);
+                this.p5.rect(newX, this.pos['y'], this.lightWidth, -this.p5.height);
+            }
 
-        // this.drawLightPoint();
-    }
-    
-    randomizeGrowState() {
-        let calcGrowState = () => {
-            let curGrowState = this.getGrowState(); 
-            if (curGrowState['active']) {                
-                // I'm currently growing or doing something. 
-                // Pass
-            } else {
-                // Update my state. 
-                let r = this.p5.int(this.p5.random(0, 2)); 
-                r = r === 1 ? GROW_STATE.GROW : GROW_STATE.SHRINK;
-                LightConfigStore.setGrowState(this.curIdx, r, false);
+            // Draw the lights from the db config that should be on. 
+            if (this.canDraw()) {
+                // Draw full light.
+                this.p5.fill(this.lightActiveColor);
+                this.p5.rect(newX, this.pos['y'], this.lightWidth, -this.p5.height);  
             }
         }
 
-        // Set new grow states for top and bottom light for the current light. 
-        calcGrowState();        
+        let curSequencerIdx = SequencerStore.getCurIndex();
+        if (curSequencerIdx === this.curIdx) {
+            if (isEditMode) {
+                this.p5.fill(this.sequencerInactiveColor);                
+            } else {
+                this.p5.fill(this.sequencerActiveColor);                
+            }
+
+            this.p5.ellipse(newX + this.lightWidth/2, this.p5.height/2, this.lightWidth * 1.5, this.lightWidth * 1.5);
+        }
+        // this.drawLightPoint();
     }
 
+    updateLight(meshEllipsePos, boundaryWidth) {
+        let isUserInteracting = EditModeStore.isUserInteracting;
+        if (isUserInteracting) {
+            let dBottomPos = meshEllipsePos.dist(this.pos);
+            let dTopPos = meshEllipsePos.dist(this.topPos);
+            if (dBottomPos < boundaryWidth/2 || dTopPos < boundaryWidth/2) {
+                // This light is activated, grow or shrink. 
+                this.updateGrowState();
+            }
+        }
+
+        this.handleGrowState();
+    }
+
+    
+    updateGrowState() {
+        let curLightState = LightConfigStore.getActiveLightState(this.curIdx);
+        let curGrowState = LightConfigStore.getGrowState(this.curIdx); 
+
+        // Is the light on? 
+        if (curLightState === LIGHT_STATE.ON) {
+            // Is this light currently growing or shrinking? 
+            if (curGrowState['active']) {
+                // I'm doing something - let's not do anything. 
+            } else {
+                // Is the state set to shrink? Because it can only shrink. 
+                if (curGrowState['state'] === GROW_STATE.SHRINK) {
+                    LightConfigStore.setGrowState(this.curIdx, GROW_STATE.SHRINK, true);
+                    // This light will not be turned on anymore.  
+                    LightConfigStore.setActiveLightState(this.curIdx, LIGHT_STATE.OFF);                
+                } else {
+                    // Pass, we can't grow a light that's already on. 
+                }
+            }
+        }
+
+        if (curLightState === LIGHT_STATE.OFF) {
+            if (curGrowState['active']) {
+                // I'm doing something - let's not do anything. 
+            } else {
+                if (curGrowState['state'] === GROW_STATE.GROW) {
+                    LightConfigStore.setGrowState(this.curIdx, GROW_STATE.GROW, true);
+                    // This light will not be turned on anymore.  
+                    LightConfigStore.setActiveLightState(this.curIdx, LIGHT_STATE.ON);
+                } else {
+                    // Pass, we can't shrink a light that's already off. 
+                }
+            }
+        }
+    }
+    
     // Grow & Shrink the height of the light.
     handleGrowState() {
         let curGrowthActive = this.getGrowState()['active'];
@@ -90,8 +152,8 @@ export default class Light {
                 }
     
                 case GROW_STATE.GROW: {
-                    if (curHeight < this.p5.height/2) {
-                        curHeight += GROW_FACTOR;
+                    if (curHeight < this.p5.height) {
+                        curHeight += this.growFactor;
                         LightConfigStore.setHeightState(this.curIdx, curHeight);
                         this.mapPos(curHeight);
                     } else {
@@ -103,7 +165,7 @@ export default class Light {
     
                 case GROW_STATE.SHRINK: {
                     if (curHeight > 0) {
-                        curHeight -= GROW_FACTOR; 
+                        curHeight -= this.growFactor; 
                         LightConfigStore.setHeightState(this.curIdx, curHeight);
                         this.mapPos(curHeight);
                     } else {
@@ -118,9 +180,25 @@ export default class Light {
             }
         }
     }
+    
+    // Set light heights based on the light configurations.
+    // Call this functions when new configs are received. 
+    updateHeight() {
+        let lightState = LightConfigStore.getActiveLightState(this.curIdx);         
+        let onHeight = this.p5.height;
+        let offHeight = 0;
+
+        if (lightState === LIGHT_STATE.ON) {
+            LightConfigStore.setHeightState(this.curIdx, onHeight);
+        }
+
+        if (lightState === LIGHT_STATE.OFF) {
+            LightConfigStore.setHeightState(this.curIdx, offHeight);
+        }
+    }
 
     mapPos( height) {
-        this.topPos['y'] = this.p5.map(height, 0, this.p5.height/2, this.p5.height/2, 0);
+        this.topPos['y'] = this.p5.map(height, 0, this.p5.height, this.p5.height, 0);
     }
 
     drawLightPoint() {
@@ -143,14 +221,18 @@ export default class Light {
     }
 
     canDraw() {
-        let drawState = LightConfigStore.getDrawState(this.curIdx);
+        let drawState = SequencerStore.getLightState(this.curIdx);
         return drawState; // It's true or false. 
     }
 
-    // Is this light on? 
     isOn() {
-        let lightState = LightConfigStore.getLightState(this.curIdx);
-        return lightState === LIGHT_STATE.ON; 
+        let lightState = LightConfigStore.getActiveLightState(this.curIdx);
+        return lightState; 
+    }
+
+    isOnFromDb() {
+        let lightState = LightConfigStore.getDbLightState(this.curIdx);
+        return lightState; 
     }
 
     isGrowing() {
@@ -158,60 +240,26 @@ export default class Light {
         return v;
     }
 
-    updateGrowState() {
-        let curLightState = LightConfigStore.getLightState(this.curIdx);
-        let curGrowState = LightConfigStore.getGrowState(this.curIdx); 
-
-        // Is the light on? 
-        if (curLightState === LIGHT_STATE.ON) {
-            // Is this light currently growing or shrinking? 
-            if (curGrowState['active']) {
-                // I'm doing something - let's not do anything. 
-            } else {
-                // Is the state set to shrink? Because it can only shrink. 
-                if (curGrowState['state'] === GROW_STATE.SHRINK) {
-                    LightConfigStore.setGrowState(this.curIdx, GROW_STATE.SHRINK, true);
-                    // This light will not be turned on anymore.  
-                    LightConfigStore.setLightState(this.curIdx, LIGHT_STATE.OFF);                
-                } else {
-                    // Pass, we can't grow a light that's already on. 
-                }
-            }
-        }
-
-        if (curLightState === LIGHT_STATE.OFF) {
-            if (curGrowState['active']) {
-                // I'm doing something - let's not do anything. 
-            } else {
-                if (curGrowState['state'] === GROW_STATE.GROW) {
-                    LightConfigStore.setGrowState(this.curIdx, GROW_STATE.GROW, true);
-                    // This light will not be turned on anymore.  
-                    LightConfigStore.setLightState(this.curIdx, LIGHT_STATE.ON);
-                } else {
-                    // Pass, we can't shrink a light that's already off. 
-                }
-            }
-        }
-    }
-
     updateDrawState(state) {
         LightConfigStore.setDrawState(this.curIdx, state); 
     }
 
-    // Set light heights based on the light configurations.
-    // Call this functions when new configs are received. 
-    updateHeight() {
-        let lightState = LightConfigStore.getLightState(this.curIdx);         
-        let onHeight = this.p5.height;
-        let offHeight = 0;
-
-        if (lightState === LIGHT_STATE.ON) {
-            LightConfigStore.setHeightState(this.curIdx, onHeight);
+    randomizeGrowState() {
+        let calcGrowState = () => {
+            let curGrowState = this.getGrowState(); 
+            if (curGrowState['active']) {                
+                // I'm currently growing or doing something. 
+                // Pass
+            } else {
+                // Update my state. 
+                let r = this.p5.int(this.p5.random(0, 2)); 
+                r = r === 1 ? GROW_STATE.GROW : GROW_STATE.SHRINK;
+                LightConfigStore.setGrowState(this.curIdx, r, false);
+            }
         }
 
-        if (lightState === LIGHT_STATE.OFF) {
-            LightConfigStore.setHeightState(this.curIdx, offHeight);
-        }
+        // Set new grow states for top and bottom light for the current light. 
+        calcGrowState();        
     }
 }
 

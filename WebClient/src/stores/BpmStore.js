@@ -30,7 +30,7 @@ class BpmStore {
     setDbBpm(newBpm) {
         // New payload from db. 
         // Reset both db and local bpm. 
-        this.bpm = newBpm;
+        this.dbBpm = newBpm;
         this.localBpm =  newBpm;
 
         // Let subscribers know new Bpm values are updated. 

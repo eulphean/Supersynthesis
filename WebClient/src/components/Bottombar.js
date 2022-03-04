@@ -9,7 +9,6 @@ import Radium from 'radium'
 import { ORIENTATION } from './App';
 import {color, fontFamily, fontSize, padding} from './CommonStyles'
 import Websocket from './Websocket';
-import LightConfigStore from '../stores/LightConfigStore';
 import EditModeStore from '../stores/EditModeStore';
 import BpmStore from '../stores/BpmStore';
 import ConfigIndexStore from '../stores/ConfigIndexStore';

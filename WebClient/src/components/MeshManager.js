@@ -9,11 +9,12 @@ import EditModeStore from "../stores/EditModeStore";
 
 // Handles all the code related to interaction with the canvas.
 const EASING = 0.025;  
+const ELLIPSE_RADIUS = 50; 
 export default class MeshManager {
     constructor(s) {
         this.p5 = s; 
         this.ellipsePos = this.p5.createVector(this.p5.width/3, this.p5.height/2);
-        this.boundaryWidth = this.p5.height/2;
+        this.boundaryWidth = this.p5.height/1.5;
         this.prevMouseX = 0;
         this.prevMouseY = 0; 
     }
@@ -44,7 +45,7 @@ export default class MeshManager {
 
                 let pos = light.topPos;
                 let height = light.getHeight();
-                if (height < this.p5.height/2 && height > 0) {
+                if (height < this.p5.height && height > 0) {
                     this.drawLine(pos, this.ellipsePos, i);
                 }
             }
@@ -86,7 +87,7 @@ export default class MeshManager {
         this.p5.fill(this.p5.color(255, 255, 255, 150));
         this.p5.strokeWeight(3);
         this.p5.stroke(this.p5.color('black'));
-        this.p5.ellipse(this.ellipsePos['x'], this.ellipsePos['y'], 60);  
+        this.p5.ellipse(this.ellipsePos['x'], this.ellipsePos['y'], ELLIPSE_RADIUS);  
     }
 
     drawLine(startPoint, endPoint, i) {
@@ -98,17 +99,17 @@ export default class MeshManager {
     }
 }
 
-                // // Use the local state to draw the lines. 
-                // if (this.ellipsePos['y'] < this.p5.height/2) {
-                //     let pos = light.topPos;
-                //     let height = light.getHeight(LIGHT_TYPE.TOP);
-                //     if (height < this.p5.height/2 && height > 0) {
-                //         this.drawLine(pos, this.ellipsePos, i);
-                //     }
-                // } else {
-                //     let pos = light.bottomPos;
-                //     let height = light.getHeight(LIGHT_TYPE.BOTTOM);
-                //     if (height < this.p5.height/2 && height > 0) {
-                //         this.drawLine(pos, this.ellipsePos, i);
-                //     }
-                // }
+// // Use the local state to draw the lines. 
+// if (this.ellipsePos['y'] < this.p5.height/2) {
+//     let pos = light.topPos;
+//     let height = light.getHeight(LIGHT_TYPE.TOP);
+//     if (height < this.p5.height/2 && height > 0) {
+//         this.drawLine(pos, this.ellipsePos, i);
+//     }
+// } else {
+//     let pos = light.bottomPos;
+//     let height = light.getHeight(LIGHT_TYPE.BOTTOM);
+//     if (height < this.p5.height/2 && height > 0) {
+//         this.drawLine(pos, this.ellipsePos, i);
+//     }
+// }

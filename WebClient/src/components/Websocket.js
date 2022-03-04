@@ -11,6 +11,7 @@ import io  from 'socket.io-client'
 import BpmStore from '../stores/BpmStore';
 import ConfigIndexStore from '../stores/ConfigIndexStore';
 import LightConfigStore from '../stores/LightConfigStore';
+import SequencerStore from '../stores/SequencerStore';
 
 const localhostURL = "http://localhost:5000";
 //const herokuURL = "https://supersynth.herokuapp.com";
@@ -43,7 +44,7 @@ class Websocket {
       }); 
       // Shows the data when user is not interacting
       this.socket.on(EVENT_SEQUENCER_PAYLOAD, data => {
-        LightConfigStore.setSequencerData(data);
+        SequencerStore.setSequencerData(data);
       });
   }
 
@@ -58,7 +59,7 @@ class Websocket {
 
   commitLightConfigData() {
     // Extract data from stores. 
-    let lightConfig = LightConfigStore.getLightConfig();
+    let lightConfig = LightConfigStore.getActiveLightConfig();
     let localBpm = BpmStore.getLocalBpm();
     let configIndex = ConfigIndexStore.getConfigIndex() + 1; 
 
@@ -96,37 +97,3 @@ class Websocket {
 }
 
 export default new Websocket();
-
-    //     // console.log('Overwriting current config.');
-
-    //     // // Get current index. 
-    //     // this.configIndex = payload['index'];
-
-    //     // // Config items. 
-    //     // let config = payload['config'];
-    //     // this.bpm = config['bpm'];
-
-
-    //     // // Trigger info subscribers. 
-    //     // for (let i = 0; i < this.infoSubscribers.length; i++) {
-    //     //     this.infoSubscribers[i]();
-    //     // }
-        
-    //     // // Light data is an array. Update the current light
-    //     // // config with this incoming data. 
-    //     // let lightData = config['lights'];
-    //     // this.updateLightConfig(lightData);
-
-    //     // //Bad assumption that this call will be successful. 
-    //     // this.configIndex += 1; 
-    //     // let dbConfig = this.filterConfig();
-    //     // this.json = {}
-    //     // this.json['bpm'] = this.localBpm; // Get the current bpm that has been set by the user. 
-    //     // this.json['lights'] = dbConfig;
-    //     // this.json['time'] = Date();
-
-    //     // let payload = {
-    //     //     'index' : this.configIndex, 
-    //     //     'config': JSON.stringify(this.json)
-    //     // }
-

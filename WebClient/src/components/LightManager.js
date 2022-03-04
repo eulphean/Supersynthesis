@@ -26,11 +26,6 @@ export default class LightManager {
         this.prepareLights();
     }
 
-    // newPayloadReceived() {
-    //     this.showResetAnimation = true; 
-    //     this.curTime = Date.now(); 
-    // }
-
     prepareLights() {
         this.lights = []; 
 
@@ -53,36 +48,15 @@ export default class LightManager {
     draw(meshEllipsePos, boundaryWidth) {
         // Draw the lights based on the state. 
         for (let i = 0; i < this.lights.length; i++) {
-            this.lights[i].draw();
-        }
-    }
-
-    updateLightGrowConfig(meshEllipsePos, boundaryWidth) {
-        for (let i = 0; i < this.lights.length; i++) {
-            let light = this.lights[i];
-
-            // Distance from the ellipse to the light's position. 
-            let d = meshEllipsePos.dist(light.pos);
-
-            // Is the ellipse above the half-way line? 
-            if (meshEllipsePos['y'] < this.p5.height/2) {
-                // Handle the top lights. 
-                // Have we crossed the threshold? 
-                if (d < boundaryWidth/2) {
-                    // This light is activated, grow or shrink. 
-                    light.updateGrowState();
-                }
-            } else { // Is the ellipse below the half-way line? 
-                // Handle the bottom lights. 
-                if (d < boundaryWidth/2) {
-                    // This light is activated, grow or shrink. 
-                    light.updateGrowState();
-                }
-            }
+            this.lights[i].draw(meshEllipsePos, boundaryWidth);
         }
     }
 }
 
+// newPayloadReceived() {
+//     this.showResetAnimation = true; 
+//     this.curTime = Date.now(); 
+// }
 // // Reset this value here. 
 // this.isCurrentlyGrowing = false;  
 // // Cycle the lights from left to right, then right to left. 
@@ -92,6 +66,20 @@ export default class LightManager {
 //     let top = light.isGrowing(LIGHT_TYPE.TOP);
 //     let bottom = light.isGrowing(LIGHT_TYPE.BOTTOM);
 //     this.isCurrentlyGrowing = this.isCurrentlyGrowing || top || bottom; 
+// }
+
+// updateLightGrowConfig(meshEllipsePos, boundaryWidth) {
+//     for (let i = 0; i < this.lights.length; i++) {
+//         let light = this.lights[i];
+
+//         // Distance from the ellipse to the light's position. 
+//         let d = meshEllipsePos.dist(light.pos);
+//         if (d < boundaryWidth/2) {
+//             // This light is activated, grow or shrink. 
+//             light.updateGrowState();
+//             console.log('Something updated');
+//         }
+//     }
 // }
 
 

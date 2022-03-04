@@ -58,8 +58,8 @@ function onWebClient(socket) {
     let count = io.of('/app').sockets.size;
     console.log('Members connected: ' + count);
 
-    let promiseConfig = database.readData();
-    Promise.all([promiseConfig]).then((values) => {
+    let promise = database.readData();
+    Promise.all([promise]).then((values) => {
         let payload = values[0]; 
         // Do we have a valid config to work with? 
         if (payload.length > 0) {
@@ -78,14 +78,15 @@ function onWebClient(socket) {
 
 function onSaveData(data) {
     console.log('New incoming data - save it in the DB.');
-    database.saveData(data).then(payload => {
+    let promise = database.saveData(data);
+    promise.then(payload => {
         if (lightManager.doesTimerExist()) { // At this time, timer will absolutely exist!!
             // Parse the payload back into object. 
             let parsedPayload = JSON.parse(payload['config']);
             let configPayload = {'index': payload['index'], 'config': parsedPayload};
             sendFullConfigToClients(configPayload);
             console.log("New payload from client. Recreate timer.");
-            // Start a fresh timer.
+            // Maybe update the timer.
             lightManager.setupTimer(parsedPayload); 
         } else {
             console.log('GRAVE ISSUE: TIMER DID NOT EXIST');

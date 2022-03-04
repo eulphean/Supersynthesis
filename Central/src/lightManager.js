@@ -23,12 +23,10 @@ class LightManager {
         // Current index of the light. 
         this.curIdx = -1;
         this.direction = DIRECTION.RIGHT; 
-        this.topLights = [];
-        this.bottomLights = [];
+        this.lights = [];
         let lightData = payload['lights'];
         lightData.forEach(d => {
-            this.topLights.push(d['TOP']);
-            this.bottomLights.push(d['BOTTOM']);
+            this.lights.push(d); 
         });
         // Current light state sent to the clients. 
         this.lightState = []; 
@@ -55,21 +53,21 @@ class LightManager {
     getLightPayload() {
         // TURN OFF ALL THE LIGHTS. 
         if (this.curIdx === -1 || this.curIdx === 24) {        
-            return {state: 'NONE'};
+            return {state: 'NONE', direction: 'NONE'};
         }
 
         // Send top light state one by one. 
         if (this.direction === DIRECTION.RIGHT) {
-            let d = {'idx': this.curIdx, 'val': this.topLights[this.curIdx], 'type':'TOP'};
+            let d = {'idx': this.curIdx, 'val': this.lights[this.curIdx]};
             this.lightState.push(d);
-            return { state: this.lightState };
+            return { state: this.lightState, direction: 'RIGHT' };
         } 
 
         // Send bottom light state one by one. 
         if (this.direction === DIRECTION.LEFT) {
-            let d = {'idx': this.curIdx, 'val': this.bottomLights[this.curIdx], 'type':'BOTTOM'};
+            let d = {'idx': this.curIdx, 'val': this.lights[this.curIdx]};
             this.lightState.push(d);
-            return { state: this.lightState };
+            return { state: this.lightState, direction: 'LEFT' };
         }
     }
 

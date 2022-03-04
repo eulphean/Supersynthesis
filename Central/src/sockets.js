@@ -5,15 +5,12 @@
 
 var socket = require('socket.io');
 var database = require('./database.js');
-var LightManager = require('./lightManager.js')
 var Sequencer = require('./Sequencer.js'); 
 
 // Global variables. 
 let appSocket; 
 let io; 
-let lightManager;
 let sequencer; 
-
 
 const EVENT_SAVE_PAYLOAD = 'event_save_payload';
 const EVENT_TIME = 'event_time';
@@ -30,10 +27,8 @@ module.exports = {
         }); 
 
         // /app and /central are two seperate namespaces. 
-        appSocket = io.of('/app').on('connection', onWebClient); // Connects all web instance to this. 
-        lightManager = new LightManager(io);
-        sequencer = new Sequencer();
-        sequencer.begin();
+        appSocket = io.of('/app').on('connection', onWebClient); // Connects all web instance to this.        
+        sequencer = new Sequencer(io);
     },
 
     // Send an event to all connected clients to keep the Socket Connection Alive. 
@@ -69,12 +64,12 @@ function onWebClient(socket) {
         if (payload.length > 0) {
             let configPayload = payload[0];
             sendFullConfigToSender(configPayload, socket);
-            // Does timer exist? 
-            if (lightManager.doesTimerExist()) {
-                console.log('Timer already exists. Do nothing!!');
+            // Is there a sequencer already running? 
+            if (sequencer.isRunning()) {
+                console.log('Sequencer already running. Do nothing!!');
             } else {
-                console.log('Timer doesnt exist. Create one!!');
-                lightManager.setupTimer(configPayload['config']); 
+                console.log('Sequencer is not running. Start it!!');
+                sequencer.begin(configPayload['config']);
             }
         }
     });
@@ -84,14 +79,13 @@ function onSaveData(data) {
     console.log('New incoming data - save it in the DB.');
     let promise = database.saveData(data);
     promise.then(payload => {
-        if (lightManager.doesTimerExist()) { // At this time, timer will absolutely exist!!
+        if (sequencer.isRunning()) { // At this time, sequencer will absolutely exist!!
             // Parse the payload back into object. 
             let parsedPayload = JSON.parse(payload['config']);
             let configPayload = {'index': payload['index'], 'config': parsedPayload};
             sendFullConfigToClients(configPayload);
-            console.log("New payload from client. Recreate timer.");
-            // Maybe update the timer.
-            lightManager.updateTimer(parsedPayload); 
+            console.log("New payload from client. Updating sequencer.");
+            sequencer.updateInterval(parsedPayload); 
         } else {
             console.log('GRAVE ISSUE: TIMER DID NOT EXIST');
         }
@@ -113,6 +107,8 @@ function onDisconnect() {
     console.log('Web client disconnected.');
     console.log('Connected clients: ' + count);
     if (count === 0) {
-        lightManager.clearTimer();
+        sequencer.stop();
     }
 }
+
+                // lightManager.setupTimer(configPayload['config']); 

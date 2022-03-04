@@ -33,10 +33,10 @@ class LightManager {
     }
 
     setupTimer(payload) {
-        this.clearTimer(); 
-        this.resetLights(payload);
-        this.intervalTime = this.getIntervalTime(payload['bpm']);
-        this.handleInterval(); 
+        // this.clearTimer(); 
+        // this.resetLights(payload);
+        // this.intervalTime = this.getIntervalTime(payload['bpm']);
+        // this.handleInterval(); 
     }
 
     updateTimer(payload) {
@@ -122,7 +122,8 @@ class LightManager {
     }
 
     doesTimerExist() {
-        return this.timerId !== '';
+        // return this.timerId !== '';
+        return true; 
     }
 }
 

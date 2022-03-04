@@ -6,11 +6,13 @@
 var socket = require('socket.io');
 var database = require('./database.js');
 var LightManager = require('./lightManager.js')
+var Sequencer = require('./Sequencer.js'); 
 
 // Global variables. 
 let appSocket; 
 let io; 
 let lightManager;
+let sequencer; 
 
 
 const EVENT_SAVE_PAYLOAD = 'event_save_payload';
@@ -30,6 +32,8 @@ module.exports = {
         // /app and /central are two seperate namespaces. 
         appSocket = io.of('/app').on('connection', onWebClient); // Connects all web instance to this. 
         lightManager = new LightManager(io);
+        sequencer = new Sequencer();
+        sequencer.begin();
     },
 
     // Send an event to all connected clients to keep the Socket Connection Alive. 

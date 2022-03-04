@@ -7,7 +7,7 @@
 */
 import Light from './Light'
 import LightConfigStore from "../stores/LightConfigStore";
-import EditModeStore from '../stores/EditModeStore';
+import SequencerBubble from './SequncerBubble';
 
 const NUM_LIGHTS = 24
 
@@ -19,6 +19,8 @@ export default class LightManager {
         this.curTime = 0; 
         this.var = 0; 
         this.dir = true; 
+
+        this.sequencerBubble = new SequencerBubble(s);
     }
     
     setup() {
@@ -48,7 +50,9 @@ export default class LightManager {
     draw(meshEllipsePos, boundaryWidth) {
         // Draw the lights based on the state. 
         for (let i = 0; i < this.lights.length; i++) {
-            this.lights[i].draw(meshEllipsePos, boundaryWidth);
+            let light = this.lights[i]; 
+            light.draw(meshEllipsePos, boundaryWidth);
+            this.sequencerBubble.draw(light);
         }
     }
 }

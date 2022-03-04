@@ -9,7 +9,7 @@ const DIRECTION = {
     RIGHT: 1,
     LEFT: 0
 }
-const OFF_TIME = 1000; // 250 milliseconds. 
+const OFF_TIME = 500; // 250 milliseconds. 
 
 class LightManager {
     constructor(io) {
@@ -37,6 +37,22 @@ class LightManager {
         this.resetLights(payload);
         this.intervalTime = this.getIntervalTime(payload['bpm']);
         this.handleInterval(); 
+    }
+
+    updateTimer(payload) {
+        console.log('Update timer without touching the current index.');
+        this.clearTimer(); 
+        // Update interval time. 
+        this.intervalTime = this.getIntervalTime(payload['bpm']); 
+        // Reassign the stored lights. 
+        this.lights = []; 
+        let lightData = payload['lights'];
+        lightData.forEach(d => {
+            this.lights.push(d); 
+        });
+        // Clear the current state. 
+        this.lightState = []; 
+        setTimeout(this.handleInterval.bind(this), OFF_TIME);
     }
 
     handleInterval() {

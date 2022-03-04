@@ -30,8 +30,6 @@ export default class Light {
         this.lightInactiveColor = this.p5.color(255, 255, 255, 125);
         this.lightBgColor = this.p5.color(255, 255, 255, 30);
         this.lightPointColor = this.p5.color('green'); // Only debug.
-        this.sequencerActiveColor = this.p5.color(255, 0, 0, 200);
-        this.sequencerInactiveColor = this.p5.color(255, 0, 0, 100);
 
         // Store the current light config. 
         this.curIdx = i; 
@@ -73,16 +71,7 @@ export default class Light {
             }
         }
 
-        let curSequencerIdx = SequencerStore.getCurIndex();
-        if (curSequencerIdx === this.curIdx) {
-            if (isEditMode) {
-                this.p5.fill(this.sequencerInactiveColor);                
-            } else {
-                this.p5.fill(this.sequencerActiveColor);                
-            }
 
-            this.p5.ellipse(newX + this.lightWidth/2, this.p5.height/2, this.lightWidth * 1.5, this.lightWidth * 1.5);
-        }
         // this.drawLightPoint();
     }
 

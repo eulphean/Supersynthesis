@@ -87,7 +87,7 @@ function onSaveData(data) {
             sendFullConfigToClients(configPayload);
             console.log("New payload from client. Recreate timer.");
             // Maybe update the timer.
-            lightManager.setupTimer(parsedPayload); 
+            lightManager.updateTimer(parsedPayload); 
         } else {
             console.log('GRAVE ISSUE: TIMER DID NOT EXIST');
         }

@@ -93,6 +93,7 @@ class Websocket {
     // Light config.
     let lightConfig = config['lights'];
     LightConfigStore.setLightConfig(lightConfig);
+    SequencerStore.clearConfig();
   }
 }
 

@@ -33,18 +33,25 @@ class SequencerStore {
                 this.drawConfig[idx] = val; 
             }
 
-            // lightState is an array of all the values that the sequencer has 
-            // covered until now on the server. So the current index of the sequencer
-            // is lightState's length - 1. 
-            let direction = payload['direction'];
-            if (direction === 'RIGHT') {
-                this.curIdx = lightState.length - 1; 
-            } 
+            let item = lightState[lightState.length - 1]; 
+            this.curIdx = item['idx'];
 
-            if (direction === 'LEFT') {
-                this.curIdx = NUM_LIGHTS - lightState.length;
-            }
+            // // lightState is an array of all the values that the sequencer has 
+            // // covered until now on the server. So the current index of the sequencer
+            // // is lightState's length - 1. 
+            // let direction = payload['direction'];
+            // if (direction === 'RIGHT') {
+            
+            // } 
+
+            // if (direction === 'LEFT') {
+            //     this.curIdx = NUM_LIGHTS - lightState.length;
+            // }
         }
+    }
+
+    clearConfig() {
+        this.drawConfig.length = 0;
     }
 
     getLightState(i) {

@@ -10,11 +10,11 @@ const NUM_LIGHTS = 24;
 class SequencerStore {
     constructor() {
         this.drawConfig = [];
-        this.curIdx = -1; 
+        this.indices = []; 
     }
 
-    getCurIndex() {
-        return this.curIdx;
+    getIndices() {
+        return this.indices;
     }
 
     setSequencerData(payload) {
@@ -24,29 +24,27 @@ class SequencerStore {
             for (let i = 0; i < NUM_LIGHTS; i++) {
                 this.drawConfig[i] = LIGHT_STATE.OFF;
             }
-            // Sequencer is off. 
-            this.curIdx = -1; 
+            this.indices = []; 
         } else {
             for (let i = 0; i < lightState.length; i++) {
                 let s = lightState[i];
-                let idx = s['idx']; let val = s['val'];
-                this.drawConfig[idx] = val; 
+                // Handle multiple gliders. 
+                if (Array.isArray(s)) {
+                    let a = s[0];
+                    let b = s[1]; 
+                    this.drawConfig[a['idx']] = a['val'];
+                    this.drawConfig[b['idx']] = b['val'];
+
+                    // Merge or split. 
+                    this.indices[0] = a['idx'];
+                    this.indices[1] = b['idx']; 
+                } else {
+                    // Only a single glider. 
+                    let idx = s['idx']; let val = s['val'];
+                    this.drawConfig[idx] = val; 
+                    this.indices[0] = idx; 
+                }
             }
-
-            let item = lightState[lightState.length - 1]; 
-            this.curIdx = item['idx'];
-
-            // // lightState is an array of all the values that the sequencer has 
-            // // covered until now on the server. So the current index of the sequencer
-            // // is lightState's length - 1. 
-            // let direction = payload['direction'];
-            // if (direction === 'RIGHT') {
-            
-            // } 
-
-            // if (direction === 'LEFT') {
-            //     this.curIdx = NUM_LIGHTS - lightState.length;
-            // }
         }
     }
 

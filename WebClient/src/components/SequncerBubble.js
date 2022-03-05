@@ -17,17 +17,20 @@ export default class SequencerBubble {
     }
 
     draw(light) {
-        let curSequencerIdx = SequencerStore.getCurIndex();
+        let indices = SequencerStore.getIndices();
         let isEditMode = EditModeStore.isEditMode;
-        if (curSequencerIdx === light.curIdx) {
-            if (isEditMode) {
-                this.p5.fill(this.sequencerInactiveColor);                
-            } else {
-                this.p5.fill(this.sequencerActiveColor);                
+        for (let i = 0; i < indices.length; i++) {
+            let idx = indices[i];     
+            if (idx === light.curIdx) {
+                if (isEditMode) {
+                    this.p5.fill(this.sequencerInactiveColor);                
+                } else {
+                    this.p5.fill(this.sequencerActiveColor);                
+                }
+                
+                let newX = light.getNewPos() + light.lightWidth/2; 
+                this.p5.ellipse(newX + light.lightWidth/2, this.p5.height/2, light.lightWidth * 1.5, light.lightWidth * 1.5);
             }
-            
-            let newX = light.getNewPos() + light.lightWidth/2; 
-            this.p5.ellipse(newX + light.lightWidth/2, this.p5.height/2, light.lightWidth * 1.5, light.lightWidth * 1.5);
         }
     }
 }

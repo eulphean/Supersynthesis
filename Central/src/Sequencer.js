@@ -18,9 +18,11 @@ const PATTERN = {
     MERGE: 4
 }
 
+const MAX_PATTERNS = 5;
 const NUM_LIGHTS = 24;
 const LOAD_NEW_PAYLOAD_TIME = 300; // 250 milliseconds. 
 const PATTERN_CHANGE_TIME = 200;
+const MAX_RANDOM_NOTES = 24; 
 
 class Sequencer {
     constructor(io) {
@@ -29,11 +31,19 @@ class Sequencer {
 
         // Handy variables for the sequencer.
         this.timerId = ''; 
-        this.curPattern = PATTERN.FORWARD; 
+        this.curPattern = PATTERN.SPLIT; 
+        this.prevPattern = PATTERN.SPLIT; 
         this.intervalTime = ''; 
         this.glider = 0; 
         this.gliderA = -1; 
         this.gliderB = -1; 
+
+        this.randomNoteIdx = 0; 
+        this.randomList = []; 
+
+        // Set a new pattern to make sure initial values are
+        // correct for each pattern. 
+        this.chooseNewPattern(); 
     }
 
     begin(payload) {
@@ -65,10 +75,10 @@ class Sequencer {
     }
 
     updateIndex() {
+        let patternChanged; 
         switch (this.curPattern) {
             case PATTERN.FORWARD: 
             {
-                let patternChanged; 
                 if (this.glider === NUM_LIGHTS) {
                     // We have reached the end, clear the system.
                     this.lightManager.sendResetPayload(); 
@@ -83,8 +93,7 @@ class Sequencer {
                 return patternChanged; 
             }
 
-            case PATTERN.BACKWARD: { 
-                let patternChanged; 
+            case PATTERN.BACKWARD: {                
                 if (this.glider < 0) {
                     // We have reached the end, clear the system. 
                     this.lightManager.sendResetPayload();
@@ -100,29 +109,67 @@ class Sequencer {
             }
 
             case PATTERN.RANDOM: {
-                // Count certain times. 
-                break; 
+                if (this.randomNoteIdx === MAX_RANDOM_NOTES) {
+                    this.lightManager.sendResetPayload();
+                    this.chooseNewPattern();
+                    patternChanged = true; 
+                } else {
+                    // Get a random index. 
+                    this.calcRandomIndex(); 
+                    this.lightManager.createPayloadAndEmit(this.gliderA);
+                    this.randomNoteIdx++; 
+                    patternChanged = false; 
+                }
+                return patternChanged; 
             }
 
             // This will give us some polyphony for multiple notes
             // being played together. 
             case PATTERN.SPLIT: {
-                // Count certain times to do this. 
+                // GliderA is going left, GliderB is going right.
+                if (this.gliderA < 0 && this.gliderB === NUM_LIGHTS) {
+                    this.lightManager.sendResetPayload(); 
+                    this.chooseNewPattern();
+                    patternChanged = true; 
+                } else {
+                    // Send two gliders together.
+                    this.lightManager.createPayloadAndEmit(this.gliderA, this.gliderB); 
+                    this.gliderA--;
+                    this.gliderB++; 
+                    patternChanged = false; 
+                }
                 break;
             }
 
             // This will give us some polyphony for multiple notes being 
             // played together. 
             case PATTERN.MERGE: {
-                // Count certain times to do this. 
+                // GliderA is going right, GliderB is going left. 
+                if (this.gliderA > this.gliderB) {
+                    this.lightManager.sendResetPayload();
+                    this.chooseNewPattern();
+                    patternChanged = true; 
+                } else {
+                    this.lightManager.createPayloadAndEmit(this.gliderA, this.gliderB);
+                    this.gliderA++;
+                    this.gliderB--; 
+                    patternChanged = false; 
+                }
                 break; 
             }
         }
     }
+    
+    setRandomPattern() {
+        this.curPattern = this.getRandom(0, MAX_PATTERNS - 1); 
+        while (this.curPattern === this.prevPattern) {
+            this.curPattern = this.getRandom(0, MAX_PATTERNS - 1)
+        }
+        this.prevPattern = this.curPattern; 
+    }
 
     chooseNewPattern() {
-        this.curPattern = Math.round(Math.random()); 
-        // this.curPattern = PATTERN.FORWARD; 
+        this.setRandomPattern(); 
 
         switch (this.curPattern) {
             case PATTERN.FORWARD:
@@ -138,19 +185,41 @@ class Sequencer {
             }
 
             case PATTERN.RANDOM: {
-                // Choose starting point
+                // Reset current index of the number of random
+                // notes picked. 
+                this.randomNoteIdx = 0;
+                this.randomList = [];
                 break;
             }
 
             case PATTERN.SPLIT: {
-                // Choose starting point. 
+                // Reset gliderA and gliderB.
+                let middle = NUM_LIGHTS / 2;
+                this.gliderA = middle; 
+                this.gliderB = middle -1; 
                 break; 
             }
 
             case PATTERN.MERGE: {
+                this.gliderA = 0; 
+                this.gliderB = NUM_LIGHTS; 
+                break; 
                 // Choose where to start. 
             }
         }
+    }
+    
+    calcRandomIndex() {
+        // Glider A = main random index.
+        // Glider B = saved as previous random index. 
+        this.gliderA = this.getRandom(0, 23);
+        while ((this.gliderA === this.gliderB) || this.randomList.includes(this.gliderA)) 
+        {
+            this.gliderA = this.getRandom(0, 23);
+        }
+        // Finally a good random number, save it.
+        this.gliderB = this.gliderA; 
+        this.randomList.push(this.gliderA); 
     }
 
     // Helper functions.
@@ -172,6 +241,10 @@ class Sequencer {
 
     getIntervalTime(bpm) {
         return Math.floor(60000/bpm); 
+    }
+
+    getRandom(min, max) {  
+        return Math.floor(Math.random() * (max - min + 1) + min);
     }
 }
 

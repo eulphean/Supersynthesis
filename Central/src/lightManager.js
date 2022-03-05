@@ -29,21 +29,17 @@ class LightManager {
         this.clientLightState = []; 
     }
 
-    createPayloadAndEmit(glider) {
-        let lightState = this.serverLights[glider];
-        let state = { 'idx' : glider, 'val': lightState }; 
-        this.clientLightState.push(state);
-        let payload = { 'state': this.clientLightState };
-        this.io.of('/app').emit(EVENT_SEQUENCER_PAYLOAD, payload); 
-    }
+    createPayloadAndEmit(gliderA, gliderB = undefined) {
+        let lightState; 
+        let state = []; 
+        lightState = this.serverLights[gliderA];
+        state.push({'idx' : gliderA, 'val': lightState});
 
-    createPayloadAndEmit(gliderA, gliderB) {
-        let lightStateA = this.serverLights[gliderA];
-        let lightStateB = this.serverLights[gliderB];
-        let state = [
-            {'idx' : gliderA, 'val': lightStateA}, 
-            {'idx' : gliderB, 'val': lightStateB}
-        ];
+        if (gliderB) {
+            lightState = this.serverLights[gliderB];
+            state.push({'idx' : gliderB, 'val': lightState});
+        }
+
         this.clientLightState.push(state);
         let payload = { 'state': this.clientLightState };
         this.io.of('/app').emit(EVENT_SEQUENCER_PAYLOAD, payload); 

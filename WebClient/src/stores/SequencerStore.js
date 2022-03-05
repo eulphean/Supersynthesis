@@ -28,21 +28,12 @@ class SequencerStore {
         } else {
             for (let i = 0; i < lightState.length; i++) {
                 let s = lightState[i];
-                // Handle multiple gliders. 
-                if (Array.isArray(s)) {
-                    let a = s[0];
-                    let b = s[1]; 
-                    this.drawConfig[a['idx']] = a['val'];
-                    this.drawConfig[b['idx']] = b['val'];
-
-                    // Merge or split. 
-                    this.indices[0] = a['idx'];
-                    this.indices[1] = b['idx']; 
-                } else {
-                    // Only a single glider. 
-                    let idx = s['idx']; let val = s['val'];
+                // All data is in an array.  
+                for (let j = 0; j < s.length; j++) {
+                    let idx = s[j]['idx'];
+                    let val = s[j]['val'];
                     this.drawConfig[idx] = val; 
-                    this.indices[0] = idx; 
+                    this.indices[j] = idx; 
                 }
             }
         }

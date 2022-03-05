@@ -16,17 +16,19 @@ class Supersynthesis(Common):
     
     def updateLights(self, state):
         if (state == 'NONE'):
-            # TODO: We need direction here. 
+            print('Reset')
+            # Turn off all of them in a direction. 
             self.fullTurnOff()    
             return
         else:
             # Get the last element from the light list.
             # Get its index and value and execute it. 
-            el = state.pop()
-            idx = el['idx']
-            val = el['val']
-            if (val == 1):
-                self.switchOn(idx)
+            states = state.pop()
+            for s in states:
+                idx = s['idx']
+                val = s['val']
+                if (val == 1):
+                    self.switchOn(idx)
 
     def resetLights(self):
         self.lightsOn(0, 23)    

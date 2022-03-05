@@ -14,7 +14,7 @@ export default class MeshManager {
     constructor(s) {
         this.p5 = s; 
         this.ellipsePos = this.p5.createVector(this.p5.width/3, this.p5.height/2);
-        this.boundaryWidth = this.p5.height/1.5;
+        this.boundaryWidth = this.p5.height;
         this.prevMouseX = 0;
         this.prevMouseY = 0; 
     }

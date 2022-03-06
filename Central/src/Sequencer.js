@@ -21,7 +21,7 @@ const PATTERN = {
 const MAX_PATTERNS = 5;
 const NUM_LIGHTS = 24;
 const LOAD_NEW_PAYLOAD_TIME = 500; // 250 milliseconds. 
-const PATTERN_CHANGE_TIME = 500;
+const PATTERN_CHANGE_TIME = 1000;
 const MAX_RANDOM_NOTES = 24; 
 
 class Sequencer {
@@ -161,9 +161,9 @@ class Sequencer {
     }
     
     setRandomPattern() {
-        this.curPattern = this.getRandom(0, MAX_PATTERNS - 1); 
+        this.curPattern = this.getRandom(MAX_PATTERNS); 
         while (this.curPattern === this.prevPattern) {
-            this.curPattern = this.getRandom(0, MAX_PATTERNS - 1)
+            this.curPattern = this.getRandom(MAX_PATTERNS)
         }
         this.prevPattern = this.curPattern; 
     }
@@ -212,10 +212,10 @@ class Sequencer {
     calcRandomIndex() {
         // Glider A = main random index.
         // Glider B = saved as previous random index. 
-        this.gliderA = this.getRandom(0, 23);
+        this.gliderA = this.getRandom(24);
         while ((this.gliderA === this.gliderB) || this.randomList.includes(this.gliderA)) 
         {
-            this.gliderA = this.getRandom(0, 23);
+            this.gliderA = this.getRandom(24);
         }
         // Finally a good random number, save it.
         this.gliderB = this.gliderA; 
@@ -243,9 +243,10 @@ class Sequencer {
         return Math.floor(60000/bpm); 
     }
 
-    getRandom(min, max) {  
-        return Math.floor(Math.random() * (max - min + 1) + min);
+    getRandom(max) {
+        return Math.floor(Math.random() * max);
     }
+      
 }
 
 module.exports = Sequencer;

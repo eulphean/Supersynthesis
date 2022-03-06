@@ -28,8 +28,8 @@ export default class SequencerBubble {
                     this.p5.fill(this.sequencerActiveColor);                
                 }
                 
-                let newX = light.getNewPos() + light.lightWidth/2; 
-                this.p5.ellipse(newX + light.lightWidth/2, this.p5.height/2, light.lightWidth * 1.5, light.lightWidth * 1.5);
+                let newX = light.getNewPos(); 
+                this.p5.ellipse(newX + light.lightWidth/2, this.p5.height/2, light.lightWidth, light.lightWidth);
             }
         }
     }

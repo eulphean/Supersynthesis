@@ -13,8 +13,8 @@ import ConfigIndexStore from '../stores/ConfigIndexStore';
 import LightConfigStore from '../stores/LightConfigStore';
 import SequencerStore from '../stores/SequencerStore';
 
-const localhostURL = "http://localhost:5000";
-//const herokuURL = "https://supersynth.herokuapp.com";
+//const localhostURL = "http://localhost:5000";
+const herokuURL = "https://supersynth.herokuapp.com";
 
 const EVENT_SAVE_PAYLOAD = 'event_save_payload';
 const EVENT_TIME = 'event_time';
@@ -23,7 +23,7 @@ const EVENT_SEQUENCER_PAYLOAD = 'event_sequencer_payload';
 
 class Websocket {
   constructor() {
-      this.siteURL = localhostURL + '/app'; 
+      this.siteURL = herokuURL + '/app'; 
 
       this.socket = io(this.siteURL, {
           reconnection: true,

@@ -7,7 +7,7 @@
 */
 import Light from './Light'
 import LightConfigStore from "../stores/LightConfigStore";
-import SequencerBubble from './SequncerBubble';
+import SequencerBubble from './SequencerBubble';
 
 const NUM_LIGHTS = 24
 

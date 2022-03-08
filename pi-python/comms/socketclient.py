@@ -34,7 +34,7 @@ class SocketClient:
         self.sio.register_namespace(appSocket)
 
     async def startServer(self):
-        await self.sio.connect(HOST_ADDRESS, namespaces=['/app'])
+        await self.sio.connect(HOST_HEROKU, namespaces=['/app'])
         await self.sio.wait()
 
 

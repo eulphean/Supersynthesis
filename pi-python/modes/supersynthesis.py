@@ -16,7 +16,7 @@ class Supersynthesis(Common):
     
     def updateLights(self, state):
         if (state == 'NONE'):
-            print('Reset')
+            # A pattern has finished, turn off all the lights. 
             # Turn off all of them in a direction. 
             self.fullTurnOff()    
             return
@@ -31,6 +31,6 @@ class Supersynthesis(Common):
                     self.switchOn(idx)
 
     def resetLights(self):
-        self.lightsOn(0, 23)    
-        time.sleep(0.5)
-        self.lightsOff(0, 23)
+        self.lightsOn(0, self.numLights)    
+        time.sleep(0.35)
+        self.lightsOff(0, self.numLights)

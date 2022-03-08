@@ -63,8 +63,8 @@ class Common:
 
     def fullTurnOff(self, reverse = False) -> None:
         if reverse:
-            for x in range(0, self.numLights):
+            for x in range(0, NUM_LIGHTS):
                 self.switchOff(x)
         else:
-            for x in reversed(range(0, self.numLights)):
+            for x in reversed(range(0, NUM_LIGHTS)):
                 self.switchOff(x)

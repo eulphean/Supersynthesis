@@ -202,7 +202,7 @@ class Sequencer {
 
             case PATTERN.MERGE: {
                 this.gliderA = 0; 
-                this.gliderB = NUM_LIGHTS; 
+                this.gliderB = NUM_LIGHTS - 1; 
                 break; 
                 // Choose where to start. 
             }
@@ -246,7 +246,6 @@ class Sequencer {
     getRandom(max) {
         return Math.floor(Math.random() * max);
     }
-      
 }
 
 module.exports = Sequencer;

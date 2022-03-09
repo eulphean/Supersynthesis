@@ -31,7 +31,9 @@ class SectionA(Common):
         self.fullTurnOff()
 
         # Setup variables. 
-        self.stateTime = Key_Press_Time
+        self.keyPressTime = Key_Press_Time
+        self.lightsOnTime = Lights_On_Time
+        self.stateTime = self.keyPressTime
         self.direction = Direction.Right
         self.part = Part(Part.Glide_Right)
         self.gliderA = 0
@@ -62,14 +64,14 @@ class SectionA(Common):
                 self.switchOn(self.gliderA)
                 self.part = Part.Glide_Left
                 # Reset state time.
-                self.stateTime = Key_Press_Time
+                self.stateTime = self.keyPressTime
             else:
                 # Turn off pending glider light.
                 self.switchOff(self.gliderA)
                 # Turn on half the lights on the right.
                 self.lightsOn(int(self.numLights/2), self.numLights)
                 # Update state time.
-                self.stateTime = Lights_On_Time
+                self.stateTime = self.lightsOnTime
             
             # Reset current time. 
             self.curTime = time()
@@ -90,12 +92,12 @@ class SectionA(Common):
                 self.switchOn(self.gliderA)
                 self.part = Part.Glide_Right
                 # Reset state time.
-                self.stateTime = Key_Press_Time
+                self.stateTime = self.keyPressTime
             else:
                 # Turn off pending glider light.
                 self.switchOff(self.gliderA)
                 self.lightsOn(0, int(self.numLights/2))
-                self.stateTime = Lights_On_Time
+                self.stateTime = self.lightsOnTime
 
             # Reset current time. 
             self.curTime = time()
@@ -122,3 +124,9 @@ class SectionA(Common):
         if (self.gliderA == 0):
             print("On Left...")
             self.part = Part.On_Left
+
+    def processOsc(self, address, args):
+        if ('noteOn' in address):
+            self.keyPressTime = args * 0.5 # 0-0.5
+        elif ('lightsOn' in address):
+            self.lightsOnTime = args * 0.25 # 0-0.25

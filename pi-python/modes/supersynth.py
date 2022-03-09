@@ -34,8 +34,3 @@ class Supersynth(Common):
         
         if (args == 0):
             self.switchOff(lightIdx)
-
-        # Pure data message.
-        # message = '0 ' + str(lightIdx) + ' ' + str(args) + ';'
-        # print (message)
-        # pd.send2pd(message)

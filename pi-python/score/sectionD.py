@@ -120,3 +120,7 @@ class SectionD(Common):
         # Turn on the gliders. 
         self.switchOn(self.leftGlider)
         self.switchOn(self.rightGlider)
+
+    def processOsc(self, address, args):
+        if ('noteOn' in address):
+            self.keyPressTime = args * 0.5

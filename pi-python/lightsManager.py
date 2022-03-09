@@ -72,3 +72,9 @@ class LightsManager:
             # Check if it's a valid state before forwarding the message.
             if (self.state == State.Supersynth):
                 self.supersynth.updateLights(address, args)
+
+        if ('shm' in address):
+            self.shm.processOsc(address, args)
+        
+        if ('autoscore' in address): 
+            self.autoscore.processOsc(address, args)

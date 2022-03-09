@@ -34,7 +34,9 @@ class SectionC(Common):
         # Count of random picks we have made. 
         self.randCount = 0
         # Time variable for comparison. 
-        self.stateTime = Random_Press_Time
+        self.randomPressTime = Random_Press_Time
+        self.keyPressTime = Key_Press_Time
+        self.stateTime = self.randomPressTime
         # Max random notes to be picked.
         self.maxRandomNotes = self.numLights
         # First state is Random
@@ -64,7 +66,7 @@ class SectionC(Common):
                 self.setMovingGliders()
                 # Start gliding. 
                 self.part = Part.Glide
-                self.stateTime = Key_Press_Time
+                self.stateTime = self.keyPressTime
 
             # Reset time.
             self.curTime = time()
@@ -84,7 +86,7 @@ class SectionC(Common):
                 # Go to next state. 
                 self.setRandomGlider()
                 self.part = Part.Random
-                self.stateTime = Random_Press_Time
+                self.stateTime = self.randomPressTime
             else:
                 # Turn them on. 
                 self.switchOn(self.leftGlider)
@@ -114,3 +116,11 @@ class SectionC(Common):
     def initMovingGliders(self) -> None:
         self.leftGlider = -1
         self.rightGlider = -1
+    
+    def processOsc(self, address, args):
+        if ('noteOn' in address):
+            self.keyPressTime = args * 0.5 # 0-0.5
+        elif ('randomOn' in address):
+            self.randomPressTime = args * 0.5 # 0-0.25
+        elif ('randomNotes' in address):
+            self.maxRandomNotes = args * 48

@@ -32,9 +32,12 @@ class SectionB(Common):
         # Initialize the two gliders.
         self.leftGlider = 0
         self.rightGlider = self.numLights - 1
-        # Time variable for comparison. 
-        self.stateTime = Key_Press_Time
+        # Time variable for comparison.
+        self.keyPressTime = Key_Press_Time
+        self.lightsOnTime = Lights_On_Time
+        self.stateTime = self.keyPressTime
         # Counts how many times we ping pong between two states.
+        self.maxPingPongCount = Max_Ping_Pong_Count
         self.pingPongCounter = 0
         # Set the first part to start with.
         self.part = Part(Part.Glide)
@@ -63,10 +66,10 @@ class SectionB(Common):
             else:
                 # Turn on all the lights. 
                 self.lightsOn(0, self.numLights)
-                self.stateTime = Lights_On_Time
+                self.stateTime = self.lightsOnTime
             
             # Have we ping ponged enough?
-            if (self.pingPongCounter == Max_Ping_Pong_Count):
+            if (self.pingPongCounter > self.maxPingPongCount):
                 # Reset ping pong counter.
                 self.pingPongCounter = 0
 
@@ -78,7 +81,7 @@ class SectionB(Common):
                 self.switchOn(self.rightGlider)
                 
                 # Reset time back to original time.
-                self.stateTime = Key_Press_Time
+                self.stateTime = self.keyPressTime
                 # Move back to glide.
                 self.part = Part.Glide
 
@@ -101,4 +104,11 @@ class SectionB(Common):
             # Turn on new gliders.
             self.switchOn(self.leftGlider)
             self.switchOn(self.rightGlider)
-        
+    
+    def processOsc(self, address, args):
+        if ('noteOn' in address):
+            self.keyPressTime = args * 0.5 # 0-0.5
+        elif ('lightsOn' in address):
+            self.lightsOnTime = args * 0.25 # 0-0.25
+        elif ('pingPong' in address):
+            self.maxPingPongCount = args * 10 #0-0.25

@@ -40,7 +40,6 @@ class SectionD(Section):
       
         # Snapshot of current time. 
         self.curTime = time()
-
         self.keyPressTime = Key_Press_Time
 
     def update(self) -> None:

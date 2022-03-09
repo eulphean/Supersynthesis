@@ -15,17 +15,13 @@ class OSCClient:
         self.dispatcher.map("/push1", callback) # supersynth
         self.dispatcher.map("/push2", callback) # autoscore
         self.dispatcher.map("/push3", callback) # shm
-        self.dispatcher.map("/supersynth*", callback) # supersynth keyboard
-        self.dispatcher.map("/dry", callback) # dry signal (PD)
-        self.dispatcher.map("/wet", callback) # wet signal (PD)
-        self.dispatcher.map("/volume", callback) # volume (PD)
-        self.dispatcher.map("/filterFreq", callback) # filter frequency (PD)
-        self.dispatcher.map("/delayFeedback", callback) # delay feedback (PD)
-        self.dispatcher.map("/pan", callback) # pan (left to right) (PD)
-        self.dispatcher.map("/mute", callback) # mute button (PD)
-        self.dispatcher.map("/envelope*", callback) # envelope (one to four) (PD)
-        self.dispatcher.map("/wavetable*", callback) # wavetable (one to four) (PD)
-        self.dispatcher.map("/delayTime*", callback) # delay time (one to four) (PD)
+        self.dispatcher.map("/supersynth*", callback) # All supersynth signals.
+        self.dispatcher.map("/pd*", callback) # All pureData signals.
+        # Simple Harmonic Motion
+        self.dispatcher.map("/shm*", callback) # All SHM signals. 
+        # Autoscore
+        self.dispatcher.map("/autoscore*", callback) # All autoscore signals. 
+
 
     async def setupServer(self, eventLoop):
         print('setup server')

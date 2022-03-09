@@ -12,10 +12,12 @@ from score.sectionD import SectionD
 
 # WE SHOULD BE ABLE TO MODIFY THESE TIMES>!!! 
 # These times are in seconds. 
-SectionA_Time = 15
-SectionB_Time = 15
-SectionC_Time = 15
-SectionD_Time = 15
+SectionA_Time = 30
+SectionB_Time = 30
+SectionC_Time = 30
+SectionD_Time = 30
+
+TIME_CONSTANT = 60
 
 class Section(Enum):
     A = 1
@@ -27,9 +29,16 @@ class Autoscore:
     def __init__(self, relay) -> None:
         # Initializes the section.
         self.sectionA = SectionA(relay)
+        self.sectionATime = SectionA_Time
+
         self.sectionB = SectionB(relay)
+        self.sectionBTime = SectionB_Time
+
         self.sectionC = SectionC(relay)
+        self.sectionCTime = SectionC_Time
+
         self.sectionD = SectionD(relay)
+        self.sectionDTime = SectionD_Time
 
     def begin(self): 
         print('*************MODE:Autoscore*************')
@@ -43,22 +52,22 @@ class Autoscore:
         elapsedTime = time() - self.curTime
 
         # State transition logic.
-        if (elapsedTime > SectionA_Time and self.curSection == Section.A):
+        if (elapsedTime > self.sectionATime and self.curSection == Section.A):
             print("Beginning SectionB...")
             self.curSection = Section.B            
             self.sectionB.begin()
             self.curTime = time()
-        elif (elapsedTime > SectionB_Time and self.curSection == Section.B):
+        elif (elapsedTime > self.sectionBTime and self.curSection == Section.B):
             print("Beginning SectionC...")
             self.curSection = Section.C
             self.sectionC.begin()
             self.curTime = time()
-        elif (elapsedTime > SectionC_Time and self.curSection == Section.C):
+        elif (elapsedTime > self.sectionCTime and self.curSection == Section.C):
             print("Beginning SectionD...")
             self.curSection = Section.D
             self.sectionD.begin()
             self.curTime = time()
-        elif (elapsedTime > SectionD_Time and self.curSection == Section.D):
+        elif (elapsedTime > self.sectionDTime and self.curSection == Section.D):
             print("Beginning SectionA...")
             self.curSection = Section.A
             self.sectionA.begin()
@@ -79,6 +88,24 @@ class Autoscore:
         # Update SectionD 
         if (self.curSection == Section.D):
             self.sectionD.update()
+    
+    def processOsc(self, address, args) -> None:
+        if ('timeA' in address):
+            self.sectionATime = args * TIME_CONSTANT
+        elif ('timeB' in address):
+            self.sectionBTime = args * TIME_CONSTANT
+        elif ('timeC' in address):
+            self.sectionCTime = args * TIME_CONSTANT
+        elif ('timeD' in address):
+            self.sectionDTime = args * TIME_CONSTANT
+        elif ('sectionA' in address):
+            self.sectionA.processOsc(address, args)
+        elif ('sectionB' in address):
+            self.sectionB.processOsc(address, args)
+        elif ('sectionC' in address):
+            self.sectionC.processOsc(address, args)
+        elif ('sectionD' in address):
+            self.sectionD.processOsc(address, args)
 
     def reset(self) -> None:
         # Take a new snapshot of the current time. 

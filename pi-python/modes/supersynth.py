@@ -15,8 +15,6 @@ class Supersynth(Common):
         self.fullTurnOff()
     
     def updateLights(self, address, args):
-        print(address)
-        print(args)
         # Extra note and row number. 
         s = address.split('/')
         noteNum = int(s[3])

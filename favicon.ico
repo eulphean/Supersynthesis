@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="48px" height="48px" viewBox="0 0 48 48" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <rect width="48" height="48" id="artboard_1" />
+    <clipPath id="clip_1">
+      <use xlink:href="#artboard_1" clip-rule="evenodd" />
+    </clipPath>
+  </defs>
+  <g id="Favicon" clip-path="url(#clip_1)">
+    <use xlink:href="#artboard_1" stroke="none" fill="#000000" />
+    <path d="M3 4L7 4L7 54L3 54L3 4Z" id="Rectangle" fill="#FFFFFF" fill-rule="evenodd" stroke="none" />
+    <path d="M10.5 19L14.5 19L14.5 54L10.5 54L10.5 19Z" id="Rectangle-Copy" fill="#FFFFFF" fill-rule="evenodd" stroke="none" />
+    <path d="M18 0L22 0L22 54L18 54L18 0Z" id="Rectangle-Copy-2" fill="#FFFFFF" fill-rule="evenodd" stroke="none" />
+    <path d="M26 27L30 27L30 54L26 54L26 27Z" id="Rectangle-Copy-3" fill="#FFFFFF" fill-rule="evenodd" stroke="none" />
+    <path d="M34 14L38 14L38 54L34 54L34 14Z" id="Rectangle-Copy-4" fill="#FFFFFF" fill-rule="evenodd" stroke="none" />
+    <path d="M41.5 0L45.5 0L45.5 54L41.5 54L41.5 0Z" id="Rectangle-Copy-5" fill="#FFFFFF" fill-rule="evenodd" stroke="none" />
+    <path d="M-0.000488281 0.00012207L47.9995 0.00012207L47.9995 48.0001L-0.000488281 48.0001L-0.000488281 0.00012207Z" id="Rectangle-6" fill="#D3D3D3" fill-opacity="0" fill-rule="evenodd" stroke="#FFFFFF" stroke-width="1" />
+  </g>
+</svg>

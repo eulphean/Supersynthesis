@@ -70,8 +70,9 @@ class LightsManager:
         # Is the address coming from the supersynth multipush. 
         if ('supersynth' in address):
             # Check if it's a valid state before forwarding the message.
-            if (self.state == State.Supersynth):
-                self.supersynth.updateLights(address, args)
+            self.supersynth.updateLights(address, args)
+            # if (self.state == State.Supersynth):
+                
 
         if ('shm' in address):
             self.shm.processOsc(address, args)

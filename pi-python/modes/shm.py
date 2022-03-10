@@ -1,18 +1,17 @@
 # A class to do all the logic for SHM here. 
 from math import sin, pi
 from time import time
-from xml.dom.minidom import parseString
 from modes.common import Common
 
 WIN_WIDTH = 800
 CENTER_POS = WIN_WIDTH / 2
 MAX_AMP = 50
 # This slows down the period of the pattern.
-SLOW_FACTOR = 0.05
+SLOW_FACTOR = 0.025
 # This adjusts the speed of the loop. 
 # We want to control it to control the on/off
 # time of the light. 
-NOTE_TIME = 0.5
+NOTE_TIME = 0.1
 # Total lights.
 NUM_LIGHTS = 24
 
@@ -73,8 +72,8 @@ class SHM(Common):
         print('*************MODE:SHM*************')
         self.fullTurnOff()
         self.maxAmp = MAX_AMP # Change this with a slider.
-        self.noteTime = 0.5
-        self.slowFactor = 0.5
+        self.slowFactor = SLOW_FACTOR # Change this with a slider.
+        self.noteTime = NOTE_TIME
         self.lights = []
         self.curTime = time()
         self.setupLights()
@@ -97,6 +96,6 @@ class SHM(Common):
 
     def processOsc(self, address, args):
         if ('noteTime' in address):
-            self.noteTime = args      
-        elif ('slowFactor' in address):
-            self.slowFactor = args * 5
+            self.noteTime = args
+        if ('maxAmp' in address):
+            self.maxAmp = args

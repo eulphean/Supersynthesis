@@ -7,9 +7,9 @@
 class BpmStore {
     constructor() {
         // Bpm coming from the database. 
-        this.dbBpm = 150;
+        this.dbBpm = 100;
         // Locally modified Bpm. 
-        this.localBpm = 150; 
+        this.localBpm = 100; 
 
         // Fire this when new Bpm is received from the database. 
         this.subscribers = [];

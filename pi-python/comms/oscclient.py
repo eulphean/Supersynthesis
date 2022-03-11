@@ -21,6 +21,7 @@ class OSCClient:
         self.dispatcher.map("/shm*", callback) # All SHM signals. 
         # Autoscore
         self.dispatcher.map("/autoscore*", callback) # All autoscore signals. 
+        self.dispatcher.map("/dark", callback)
 
 
     async def setupServer(self, eventLoop):

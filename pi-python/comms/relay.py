@@ -16,6 +16,7 @@ class Relay:
         self.relayTwoPins = [21, 20, 16, 12, 1, 26, 19, 13]
         self.relayThreePins= [27, 22, 10, 9, 11, 0, 5, 6]
         self.relay = []
+        self.isDark = True
 
         #Control the GPIO pins from the windows machine.
         if (debug):
@@ -26,10 +27,11 @@ class Relay:
             self.initPins()
 
     def on(self, idx, sound) -> None:
-        print("On, idx: " + str(idx))
-        led = self.relay[idx]
-        # # Flipped by design.
-        led.on()
+        if (self.isDark == False):
+            print("On, idx: " + str(idx))
+            led = self.relay[idx]
+            # # Flipped by design.
+            led.on()
 
         # Play a sound only if I want to it to be on.
         if (sound):
@@ -38,10 +40,11 @@ class Relay:
             send2pd(message)
 
     def off(self, idx) -> None:
-        print("Off, idx: " + str(idx))
-        led = self.relay[idx]
-        # Flipped by design.
-        led.off()
+        if (self.isDark == False):
+            print("Off, idx: " + str(idx))
+            led = self.relay[idx]
+            # Flipped by design.
+            led.off()
 
         # Pure data message. 
         message = '0 ' + str(idx) + ' ' + str(0) + ';'

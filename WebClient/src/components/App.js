@@ -21,7 +21,7 @@ export const ORIENTATION = {
 const styles = {
   container: {
     position: 'fixed',
-    webkitOverflowScrolling: 'auto',
+    WebkitOverflowScrolling: 'touch',
     top: '0%',
     left: '0%',
     right: '0%',

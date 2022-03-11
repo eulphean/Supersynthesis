@@ -46,8 +46,8 @@ const customFadeOut = Radium.keyframes({
 }, 'fadesOut'); 
 
 const fadeInDuration = '0.5s'; 
-const slideInDuration = '2.0s'; 
-const fadeOutDuration = '1.5s';
+const slideInDuration = '1.0s'; 
+const fadeOutDuration = '0.5s';
 
 const aboutTheWork = 'Supersynthesis is an interactive audio-visual art installation that invites people to create a space for collective expression and participation. Accompanied with a physical installation, it utilizes the medium of light and sound to craft a communal experience where the audience activates the piece and the space around it by interacting with it through an online interface. Every audience input is blended into the previous response, thus synthesizing a progressively evolving wave of expression. In an increasingly fragmented society, this project aspires to create an inclusive space, where anybody can leave a trace of their thought with freedom. By participating in Supersynthesis, one becomes part of a communal wave that’ll anonymously accumulate until the forthcoming eternity.';
 const styles={
@@ -481,7 +481,7 @@ class Popup extends React.Component {
     }
 
     getFooter() {
-        const tim = 'https://www.vaexhibitions.arts.columbia.edu/class-of-2021-first-years/timothy-kwasny';
+        const tim = 'https://timkwasny96.wixsite.com/site';
         const amay = 'https://amaykataria.com';
         return (
             <div style={styles.footerContainer}>
@@ -522,6 +522,7 @@ class Popup extends React.Component {
 
     onNoHandle(event) {
         event.stopPropagation();
+        EditModeStore.setUserInteracting(false);
         this.hidePopup(event);
     }
 
@@ -535,14 +536,17 @@ class Popup extends React.Component {
             popupState: PopupState.Open,
             popupType: popupType
         }); 
+
+        // Force the user interaction to be false because we get stuck sometime in it. 
         EditModeStore.setIsPopupActive(true);
+        EditModeStore.setUserInteracting(false);
     }
 
     hidePopup(event) {
+        EditModeStore.setIsPopupActive(false);
         if (event) {
             event.stopPropagation(); 
         }
-        EditModeStore.setIsPopupActive(false);
         this.setState({
             popupState: PopupState.Close
         });

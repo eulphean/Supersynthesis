@@ -23,7 +23,8 @@ export default class Light {
         
         // Point at the top. 
         let newX = this.getNewPos() + this.lightWidth/2; // Keep this at the center of the light.
-        this.topPos = this.p5.createVector(newX, 0); // By default at the top. 
+        this.topPos = this.p5.createVector(newX, 0); // By default at the top. (Always changing)
+        this.top = this.p5.createVector(newX, 0); 
         
         // Colors. 
         this.lightActiveColor = this.p5.color('white');
@@ -37,7 +38,7 @@ export default class Light {
 
         // Variable for the timer's interval id. 
         this.growIntervalId = ''; 
-        setInterval(this.randomizeGrowState.bind(this), 3000); 
+        setInterval(this.randomizeGrowState.bind(this), 500); 
     }
 
 
@@ -79,7 +80,7 @@ export default class Light {
         let isUserInteracting = EditModeStore.isUserInteracting;
         if (isUserInteracting) {
             let dBottomPos = meshEllipsePos.dist(this.pos);
-            let dTopPos = meshEllipsePos.dist(this.topPos);
+            let dTopPos = meshEllipsePos.dist(this.top);
             if (dBottomPos < boundaryWidth/2 || dTopPos < boundaryWidth/2) {
                 // This light is activated, grow or shrink. 
                 this.updateGrowState();
@@ -251,43 +252,3 @@ export default class Light {
         calcGrowState();        
     }
 }
-
-        // let height = this.getHeight();
-        // if (this.canDraw()) {
-        //     this.p5.fill(this.lightActiveColor);
-        // } else {
-        //     this.p5.fill(this.lightInactiveColor);
-        // }
-        // this.p5.rect(newX, this.pos['y'], this.lightWidth, -height);
-    // specialDraw() {
-    //     let newX = this.getNewPos();
-
-    //     // Background bars.
-    //     this.p5.fill(this.lightBgColor);
-    //     this.p5.rect(newX, 0, this.lightWidth, this.p5.height);
-
-    //     // Full light bars.
-    //     this.p5.fill(this.lightColor);
-    //     this.p5.rect(newX, 0, this.lightWidth, this.p5.height);
-    // }
-
-// let isEditMode = EditModeStore.isEditMode;
-// let isUserInteracting = EditModeStore.isUserInteracting; 
-        // } else {
-        //     // this.p5.fill(this.lightBgColor);
-        //     // this.p5.rect(newX, 0, this.lightWidth, this.p5.height);
-        //     // // Draw solid light
-        //     // if (this.canDraw()) {
-        //     //     this.p5.fill(this.lightColor);
-        //     //     this.p5.rect(newX, 0, this.lightWidth, this.p5.height);
-        //     // }
-        // }
-                //if (isUserInteracting || isEditMode) {
-
-                // Bottom lights
-        // this.p5.fill(this.lightBgColor);
-        // this.p5.rect(newX, this.pos['y'], this.lightWidth, this.p5.height/2);
-
-        // height = this.getHeight(LIGHT_TYPE.BOTTOM);
-        // this.p5.fill(this.lightInactiveColor);
-        // this.p5.rect(newX, this.pos['y'], this.lightWidth, height);  

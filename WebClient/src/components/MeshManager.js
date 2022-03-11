@@ -8,7 +8,7 @@
 import EditModeStore from "../stores/EditModeStore";
 
 // Handles all the code related to interaction with the canvas.
-const EASING = 0.025;  
+const EASING = 0.05;  
 const ELLIPSE_RADIUS = 50; 
 export default class MeshManager {
     constructor(s) {

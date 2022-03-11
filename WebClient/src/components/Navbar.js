@@ -92,7 +92,12 @@ class Navbar extends React.Component {
   onReset() {
     EditModeStore.setEditMode(false);
     EditModeStore.setUserInteracting(false);
-    this.popupRef.current.hidePopup();
+    let curPopupType = this.popupRef.current.state.popupType; 
+    if (curPopupType === PopupType.Send) {
+      this.popupRef.current.hidePopup();
+    } else {
+      // Don't close the popup.
+    }
   }
 
   render() {

@@ -9,6 +9,8 @@ from score.autoscore import Autoscore
 from comms.relay import Relay
 from enum import Enum
 
+NUM_LIGHTS = 24
+
 class State(Enum):
     Supersynthesis = 1
     Supersynth = 2
@@ -51,6 +53,19 @@ class LightsManager:
                 self.supersynthesis.updateLights(state)
         else:
             pass
+
+                
+    def processDark(self, args):
+        if (args == 1):
+            # Turn off all the lights. 
+            for x in range(0, NUM_LIGHTS):
+                self.relay.off(x)
+            # Set dark flag. 
+            print('Dark True')
+            self.relay.setDark(True)
+        else:
+            print('Dark False')
+            self.relay.setDark(False)
     
     def processOscData(self, address, args): 
         # Set the right state. 
@@ -73,9 +88,12 @@ class LightsManager:
             self.supersynth.updateLights(address, args)
             # if (self.state == State.Supersynth):
                 
-
         if ('shm' in address):
             self.shm.processOsc(address, args)
         
         if ('autoscore' in address): 
             self.autoscore.processOsc(address, args)
+
+        if ('dark' in address):
+            self.processDark(args)
+

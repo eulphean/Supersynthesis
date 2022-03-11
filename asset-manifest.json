@@ -1,6 +1,6 @@
 {
   "files": {
-    "main.css": "/static/css/main.8f82319b.chunk.css",
+    "main.css": "/static/css/main.ddc0048f.chunk.css",
     "main.js": "/static/js/main.2ab7b4b6.chunk.js",
     "main.js.map": "/static/js/main.2ab7b4b6.chunk.js.map",
     "runtime-main.js": "/static/js/runtime-main.38b3c250.js",
@@ -8,9 +8,9 @@
     "static/js/2.c879d5e5.chunk.js": "/static/js/2.c879d5e5.chunk.js",
     "static/js/2.c879d5e5.chunk.js.map": "/static/js/2.c879d5e5.chunk.js.map",
     "index.html": "/index.html",
-    "precache-manifest.a79f486d86ee2c1244599d19614dd3d4.js": "/precache-manifest.a79f486d86ee2c1244599d19614dd3d4.js",
+    "precache-manifest.d10632dca95240e29a22e49d2e1f55b6.js": "/precache-manifest.d10632dca95240e29a22e49d2e1f55b6.js",
     "service-worker.js": "/service-worker.js",
-    "static/css/main.8f82319b.chunk.css.map": "/static/css/main.8f82319b.chunk.css.map",
+    "static/css/main.ddc0048f.chunk.css.map": "/static/css/main.ddc0048f.chunk.css.map",
     "static/js/2.c879d5e5.chunk.js.LICENSE.txt": "/static/js/2.c879d5e5.chunk.js.LICENSE.txt",
     "static/media/about.ea00a3b0.svg": "/static/media/about.ea00a3b0.svg",
     "static/media/stylesheet.css": "/static/media/josefinsans-semibold-webfont.f1b2a5a6.woff2",
@@ -19,7 +19,7 @@
   "entrypoints": [
     "static/js/runtime-main.38b3c250.js",
     "static/js/2.c879d5e5.chunk.js",
-    "static/css/main.8f82319b.chunk.css",
+    "static/css/main.ddc0048f.chunk.css",
     "static/js/main.2ab7b4b6.chunk.js"
   ]
 }

@@ -12,6 +12,8 @@ import Websocket from './Websocket';
 import EditModeStore from '../stores/EditModeStore';
 import BpmStore from '../stores/BpmStore';
 import ConfigIndexStore from '../stores/ConfigIndexStore';
+import LightConfigStore from '../stores/LightConfigStore';
+import TimerStore from '../stores/TimerStore';
 
 const styles = {
     container: {
@@ -58,7 +60,8 @@ class BottomBar extends React.Component {
       localBpm: '',
       dbBpm: '',
       configIndex: '',
-      isEditMode: false
+      isEditMode: false,
+      isSendEnabled: LightConfigStore.hasConfigEdited
     }
   }
 
@@ -66,6 +69,7 @@ class BottomBar extends React.Component {
     BpmStore.subscribe(this.onBpmUpdated.bind(this));
     ConfigIndexStore.subscribe(this.onConfigIndexUpdated.bind(this));
     EditModeStore.subscribe(this.onEditModeUpdate.bind(this));
+    LightConfigStore.subscribeForConfigChange(this.onLightConfigChange.bind(this));
   }
  
   render() {
@@ -74,16 +78,6 @@ class BottomBar extends React.Component {
     let heightStyle = this.getHeightStyle();
     let elements = this.getElements(heightStyle, indices, bpm);
     return elements; 
-  }
-
-  getEditModeElements(heightStyle, bpm) {
-    return (
-      <div style={[styles.container, heightStyle]}>
-          <div onClick={this.onBack.bind(this)} style={[styles.info, styles.button]}>Back</div>
-          <div style={styles.info}>{bpm + 'bpm'}</div>
-          <div onClick={this.onSend.bind(this)} style={[styles.info, styles.button]}>Send</div>
-      </div>   
-    );
   }
 
   getElements(heightStyle, indices, bpm) {
@@ -111,8 +105,8 @@ class BottomBar extends React.Component {
 
   getSendButton() {
     let buttonStyle = [styles.info, styles.button];
-    buttonStyle = !this.state.isEditMode ? [buttonStyle, styles.disabled] : buttonStyle;
-    let onClick = !this.state.isEditMode ? () => {} : this.onSend.bind(this);
+    buttonStyle = !this.state.isSendEnabled ? [buttonStyle, styles.disabled] : buttonStyle;
+    let onClick = !this.state.isSendEnabled ? () => {} : this.onSend.bind(this);
     return (
       <div 
         onClick={onClick} 
@@ -161,6 +155,13 @@ class BottomBar extends React.Component {
     return deviceHeight * c; 
   }
 
+  onLightConfigChange() {
+    let hasConfigChanged = LightConfigStore.hasConfigEdited; 
+    this.setState({
+      isSendEnabled: hasConfigChanged
+    });
+  }
+
   onEditModeUpdate() {
     let isEditMode = EditModeStore.isEditMode; 
     // Don't re-render if we are already in the state. 
@@ -203,6 +204,7 @@ class BottomBar extends React.Component {
     event.stopPropagation();
     EditModeStore.setEditMode(false);
     EditModeStore.setUserInteracting(false);
+    TimerStore.cancelPopup();
     // Just before committing this. 
     Websocket.commitLightConfigData();
   }

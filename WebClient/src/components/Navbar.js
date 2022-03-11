@@ -6,11 +6,13 @@
 */
 import React from 'react'
 import Radium from 'radium'
+import { PopupType } from './Popup'
 import Popup from './Popup'
 import { ORIENTATION } from './App'
 import { ReactComponent as About } from '../svg/about.svg'
 import {color, fontFamily, fontSize, padding} from './CommonStyles'
 import EditModeStore from '../stores/EditModeStore'
+import TimerStore from '../stores/TimerStore'
 
 const animation = {
   rotate: Radium.keyframes({
@@ -75,6 +77,24 @@ class Navbar extends React.Component {
     this.popupRef = React.createRef(); 
   }
 
+  componentDidMount() {
+    TimerStore.subscribePopup(this.onShowPopup.bind(this)); 
+    TimerStore.subscribeReset(this.onReset.bind(this));
+  }
+
+  onShowPopup() 
+  {
+    // Send popup type. 
+    this.popupRef.current.showPopup(PopupType.Send);
+    console.log('Show Poppup');
+  }
+
+  onReset() {
+    EditModeStore.setEditMode(false);
+    EditModeStore.setUserInteracting(false);
+    this.popupRef.current.hidePopup();
+  }
+
   render() {
     let aboutStyle = [styles.iconContainer, styles.simpleRotation];
     let heightStyle = this.getHeightStyle(); 
@@ -131,9 +151,7 @@ class Navbar extends React.Component {
   }
 
   handleAbout() {
-    console.log('Create a popup.');
-    this.popupRef.current.showPopup();
-    EditModeStore.setIsPopupActive(true);
+    this.popupRef.current.showPopup(PopupType.About);
   }
 }
 

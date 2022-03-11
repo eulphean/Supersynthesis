@@ -14,9 +14,12 @@ import EditModeStore from '../stores/EditModeStore'
 import LightManager from './LightManager'
 import MeshManager from './MeshManager'
 import BpmManager from './BpmManager'
+import TimerStore from '../stores/TimerStore'
+import LightConfigStore from '../stores/LightConfigStore'
 
 var sketch = (s) => {
   let lightManager, meshManager, bpmManager;
+  let shouldTrigger = false; 
   s.setup = () => {
     let canvasContainer = s.select('#canvasContainer');
     let height = canvasContainer.height;
@@ -42,11 +45,20 @@ var sketch = (s) => {
     } else if (!EditModeStore.isPopupActive) {
       EditModeStore.setUserInteracting(true); 
       EditModeStore.setEditMode(true);
+      shouldTrigger = true; 
     }
   };
 
   s.mouseReleased = () => {
-    EditModeStore.setUserInteracting(false); 
+    if (!EditModeStore.isPopupActive) {
+      EditModeStore.setUserInteracting(false); 
+      let hasConfigEdited = LightConfigStore.hasConfigEdited;
+      if (shouldTrigger && hasConfigEdited) {
+        console.log('Schedule popup')
+        TimerStore.startTimer();
+        shouldTrigger = false;
+      }
+    }
   }
 
   s.windowResized = () => {

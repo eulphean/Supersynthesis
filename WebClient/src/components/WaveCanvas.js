@@ -43,8 +43,10 @@ var sketch = (s) => {
     if (s.mouseY > s.height || s.mouseY < 0) {
       // Ignore. 
     } else if (!EditModeStore.isPopupActive) {
+      console.log('Reset');
       EditModeStore.setUserInteracting(true); 
       EditModeStore.setEditMode(true);
+      TimerStore.cancelReset();
       shouldTrigger = true; 
     }
   };
@@ -77,6 +79,7 @@ var sketch = (s) => {
 const styles = {
   container: {
     position: 'relative',
+    webkitOverflowScrolling: 'touch',
     backgroundColor: color.bgBlack,
     margin: 0,
     padding: 0,

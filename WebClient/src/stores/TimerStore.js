@@ -5,7 +5,7 @@
 // This time helps us schedule some events like initiating a popup for sending a message.
 
 const POPUP_TIME = 500;
-const RESET_TIME = 10000; 
+const RESET_TIME = 30000; 
 class TimerStore {
     constructor() {
         this.isEditMode = false; 

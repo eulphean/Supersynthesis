@@ -513,9 +513,9 @@ class Popup extends React.Component {
     onYesHandle(event) {
         event.stopPropagation();
         TimerStore.cancelReset();
-        this.hidePopup(event);
         EditModeStore.setEditMode(false);
         EditModeStore.setUserInteracting(false);
+        this.hidePopup(event);
         // Send the data. 
         Websocket.commitLightConfigData();
     }
@@ -542,11 +542,10 @@ class Popup extends React.Component {
         if (event) {
             event.stopPropagation(); 
         }
-
+        EditModeStore.setIsPopupActive(false);
         this.setState({
             popupState: PopupState.Close
         });
-        EditModeStore.setIsPopupActive(false);
     }
 
     handleOnTouch(event) {

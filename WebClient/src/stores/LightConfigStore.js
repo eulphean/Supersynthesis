@@ -5,6 +5,8 @@
 // into four states: light, height, grow, and draw. These states are responsible for how the lights are drawn and 
 // transmitted to the database. 
 
+import TimerStore from "./TimerStore";
+
 export const LIGHT_STATE = {
     ON: 1,
     OFF: 0
@@ -96,6 +98,8 @@ class LightConfigStore {
             this.hasConfigEdited = true;
             this.configEditSubscriber();
         }
+
+        TimerStore.cancelReset();
     }
 
     // GET/SET light's grow state. 

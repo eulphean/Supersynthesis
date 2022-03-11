@@ -61,7 +61,7 @@ class LightsManager:
                 self.relay.switchOff(x)
             self.relay.isDark = True
             # Set dark flag
-        else 
+        else:
             self.relay.isDark = False
 
     

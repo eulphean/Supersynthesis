@@ -16,7 +16,7 @@ class Relay:
         self.relayTwoPins = [21, 20, 16, 12, 1, 26, 19, 13]
         self.relayThreePins= [27, 22, 10, 9, 11, 0, 5, 6]
         self.relay = []
-        self.isDark = True
+        self.isDark = False
 
         #Control the GPIO pins from the windows machine.
         if (debug):

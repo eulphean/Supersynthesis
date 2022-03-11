@@ -60,8 +60,10 @@ class LightsManager:
             for x in range(0, NUM_LIGHTS):
                 self.relay.switchOff(x)
             self.relay.isDark = True
+            print('TURN DARK')
             # Set dark flag
         else:
+            print('TURN ON')
             self.relay.isDark = False
 
     

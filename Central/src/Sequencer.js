@@ -21,7 +21,7 @@ const PATTERN = {
 const MAX_PATTERNS = 5;
 const NUM_LIGHTS = 24;
 const LOAD_NEW_PAYLOAD_TIME = 500; // 250 milliseconds. 
-const PATTERN_CHANGE_TIME = 1000;
+const PATTERN_CHANGE_TIME = 1500;
 const MAX_RANDOM_NOTES = 24; 
 
 class Sequencer {

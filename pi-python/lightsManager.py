@@ -17,6 +17,8 @@ class State(Enum):
     Autoscore = 3
     SHM = 4
 
+NUM_LIGHTS = 24
+
 class LightsManager: 
     def __init__(self, debugState)->None: 
         # Initialize the relay. 
@@ -67,6 +69,19 @@ class LightsManager:
             print('Dark False')
             self.relay.setDark(False)
     
+    def processDark(self, args):
+        if (args == 1):
+            # Turn off everything
+            for x in range(0, NUM_LIGHTS):
+                self.relay.off(x)
+            self.relay.isDark = True
+            print('TURN DARK')
+            # Set dark flag
+        else:
+            print('TURN ON')
+            self.relay.isDark = False
+
+    
     def processOscData(self, address, args): 
         # Set the right state. 
         if (address == '/push0'):
@@ -96,4 +111,3 @@ class LightsManager:
 
         if ('dark' in address):
             self.processDark(args)
-

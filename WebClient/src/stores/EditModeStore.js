@@ -25,6 +25,7 @@ class EditModeStore {
 
     setUserInteracting(val) {
         if (this.isUserInteracting !== val) {
+            console.log('User Interacting: ' + val)
             this.isUserInteracting = val; 
             this.subscribers.forEach(s => s());
         }
@@ -32,6 +33,7 @@ class EditModeStore {
 
     setIsPopupActive(val) {
         if (this.isPopupActive !== val) {
+            console.log('Popup Active:' + val);
             this.isPopupActive = val; 
             this.subscribers.forEach(s => s());
         }

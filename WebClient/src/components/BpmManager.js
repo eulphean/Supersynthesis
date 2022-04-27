@@ -8,12 +8,14 @@
 import BpmStore from '../stores/BpmStore'
 import EditModeStore from "../stores/EditModeStore";
 
-const MAX_BPM = 300;
-const MIN_BPM = 150;
+const MAX_BPM = 200;
+const MIN_BPM = 100;
 export default class bpmManager {
     constructor(s) {
         this.p5 = s;
-        this.curBpm = BpmStore.getDbBpm();
+        BpmStore.subscribe(() => {
+            this.curBpm = BpmStore.getLocalBpm();
+        }); 
         this.curTime = ''; 
     }
 
@@ -43,11 +45,17 @@ export default class bpmManager {
 
             // Time that has elapsed. 
             let elapsedTime = Date.now() - this.curTime; 
-            let v = this.p5.sin(elapsedTime /(sum)); 
-            let mapped =  this.p5.map(v, -1, 1, 0, 0.5);
+            let v = this.p5.sin((elapsedTime + 0.1) / (sum + 1)); 
+            let mapped =  this.p5.map(v, -1, 1, 0, 0.1);
             
             // Calculate the new bpm. 
-            this.curBpm = shouldAdd ? (this.curBpm + mapped) : (this.curBpm - mapped); 
+            if (shouldAdd) {
+                this.curBpm = this.curBpm + mapped * 3.0;
+            }
+
+            if (!shouldAdd) {
+                this.curBpm = this.curBpm - mapped * 0.01;
+            }
             
             if (this.curBpm < MIN_BPM) {
                 this.curBpm = MIN_BPM; 

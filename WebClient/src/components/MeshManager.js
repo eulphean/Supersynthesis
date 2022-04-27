@@ -8,21 +8,22 @@
 import EditModeStore from "../stores/EditModeStore";
 
 // Handles all the code related to interaction with the canvas.
-const EASING = 0.05;  
+const EASING = 0.08;  
 const ELLIPSE_RADIUS = 50; 
 export default class MeshManager {
     constructor(s) {
         this.p5 = s; 
         this.ellipsePos = this.p5.createVector(this.p5.width/3, this.p5.height/2);
-        this.boundaryWidth = this.p5.height;
+        this.boundaryWidth = this.p5.width/1.5;
         this.prevMouseX = 0;
         this.prevMouseY = 0; 
     }
 
     draw(lights) {
         let isEditMode = EditModeStore.isEditMode; 
+        let isUserInteracting = EditModeStore.isUserInteracting;
         let isPopupActive = EditModeStore.isPopupActive;        
-        if (isEditMode) {
+        if (isEditMode && isUserInteracting) {
             let mouseX, mouseY;
             // Don't trap mouseX or mouseY if I'm in the popup. 
             if (isPopupActive || this.p5.mouseY > this.p5.height || this.p5.mouseY < 0) {
@@ -78,10 +79,14 @@ export default class MeshManager {
     }
 
     drawEllipse() {
-        // // Outer ellipse boundary 
+        // let isUserInteracting = EditModeStore.isUserInteracting; 
+        // if (isUserInteracting) {
         // this.p5.fill(this.p5.color(255, 255, 255, 50));
-        // this.p5.noStroke();
-        // this.p5.ellipse(this.ellipsePos['x'], this.ellipsePos['y'], this.boundaryWidth);  
+        //     this.p5.noStroke();
+        //     this.p5.ellipse(this.ellipsePos['x'], this.ellipsePos['y'], this.boundaryWidth);  
+        // }
+        // // Outer ellipse boundary 
+
 
         // Inner ellipse
         this.p5.fill(this.p5.color(255, 255, 255, 150));
@@ -98,18 +103,3 @@ export default class MeshManager {
         this.p5.line(startPoint['x'], startPoint['y'], endPoint['x'], endPoint['y']);
     }
 }
-
-// // Use the local state to draw the lines. 
-// if (this.ellipsePos['y'] < this.p5.height/2) {
-//     let pos = light.topPos;
-//     let height = light.getHeight(LIGHT_TYPE.TOP);
-//     if (height < this.p5.height/2 && height > 0) {
-//         this.drawLine(pos, this.ellipsePos, i);
-//     }
-// } else {
-//     let pos = light.bottomPos;
-//     let height = light.getHeight(LIGHT_TYPE.BOTTOM);
-//     if (height < this.p5.height/2 && height > 0) {
-//         this.drawLine(pos, this.ellipsePos, i);
-//     }
-// }

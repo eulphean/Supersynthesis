@@ -5,6 +5,8 @@
 // into four states: light, height, grow, and draw. These states are responsible for how the lights are drawn and 
 // transmitted to the database. 
 
+import TimerStore from "./TimerStore";
+
 export const LIGHT_STATE = {
     ON: 1,
     OFF: 0
@@ -31,6 +33,13 @@ class LightConfigStore {
 
         // Default light config for 24 lights. 
         this.prepareDefaultLightConfig();
+        
+        this.hasConfigEdited = false; 
+        this.configEditSubscriber = ''
+    }
+
+    subscribeForConfigChange(listener) {
+        this.configEditSubscriber = listener; 
     }
 
     setMaxHeight(height) {
@@ -67,6 +76,11 @@ class LightConfigStore {
             this.heightConfig[i] = (lightState === LIGHT_STATE.ON) ? this.maxLightHeight : 0; 
             // Don't modify Draw State. That is modified by the sequencer event. 
         }
+
+        if (this.hasConfigEdited === true) {
+            this.hasConfigEdited = false; 
+            this.configEditSubscriber(); 
+        }
     }
 
     // Light config from the database. 
@@ -79,6 +93,13 @@ class LightConfigStore {
     }
     setActiveLightState(i, lightState) {
         this.activeLightConfig[i] = lightState; 
+
+        if (this.hasConfigEdited === false) {
+            this.hasConfigEdited = true;
+            this.configEditSubscriber();
+        }
+
+        TimerStore.cancelReset();
     }
 
     // GET/SET light's grow state. 

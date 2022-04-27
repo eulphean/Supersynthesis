@@ -11,6 +11,8 @@ import { color, padding, fontFamily, fontSize } from './CommonStyles.js'
 import { ReactComponent as Exit } from '../svg/close.svg'
 import { fadeOutUp, fadeOutDown, fadeInDown, fadeInUp } from 'react-animations'
 import EditModeStore from '../stores/EditModeStore.js'
+import Websocket from './Websocket.js'
+import TimerStore from '../stores/TimerStore.js'
 
 // Maintain the current popup state (to track animations)
 var PopupState = {
@@ -18,6 +20,11 @@ var PopupState = {
     Close: 1,
     None: 2
 }; 
+
+export var PopupType = {
+    About: 0,
+    Send: 1
+}
 
 // Custom Fade in animation. 
 const customFadeIn = Radium.keyframes({
@@ -39,10 +46,10 @@ const customFadeOut = Radium.keyframes({
 }, 'fadesOut'); 
 
 const fadeInDuration = '0.5s'; 
-const slideInDuration = '2.0s'; 
-const fadeOutDuration = '1.5s';
+const slideInDuration = '1.0s'; 
+const fadeOutDuration = '0.5s';
 
-const aboutTheWork = 'Supersynthesis is an interactive audio-visual public art installation that invites people to create a space for collective expression and participation. Accompanied with a physical installation, it utilizes the medium of light and sound to craft a communal experience where the audience activates the piece and the space around it by interacting with it through this online interface. Every audience response is blended into the previous response, thus synthesizing a progressively evolving wave of experience. In an increasingly fragmented society, this project aspires to create an inclusive-whole-living entity, to which anybody can leave a trace of their thought with freedom and creativity. By participating in Supersynthesis, one becomes part of a communal wave that’ll anonymously accumulate until the forthcoming eternity.';
+const aboutTheWork = 'Supersynthesis is an interactive audio-visual art installation that invites people to create a space for collective expression and participation. Accompanied with a physical installation, it utilizes the medium of light and sound to craft a communal experience where the audience activates the piece and the space around it by interacting with it through an online interface. Every audience input is blended into the previous response, thus synthesizing a progressively evolving wave of expression. In an increasingly fragmented society, this project aspires to create an inclusive space, where anybody can leave a trace of their thought with freedom. By participating in Supersynthesis, one becomes part of a communal wave that’ll anonymously accumulate until the forthcoming eternity.';
 const styles={
     overlay: {
         position: 'fixed',
@@ -202,6 +209,75 @@ const styles={
         }
     },
 
+    sendTitle: {
+        marginTop: padding.small,
+        textAlign: 'center',
+        fontFamily: fontFamily.heatwave,
+        fontSize: fontSize.extraBig,
+        letterSpacing: '2.5px',
+
+        '@media (min-width: 750px)': {  
+            fontSize: fontSize.extraBig
+        },
+
+        '@media (min-width: 900px)': {  
+            fontSize: fontSize.huge
+        },
+
+        '@media (min-width: 1200px)' : {
+            fontSize: fontSize.veryHuge
+        }
+    },
+
+    subtitle: {
+        marginBottom: padding.lessBig,
+        textAlign: 'center',
+        fontFamily: fontFamily.heatwave,
+        fontSize: fontSize.verySmall,
+        letterSpacing: '2.5px',
+       
+        '@media (min-width: 750px)': {  
+            fontSize: fontSize.lessSmall
+        },
+
+        '@media (min-width: 900px)': {  
+            fontSize: fontSize.small
+        },
+
+        '@media (min-width: 1200px)' : {
+            fontSize: fontSize.small
+        }
+    },
+
+    buttonContainer: {
+        display: 'flex',
+        flexContainer: 'row',
+        marginTop: padding.extraSmall,
+        marginBottom: padding.big,
+        justifyContent: 'space-evenly'
+    },
+
+    button: {
+        background: color.fgWhite,
+        padding: padding.verySmall,
+        color: color.bgBlack,
+        fontFamily: fontFamily.heatwave,
+        letterSpacing: '2.5px',
+        fontSize: fontSize.small,
+               
+        '@media (min-width: 750px)': {  
+            fontSize: fontSize.lessBig
+        },
+
+        '@media (min-width: 900px)': {  
+            fontSize: fontSize.big
+        },
+
+        '@media (min-width: 1200px)' : {
+            fontSize: fontSize.veryBig
+        }
+    },
+
     body: {
         display: 'flex',
         flexDirection: 'column',
@@ -293,6 +369,7 @@ class Popup extends React.Component {
         this.state={
             isVisible: false,
             popupState: PopupState.None,
+            popupType: PopupType.About
         };
 
         this.content = React.createRef(); 
@@ -316,7 +393,12 @@ class Popup extends React.Component {
 
         // Handle different types of Popups. 
         let content, contentContainerStyle; 
-        content = this.getAboutContent();
+        if (this.state.popupType === PopupType.About) {
+            content = this.getAboutContent();
+        } else {
+            content = this.getSendContent(); 
+        }
+
         if (this.state.isVisible) {
             contentContainerStyle = [styles.contentContainer, styles.showContent]; 
             if (this.state.popupState === PopupState.Open) {
@@ -360,6 +442,26 @@ class Popup extends React.Component {
         ); 
     }
 
+    getSendContent() { 
+        let bodyStyle = [styles.body, styles.mediaQueryOnText];
+        let iconButton = this.getIconButton();  
+        return (
+            <div ref={this.content} style={styles.content}>
+                <div style={styles.stretchContainer}>
+                    { iconButton }
+                    <div style={bodyStyle}>
+                        <div style={styles.sendTitle}>SEND</div>
+                        <div style={styles.subtitle}>supersynthesis</div>       
+                        <div style={styles.buttonContainer}>
+                            <div onClick={this.onYesHandle.bind(this)} style={styles.button}>yes</div>
+                            <div onClick={this.onNoHandle.bind(this)} style={styles.button}>no</div>    
+                        </div>         
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
     getAboutContent() {
         let footer = this.getFooter(); 
         let iconButton = this.getIconButton();  
@@ -379,7 +481,7 @@ class Popup extends React.Component {
     }
 
     getFooter() {
-        const tim = 'https://www.vaexhibitions.arts.columbia.edu/class-of-2021-first-years/timothy-kwasny';
+        const tim = 'https://timkwasny96.wixsite.com/site';
         const amay = 'https://amaykataria.com';
         return (
             <div style={styles.footerContainer}>
@@ -408,21 +510,46 @@ class Popup extends React.Component {
         )
     }
 
-    showPopup() {
+    onYesHandle(event) {
+        event.stopPropagation();
+        TimerStore.cancelReset();
+        EditModeStore.setEditMode(false);
+        EditModeStore.setUserInteracting(false);
+        this.hidePopup(event);
+        // Send the data. 
+        Websocket.commitLightConfigData();
+    }
+
+    onNoHandle(event) {
+        event.stopPropagation();
+        EditModeStore.setUserInteracting(false);
+        this.hidePopup(event);
+    }
+
+    showPopup(popupType) {
+        console.log('Create a popup.');
+
         // Adjust the scroll top.
         this.content.current.scrollTop = 0; 
         this.setState({
             isVisible: true,
             popupState: PopupState.Open,
+            popupType: popupType
         }); 
+
+        // Force the user interaction to be false because we get stuck sometime in it. 
+        EditModeStore.setIsPopupActive(true);
+        EditModeStore.setUserInteracting(false);
     }
 
     hidePopup(event) {
-        event.stopPropagation(); 
+        EditModeStore.setIsPopupActive(false);
+        if (event) {
+            event.stopPropagation(); 
+        }
         this.setState({
             popupState: PopupState.Close
         });
-        EditModeStore.setIsPopupActive(false);
     }
 
     handleOnTouch(event) {

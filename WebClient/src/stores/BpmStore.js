@@ -7,16 +7,16 @@
 class BpmStore {
     constructor() {
         // Bpm coming from the database. 
-        this.dbBpm = 150;
+        this.dbBpm = 100;
         // Locally modified Bpm. 
-        this.localBpm = 150; 
+        this.localBpm = 100; 
 
         // Fire this when new Bpm is received from the database. 
-        this.subscriber = '';
+        this.subscribers = [];
     }
 
     subscribe(listener) {
-        this.subscriber = listener;
+        this.subscribers.push(listener);
     }
 
     getDbBpm() {
@@ -34,7 +34,9 @@ class BpmStore {
         this.localBpm =  newBpm;
 
         // Let subscribers know new Bpm values are updated. 
-        this.subscriber();
+        this.subscribers.forEach(l => {
+            l();
+        });
     }
 
     setLocalBpm(localBpm) {
@@ -42,7 +44,9 @@ class BpmStore {
         // subscribers know that we have new values. 
         if (this.localBpm !== localBpm) {
             this.localBpm = localBpm;
-            this.subscriber(); 
+            this.subscribers.forEach(l => {
+                l();
+            });
         }
     }
 }

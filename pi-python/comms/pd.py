@@ -8,7 +8,7 @@
 import os
 def send2pd(message):
     # Send a message to PD.
-    os.system("echo '" + message + "' | pdsend 3000")
+    os.system("echo '" + message + "' | /Applications/Pd-0.52-2.app/Contents/Resources/bin/pdsend 3000")
 
 def handlePdOscMessage(address, args):
     # Default message when we want to filter everything unneeded out.

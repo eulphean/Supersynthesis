@@ -2,8 +2,8 @@
 # Date: 02/22/2022
 # File: relay.py
 # Description: Class that controls all the interaction with the relays on the raspberry pi.
-from gpiozero import LED
-from gpiozero.pins.pigpio import PiGPIOFactory
+#from gpiozero import LED
+#from gpiozero.pins.pigpio import PiGPIOFactory
 from comms.pd import send2pd
 
 # IP Address of the raspberry pi. 
@@ -20,8 +20,9 @@ class Relay:
 
         #Control the GPIO pins from the windows machine.
         if (debug):
-            factory = PiGPIOFactory(host=RASPI_IP)
-            self.initDebugPins(factory)
+            print('Debug')
+            #factory = PiGPIOFactory(host=RASPI_IP)
+            #self.initDebugPins(factory)
         else:
             # Run with raspberry pi.
             self.initPins()
@@ -29,9 +30,9 @@ class Relay:
     def on(self, idx, sound) -> None:
         if (self.isDark == False):
             print("On, idx: " + str(idx))
-            led = self.relay[idx]
+            #led = self.relay[idx]
             # # Flipped by design.
-            led.on()
+            #led.on()
 
         # Play a sound only if I want to it to be on.
         if (sound):
@@ -42,9 +43,9 @@ class Relay:
     def off(self, idx) -> None:
         if (self.isDark == False):
             print("Off, idx: " + str(idx))
-            led = self.relay[idx]
+            #led = self.relay[idx]
             # Flipped by design.
-            led.off()
+            #led.off()
 
         # Pure data message. 
         message = '0 ' + str(idx) + ' ' + str(0) + ';'
@@ -55,18 +56,18 @@ class Relay:
         # Set the pins
         for x in self.relayOnePins:
             print(x)
-            led = LED(x)
-            self.relay.append(led)
+            # led = LED(x)
+            # self.relay.append(led)
         
         for x in self.relayTwoPins:
             print(x)
-            led = LED(x)
-            self.relay.append(led)
+            # led = LED(x)
+            # self.relay.append(led)
 
         for x in self.relayThreePins:
             print(x)
-            led = LED(x)
-            self.relay.append(led)
+            # led = LED(x)
+            # self.relay.append(led)
 
 
     def initDebugPins(self, factory):
@@ -74,18 +75,18 @@ class Relay:
         # # Set the pins
         for x in self.relayOnePins:
             print(x)
-            led = LED(x, pin_factory=factory)
-            self.relay.append(led)
+            # led = LED(x, pin_factory=factory)
+            # self.relay.append(led)
         
         for x in self.relayTwoPins:
             print(x)
-            led = LED(x, pin_factory=factory)
-            self.relay.append(led)
+            # led = LED(x, pin_factory=factory)
+            # self.relay.append(led)
 
         for x in self.relayThreePins:
             print(x)
-            led = LED(x, pin_factory=factory)
-            self.relay.append(led)
+            # led = LED(x, pin_factory=factory)
+            # self.relay.append(led)
 
             
 

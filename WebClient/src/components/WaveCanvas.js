@@ -86,6 +86,14 @@ const styles = {
     margin: 0,
     padding: 0,
     zIndex: '1'
+  },
+
+  hideCanvas: {
+    display: 'none'
+  },
+
+  showCanvas: {
+    display: 'inline'
   }
 };
 
@@ -112,6 +120,7 @@ class WaveCanvas extends React.Component {
       if (!this.doesSketchExist) {
         console.log('New Sketch');
         this.myP5 = new p5(sketch, this.sketchRef.current);   
+        this.doesSketchExist = true;
       }
     }
   }
@@ -120,17 +129,19 @@ class WaveCanvas extends React.Component {
     let heightStyle = this.getHeightStyle();
     let containerStyle = [styles.container, heightStyle];
     if (this.state.currentMode === MODE.SCORE) {
-      return (
-        <div id={'canvasContainer'} 
-          ref={this.sketchRef} 
-          style={containerStyle}>
-        </div>
-      );
-    } else {
-      return (
-        <PianoRoll wrapperStyle={containerStyle} />
-      );
+      console.log("HELLO SCORE");
     }
+    let canvasStyle = this.state.currentMode === MODE.SCORE ? [containerStyle, styles.showCanvas] : [containerStyle, styles.hideCanvas];
+    let pianoStyle = this.state.currentMode === MODE.SYNTH ? [containerStyle, styles.showCanvas] : [containerStyle, styles.hideCanvas];
+    return (
+      <>
+          <div id={'canvasContainer'} 
+            ref={this.sketchRef} 
+            style={canvasStyle}>
+          </div>
+          <PianoRoll wrapperStyle={pianoStyle} />
+      </>
+    );
   }
 
   onModeUpdate(newMode) {

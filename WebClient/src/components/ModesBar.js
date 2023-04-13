@@ -109,7 +109,7 @@ class ModesBar extends React.Component {
         }
 
         if (deviceWidth > 1000) {
-        c = 0.09; 
+        c = 0.065; 
         }
     }
 

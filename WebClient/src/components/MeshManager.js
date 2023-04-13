@@ -34,8 +34,13 @@ export default class MeshManager {
                 mouseY = this.p5.mouseY;
             }
 
-            this.ellipsePos['x'] += (mouseX - this.ellipsePos['x']) * EASING;
-            this.ellipsePos['y'] += (mouseY - this.ellipsePos['y']) * EASING; 
+            // When scoring keep this easing functionality for aesthetics.
+            // this.ellipsePos['x'] += (mouseX - this.ellipsePos['x']) * EASING;
+            // this.ellipsePos['y'] += (mouseY - this.ellipsePos['y']) * EASING; 
+
+            // Piano - Translate it into this directly.
+            this.ellipsePos['x'] = mouseX;
+            this.ellipsePos['y'] = mouseY;
 
             // Make sure the ellipse doesn't go outside the boundary.
             this.containEllipse();

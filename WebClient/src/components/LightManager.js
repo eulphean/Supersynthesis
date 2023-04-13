@@ -48,11 +48,12 @@ export default class LightManager {
     }
     
     draw(meshEllipsePos, boundaryWidth) {
+        console.log('Draw Lights');
         // Draw the lights based on the state. 
         for (let i = 0; i < this.lights.length; i++) {
             let light = this.lights[i]; 
             light.draw(meshEllipsePos, boundaryWidth);
-            this.sequencerBubble.draw(light);
+            //this.sequencerBubble.draw(light);
         }
     }
 }

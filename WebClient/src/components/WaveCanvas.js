@@ -16,6 +16,7 @@ import MeshManager from './MeshManager'
 import BpmManager from './BpmManager'
 import TimerStore from '../stores/TimerStore'
 import LightConfigStore from '../stores/LightConfigStore'
+import PianoRoll from './PianoRoll'
 
 var sketch = (s) => {
   let lightManager, meshManager, bpmManager;
@@ -96,18 +97,22 @@ class WaveCanvas extends React.Component {
 
   componentDidMount() {
     console.log('Wave canvas mounted');    
-    this.myP5 = new p5(sketch, this.sketchRef.current); 
+    //this.myP5 = new p5(sketch, this.sketchRef.current); 
   }
   
   render() {     
     let heightStyle = this.getHeightStyle();
     let containerStyle = [styles.container, heightStyle];
+    // Completely replace the canvas with a set of buttons that can be triggered instead of the score creation.
+    // return (
+    //   <div id={'canvasContainer'} 
+    //     ref={this.sketchRef} 
+    //     style={containerStyle}>
+    //   </div>
+    // );
     return (
-      <div id={'canvasContainer'} 
-        ref={this.sketchRef} 
-        style={containerStyle}>
-      </div>
-    );
+      <PianoRoll wrapperStyle={containerStyle} />
+    )
   }
 
   getHeightStyle() {

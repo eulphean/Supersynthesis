@@ -51,27 +51,29 @@ export default class Light {
         this.p5.fill(this.lightBgColor);        
         this.p5.rect(newX, this.pos['y'], this.lightWidth, -this.p5.height);
 
-        if (isEditMode) {
-            this.updateLight(meshEllipsePos, boundaryWidth);            
-            // Draw the actual light. 
-            let height = this.getHeight();
-            this.p5.fill(this.lightActiveColor);
-            this.p5.rect(newX, this.pos['y'], this.lightWidth, -height);  
-        } else {
-            // Draw the actual lights from the DB config that are lighting. 
-            if (this.isOnFromDb()) {
-                this.p5.fill(this.lightInactiveColor);
-                this.p5.rect(newX, this.pos['y'], this.lightWidth, -this.p5.height);
-            }
+        // This is great logic for scoring and other things. Right now I need to figure 
+        // out the logic for the keyboard.
+        // NOTE: Commenting this out briefly.
+        // if (isEditMode) {
+        //     this.updateLight(meshEllipsePos, boundaryWidth);            
+        //     // Draw the actual light. 
+        //     let height = this.getHeight();
+        //     this.p5.fill(this.lightActiveColor);
+        //     this.p5.rect(newX, this.pos['y'], this.lightWidth, -height);  
+        // } else {
+        //     // Draw the actual lights from the DB config that are lighting. 
+        //     if (this.isOnFromDb()) {
+        //         this.p5.fill(this.lightInactiveColor);
+        //         this.p5.rect(newX, this.pos['y'], this.lightWidth, -this.p5.height);
+        //     }
 
-            // Draw the lights from the db config that should be on. 
-            if (this.canDraw()) {
-                // Draw full light.
-                this.p5.fill(this.lightActiveColor);
-                this.p5.rect(newX, this.pos['y'], this.lightWidth, -this.p5.height);  
-            }
-        }
-
+        //     // Draw the lights from the db config that should be on. 
+        //     if (this.canDraw()) {
+        //         // Draw full light.
+        //         this.p5.fill(this.lightActiveColor);
+        //         this.p5.rect(newX, this.pos['y'], this.lightWidth, -this.p5.height);  
+        //     }
+        // }
 
         // this.drawLightPoint();
     }

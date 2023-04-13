@@ -68,7 +68,7 @@ class BottomBar extends React.Component {
   componentDidMount() {
     BpmStore.subscribe(this.onBpmUpdated.bind(this));
     ConfigIndexStore.subscribe(this.onConfigIndexUpdated.bind(this));
-    EditModeStore.subscribe(this.onEditModeUpdate.bind(this));
+    //EditModeStore.subscribe(this.onEditModeUpdate.bind(this));
     LightConfigStore.subscribeForConfigChange(this.onLightConfigChange.bind(this));
   }
  

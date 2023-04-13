@@ -7,7 +7,8 @@ from gpiozero.pins.pigpio import PiGPIOFactory
 from comms.pd import send2pd
 
 # IP Address of the raspberry pi. 
-RASPI_IP = '192.168.0.10'
+# RASPI_IP = '192.168.0.10'
+RASPI_IP = '10.1.10.214'
 
 class Relay:
     def __init__(self, debug = False) -> None:

@@ -46,15 +46,17 @@ class LightsManager:
     # This function should only process the data if it's
     # in Supersynthesis mode. 
     def processLightData(self, socketData)->None: 
-        if (self.state == State.Supersynthesis):    
-            if ('index' in socketData):
-                self.supersynthesis.resetLights()      
-            else:
-                state = socketData['state']
-                # Extract state and pass it to supersynthesis.
-                self.supersynthesis.updateLights(state)
-        else:
-            pass
+        # if (self.state == State.Supersynthesis):    
+        #     if ('index' in socketData):
+        #         self.supersynthesis.resetLights()      
+        #     else:
+        #         state = socketData['state']
+        #         # Extract state and pass it to supersynthesis.
+        #         self.supersynthesis.updateLights(state)
+        # else:
+        #     pass
+        print('Piano Notes')
+        self.supersynth.socketLights(socketData)
 
                 
     def processDark(self, args):

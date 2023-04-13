@@ -2,8 +2,8 @@ from pythonosc.osc_server import AsyncIOOSCUDPServer
 from pythonosc.dispatcher import Dispatcher
 
 # Ip Address of the host (for OSC). 
-HOST_WINDOWS = "192.168.0.11"
-HOST_PI = "172.16.100.38"
+HOST_WINDOWS = "10.1.10.66"
+HOST_PI = "10.1.10.214"
 HOST_PORT = 8000
 
 class OSCClient: 

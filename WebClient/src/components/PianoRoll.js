@@ -7,9 +7,10 @@
 
 import React from 'react'
 import Radium from 'radium'
+import Websocket from './Websocket';
 
 const ON_COLOR = 'rgb(255, 255, 255)';
-const OFF_COLOR = 'rgba(255, 255, 255, 0.125)';
+const OFF_COLOR = 'rgba(255, 255, 255, 0.3)';
 
 const styles = {
     container: {
@@ -86,17 +87,25 @@ class PianoRoll extends React.Component {
 
     // Index ranges from 0-23 for each light.
     onPress(index) {
-        // We should update this information on the backend somehow and send it over to the relay.
-        let newKeyState = this.state.keyState; 
-        newKeyState[index] = 1; 
-        this.setState({
-            keyState: newKeyState
-        });
+        this.updateState(this.state.keyState, index, 1);
     }
 
     onRelease(index) {
-        let newKeyState = this.state.keyState; 
-        newKeyState[index] = 0;
+        this.updateState(this.state.keyState, index, 0);
+    }
+
+    // Common helper function to update the piano roll state.
+    updateState(oldState, index, value)  {
+        let newKeyState = [...oldState]; 
+        newKeyState[index] = value; 
+        let newStateString = JSON.stringify(newKeyState);
+        let oldStateString = JSON.stringify(oldState);
+
+        if (newStateString !== oldStateString) {
+            // Send this config over to the installation.
+            Websocket.sendPianoNotes(newStateString);
+        }  
+
         this.setState({
             keyState: newKeyState
         });

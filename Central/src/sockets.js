@@ -15,6 +15,7 @@ let sequencer;
 const EVENT_SAVE_PAYLOAD = 'event_save_payload';
 const EVENT_TIME = 'event_time';
 const EVENT_FULL_PAYLOAD = 'event_full_payload';
+const EVENT_PIANO_NOTES = 'event_piano_notes';
 
 module.exports = {
     socketConfig: function(server) {
@@ -48,7 +49,8 @@ function onWebClient(socket) {
     console.log('New Web Client connection: ' + socket.id); 
     
     // Subscribe to all the callbacks.
-    socket.on(EVENT_SAVE_PAYLOAD, onSaveData); 
+    socket.on(EVENT_SAVE_PAYLOAD, onSaveData); // Save config.
+    socket.on(EVENT_PIANO_NOTES, onPianoNotes); // Receive piano notes.
     socket.on('disconnect', (socket) => {
         console.log(socket);
         onDisconnect(socket);
@@ -57,6 +59,8 @@ function onWebClient(socket) {
     let count = io.of('/app').sockets.size;
     console.log('Members connected: ' + count);
 
+    // Read all the data from the database as soon as the socket is connected and 
+    // send it back to the webclient. 
     let promise = database.readData();
     Promise.all([promise]).then((values) => {
         let payload = values[0]; 
@@ -75,6 +79,12 @@ function onWebClient(socket) {
     });
 }
 
+function onPianoNotes(data) {
+    console.log('Piano Payload Received: Forward it to the other cleints.');
+    let parsedPayload = JSON.parse(data);
+    sendPianoPayload(parsedPayload);
+}
+
 function onSaveData(data) {
     console.log('New incoming data - save it in the DB.');
     let promise = database.saveData(data);
@@ -90,6 +100,10 @@ function onSaveData(data) {
             console.log('GRAVE ISSUE: TIMER DID NOT EXIST');
         }
     });
+}
+
+function sendPianoPayload(payload) {
+    io.of('/app').emit(EVENT_PIANO_NOTES, payload);
 }
 
 // Sending full payload to the clients. 

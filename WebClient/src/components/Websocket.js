@@ -21,6 +21,9 @@ const EVENT_TIME = 'event_time';
 const EVENT_FULL_PAYLOAD = 'event_full_payload';
 const EVENT_SEQUENCER_PAYLOAD = 'event_sequencer_payload';
 
+// Piano events
+const EVENT_PIANO_NOTES = 'event_piano_notes';
+
 class Websocket {
   constructor() {
       this.siteURL = localhostURL + '/app'; 
@@ -55,6 +58,10 @@ class Websocket {
 
   logTime(data) {
     // console.log('Socket Connection Alive: ' + data);
+  }
+
+  sendPianoNotes(payload) {
+    this.socket.emit(EVENT_PIANO_NOTES, payload);
   }
 
   commitLightConfigData() {

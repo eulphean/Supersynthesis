@@ -44,6 +44,7 @@ class BpmStore {
         // subscribers know that we have new values. 
         if (this.localBpm !== localBpm) {
             this.localBpm = localBpm;
+            // console.log(this.localBpm);
             this.subscribers.forEach(l => {
                 l();
             });

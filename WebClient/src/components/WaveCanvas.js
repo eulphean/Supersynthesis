@@ -11,6 +11,7 @@ import {color} from './CommonStyles'
 import p5 from 'p5'
 import { ORIENTATION } from './App'
 import EditModeStore from '../stores/EditModeStore'
+import ModeStore, {MODE} from '../stores/ModeStore'
 import LightManager from './LightManager'
 import MeshManager from './MeshManager'
 import BpmManager from './BpmManager'
@@ -93,26 +94,49 @@ class WaveCanvas extends React.Component {
     super(props);   
     this.containerRef = React.createRef();
     this.sketchRef = React.createRef(); 
+    this.doesSketchExist = false; 
+
+    this.state = {
+      currentMode: ModeStore.getCurrentMode()
+    }
   }
 
   componentDidMount() {
     console.log('Wave canvas mounted');    
-    //this.myP5 = new p5(sketch, this.sketchRef.current); 
+    ModeStore.subscribe(this.onModeUpdate.bind(this)); 
+  }
+
+  componentDidUpdate() {
+    if (this.state.currentMode === MODE.SCORE) {
+      // Don't recreate the sketch.
+      if (!this.doesSketchExist) {
+        console.log('New Sketch');
+        this.myP5 = new p5(sketch, this.sketchRef.current);   
+      }
+    }
   }
   
   render() {     
     let heightStyle = this.getHeightStyle();
     let containerStyle = [styles.container, heightStyle];
-    // Completely replace the canvas with a set of buttons that can be triggered instead of the score creation.
-    // return (
-    //   <div id={'canvasContainer'} 
-    //     ref={this.sketchRef} 
-    //     style={containerStyle}>
-    //   </div>
-    // );
-    return (
-      <PianoRoll wrapperStyle={containerStyle} />
-    )
+    if (this.state.currentMode === MODE.SCORE) {
+      return (
+        <div id={'canvasContainer'} 
+          ref={this.sketchRef} 
+          style={containerStyle}>
+        </div>
+      );
+    } else {
+      return (
+        <PianoRoll wrapperStyle={containerStyle} />
+      );
+    }
+  }
+
+  onModeUpdate(newMode) {
+    this.setState({
+      currentMode: newMode
+    });
   }
 
   getHeightStyle() {

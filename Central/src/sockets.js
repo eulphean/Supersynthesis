@@ -16,6 +16,7 @@ const EVENT_SAVE_PAYLOAD = 'event_save_payload';
 const EVENT_TIME = 'event_time';
 const EVENT_FULL_PAYLOAD = 'event_full_payload';
 const EVENT_PIANO_NOTES = 'event_piano_notes';
+const EVENT_MODE_PAYLOAD = 'event_mode_payload';
 
 module.exports = {
     socketConfig: function(server) {
@@ -51,6 +52,8 @@ function onWebClient(socket) {
     // Subscribe to all the callbacks.
     socket.on(EVENT_SAVE_PAYLOAD, onSaveData); // Save config.
     socket.on(EVENT_PIANO_NOTES, onPianoNotes); // Receive piano notes.
+    socket.on(EVENT_MODE_PAYLOAD, onModeData); // Save mode data.
+
     socket.on('disconnect', (socket) => {
         console.log(socket);
         onDisconnect(socket);
@@ -61,8 +64,10 @@ function onWebClient(socket) {
 
     // Read all the data from the database as soon as the socket is connected and 
     // send it back to the webclient. 
-    let promise = database.readData();
-    Promise.all([promise]).then((values) => {
+    let lightDataPromise = database.readData();
+    let modeDataPromise = database.readModeData();
+    Promise.all([lightDataPromise, modeDataPromise]).then((values) => {
+        // Light Payload
         let payload = values[0]; 
         // Do we have a valid config to work with? 
         if (payload.length > 0) {
@@ -76,11 +81,35 @@ function onWebClient(socket) {
                 sequencer.begin(configPayload['config']);
             }
         }
+
+        // Mode data payload
+        let modePayload = values[1];
+        socket.emit(EVENT_MODE_PAYLOAD, modePayload);
+    });
+
+    // let modeDataPromise = database.readModeData();
+    // modeDataPromise.then(v => {
+    //     socket.emit(EVENT_MODE_PAYLOAD, v);
+    // });
+
+    // let lightDataPromise = database.readData(); 
+    // lightDataPromise.then(values => {
+    //     console.log(values);
+    // })
+}
+
+function onModeData(data) {
+    console.log('New Mode Received.');
+    // Commit to the database.
+    // Forward this to other clients that are connected.
+    let promise = database.updateModeData(data);
+    promise.then(payload => {
+        io.of('/app').emit(EVENT_MODE_PAYLOAD, payload);
     });
 }
 
 function onPianoNotes(data) {
-    console.log('Piano Payload Received: Forward it to the other cleints.');
+    console.log('Piano Notes Received.');
     let parsedPayload = JSON.parse(data);
     sendPianoPayload(parsedPayload);
 }

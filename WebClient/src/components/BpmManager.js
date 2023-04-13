@@ -13,6 +13,7 @@ const MIN_BPM = 100;
 export default class bpmManager {
     constructor(s) {
         this.p5 = s;
+        this.curBpm = BpmStore.getLocalBpm();
         BpmStore.subscribe(() => {
             this.curBpm = BpmStore.getLocalBpm();
         }); 

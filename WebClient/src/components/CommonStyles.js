@@ -1,6 +1,7 @@
 const color = {
     bgBlack: 'black',
     fgWhite: 'white',
+    selected: 'red',
     disabled: 'grey'
 };
 

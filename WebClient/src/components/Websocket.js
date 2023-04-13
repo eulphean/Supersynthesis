@@ -12,6 +12,8 @@ import BpmStore from '../stores/BpmStore';
 import ConfigIndexStore from '../stores/ConfigIndexStore';
 import LightConfigStore from '../stores/LightConfigStore';
 import SequencerStore from '../stores/SequencerStore';
+import ModeStore from '../stores/ModeStore';
+import EditModeStore from '../stores/EditModeStore';
 
 const localhostURL = "http://localhost:5000";
 //const herokuURL = "https://supersynth.herokuapp.com";
@@ -23,6 +25,9 @@ const EVENT_SEQUENCER_PAYLOAD = 'event_sequencer_payload';
 
 // Piano events
 const EVENT_PIANO_NOTES = 'event_piano_notes';
+
+// Mode events
+const EVENT_MODE_PAYLOAD = 'event_mode_payload';
 
 class Websocket {
   constructor() {
@@ -49,6 +54,10 @@ class Websocket {
       this.socket.on(EVENT_SEQUENCER_PAYLOAD, data => {
         SequencerStore.setSequencerData(data);
       });
+      // Read the initial data about the Modes.
+      this.socket.on(EVENT_MODE_PAYLOAD, (currentMode) => {
+        ModeStore.setMode(currentMode);
+      });
   }
 
   // -------------------- DON'T CHANGE THESE -------------------    
@@ -62,6 +71,12 @@ class Websocket {
 
   sendPianoNotes(payload) {
     this.socket.emit(EVENT_PIANO_NOTES, payload);
+  }
+
+  commitModeData() {
+    // Store mode data to the database.
+    let currentMode = ModeStore.getCurrentMode();
+    this.socket.emit(EVENT_MODE_PAYLOAD, currentMode);
   }
 
   commitLightConfigData() {

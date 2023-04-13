@@ -11,6 +11,7 @@ import Radium from 'radium'
 import Navbar from './Navbar';
 import WaveCanvas from './WaveCanvas';
 import BottomBar from './Bottombar';
+import ModesBar from './ModesBar';
 
 // Enum to track the device orientation. 
 export const ORIENTATION = {
@@ -60,6 +61,7 @@ class App extends React.Component {
       <div style={styles.container}>
         <Navbar orientation={this.state.orientation} />
         <WaveCanvas orientation={this.state.orientation} />
+        <ModesBar orientation={this.state.orientation} />
         <BottomBar orientation={this.state.orientation} />
       </div>
     );

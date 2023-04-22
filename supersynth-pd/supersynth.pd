@@ -221,9 +221,9 @@
 #X obj 176 216 sel 0 1 2 3;
 #N canvas 0 50 450 250 (subpatch) 0;
 #X array notes 24 float 3;
-#A 0 220 196 293.66 220 329.63 246.94 92.49 146.83 440 659.26 493.88
-185 146.83 130.8 392 587.33 880 164.81 659.26 739.9 783.99 261.6 185
-196;
+#A 0 440 659.26 493.88 220 329.63 246.94 92.49 146.83 440 659.26 440
+185 440 130.8 440 587.33 880 987.77 110 739.9 783.99 261.6 73.4 110
+;
 #X coords 0 1 24 -1 200 140 1;
 #X restore 100 20 graph;
 #X connect 4 0 5 0;
@@ -317,8 +317,6 @@
 #X obj 207 455 *~ 0;
 #X obj 281 454 *~ 0;
 #X obj 398 311 else/ping.pong~ 505 0;
-#X obj 138 969 else/display;
-#X obj 234 984 else/display;
 #X connect 0 0 2 0;
 #X connect 0 0 1 0;
 #X connect 1 0 8 0;
@@ -344,8 +342,8 @@
 #X connect 20 1 46 0;
 #X connect 23 0 28 0;
 #X connect 24 0 29 0;
-#X connect 25 0 51 0;
-#X connect 26 0 50 0;
+#X connect 25 0 24 1;
+#X connect 26 0 23 1;
 #X connect 30 0 32 0;
 #X connect 31 0 45 1;
 #X connect 31 0 46 1;
@@ -370,8 +368,6 @@
 #X connect 48 0 16 0;
 #X connect 49 0 47 0;
 #X connect 49 0 48 0;
-#X connect 50 0 23 1;
-#X connect 51 0 24 1;
 #X restore 860 887 pd filterChain;
 #N canvas 113 183 521 378 setEnvelope 0;
 #X obj 129 153 sel 0 1 2 3;

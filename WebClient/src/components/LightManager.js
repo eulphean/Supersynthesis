@@ -52,7 +52,7 @@ export default class LightManager {
         for (let i = 0; i < this.lights.length; i++) {
             let light = this.lights[i]; 
             light.draw(meshEllipsePos, boundaryWidth);
-            //this.sequencerBubble.draw(light);
+            this.sequencerBubble.draw(light);
         }
     }
 }

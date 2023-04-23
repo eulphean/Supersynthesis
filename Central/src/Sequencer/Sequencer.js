@@ -68,6 +68,10 @@ class Sequencer {
         // New time interval for the sequencer. 
         console.log('Update sequencer with a new time interval.');
         this.intervalTime = this.getIntervalTime(payload['bpm']);
+        
+        // Reset system
+        this.chooseNewPattern();
+        this.lightManager.sendResetPayload();
 
         // Wait for new_payload_time during which the intallation will flash
         // before restarting the sequencer. 
@@ -224,6 +228,7 @@ class Sequencer {
 
     // Helper functions.
     stop() {
+        console.log('Stop Sequencer')
         this.clearTimer(); 
     }
 

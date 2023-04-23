@@ -68,7 +68,7 @@ class ModesBar extends React.Component {
     }
 
     handleClick(newMode) {
-        ModeStore.setMode(newMode);
+        ModeStore.setMode(newMode, true);
     }
 
     onModeUpdate(newMode) {

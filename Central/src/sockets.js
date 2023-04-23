@@ -10,7 +10,6 @@ var ModeHandler = require('./Modes/ModeHandler.js');
 // Global variables. 
 let appSocket; 
 let io; 
-let sequencer; 
 
 const EVENT_TIME = 'event_time';
 
@@ -43,7 +42,7 @@ function ping() {
 }
 
 function onWebClient(socket) {
-    console.log('New Web Client connection: ' + socket.id); 
+    console.log('***New Web Client connection: ' + socket.id + '***'); 
 
     // Current app (socket) interacting with the backend. 
     modeHandler.setCurrentSocket(socket); 
@@ -79,57 +78,6 @@ function onDisconnect() {
     console.log('Web client disconnected.');
     console.log('Connected clients: ' + count);
     if (count === 0) {
-        //sequencer.stop();
+        modeHandler.stopSequencer();
     }
 }
-
-// // Data is 0, 1, 2, 3
-// // 0: Synth, 1: Dream, 2: Score, 3: Sweep
-// function onModeData(data) {
-//     console.log('New Mode Received.');
-//     // Commit to the database.
-//     // Forward this to other clients that are connected.
-//     let promise = database.updateModeData(data);
-//     promise.then(payload => {
-//         io.of('/app').emit(EVENT_MODE_PAYLOAD, payload);
-//         // Update current mode. 
-//         modeManager.setCurrentMode(payload);
-//     });
-// }
-
-// function onPianoNotes(data) {
-//     console.log('Piano Notes Received.');
-//     let parsedPayload = JSON.parse(data);
-//     sendPianoPayload(parsedPayload);
-// }
-
-// function onSaveData(data) {
-//     console.log('New incoming data - save it in the DB.');
-//     let promise = database.saveData(data);
-//     promise.then(payload => {
-//         if (sequencer.isRunning()) { // At this time, sequencer will absolutely exist!!
-//             // Parse the payload back into object. 
-//             let parsedPayload = JSON.parse(payload['config']);
-//             let configPayload = {'index': payload['index'], 'config': parsedPayload};
-//             sendFullConfigToClients(configPayload);
-//             console.log("New payload from client. Updating sequencer.");
-//             sequencer.updateInterval(parsedPayload); 
-//         } else {
-//             console.log('GRAVE ISSUE: TIMER DID NOT EXIST');
-//         }
-//     });
-// }
-
-// function sendPianoPayload(payload) {
-//     io.of('/app').emit(EVENT_PIANO_NOTES, payload);
-// }
-
-// // Sending full payload to the clients. 
-// function sendFullConfigToSender(payload, socket) { 
-//     socket.emit(EVENT_FULL_PAYLOAD, payload);
-// }
-
-// // Sending full payload to the clients. 
-// function sendFullConfigToClients(payload) { 
-//     io.of('/app').emit(EVENT_FULL_PAYLOAD, payload);
-// }

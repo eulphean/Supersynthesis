@@ -142,7 +142,7 @@ function onInsertTimer(timerId) {
 function onReadConfigs(socket) {
     console.log('Read database');
     let promise = new Promise((resolve, reject) => {
-            pool.query('SELECT * FROM entries ORDER BY index DESC LIMIT 1;', (error, result) => {
+            pool.query('SELECT * FROM entries ORDER BY index DESC;', (error, result) => {
             if (error) {
                 console.log('Some error');
                 throw error; 

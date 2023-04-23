@@ -6,25 +6,27 @@
 // uses the Sequnecer, etc to do things. 
 var Sequencer = require('../Sequencer/Sequencer.js'); 
 var database = require('../database.js');
-
-const EVENT_FULL_PAYLOAD = 'event_full_payload';
-const EVENT_SYNTH_NOTES = 'event_synth_notes';
-const EVENT_MODE_PAYLOAD = 'event_mode_payload';
-const EVENT_SAVE_PAYLOAD = 'event_save_payload';
+var DreamManager = require('./DreamManager.js');
+var ScoreManager = require('./ScoreManager.js');
+var EVENTS = require('./CommonTypes.js').EVENTS;
+var MODES = require('./CommonTypes.js').MODES;
 
 class ModeHandler {
     constructor(io) {
         this.io = io; 
         this.sequencer = new Sequencer(io);
+        this.dreamManager = new DreamManager();
+        this.scoreManager = new ScoreManager();
+        this.lightConfigs = '';
         this.currentMode = '';
         this.socket = ''; 
     }
 
     subscribe() {
         // Subscribe to all Mode related callbacks.
-        this.socket.on(EVENT_SAVE_PAYLOAD, this.onSaveData.bind(this)); // Save config.
-        this.socket.on(EVENT_SYNTH_NOTES, this.onSynthNotes.bind(this)); // Receive piano notes.
-        this.socket.on(EVENT_MODE_PAYLOAD, this.onModeData.bind(this)); // Save mode data.
+        this.socket.on(EVENTS.EVENT_SAVE_PAYLOAD, this.onSaveData.bind(this)); // Save config.
+        this.socket.on(EVENTS.EVENT_SYNTH_NOTES, this.onSynthNotes.bind(this)); // Receive piano notes.
+        this.socket.on(EVENTS.EVENT_MODE_PAYLOAD, this.onModeData.bind(this)); // Save mode data.
     }
 
     onSaveData() {
@@ -47,7 +49,7 @@ class ModeHandler {
     onSynthNotes(data) {
         console.log('Synth Notes Received.');
         let parsedPayload = JSON.parse(data);
-        this.io.of('/app').emit(EVENT_SYNTH_NOTES, parsedPayload);
+        this.io.of('/app').emit(EVENTS.EVENT_SYNTH_NOTES, parsedPayload);
     }
 
     onModeData(data) {
@@ -56,7 +58,7 @@ class ModeHandler {
         // Forward this to other clients that are connected.
         let promise = database.updateModeData(data);
         promise.then(payload => {
-            this.io.of('/app').emit(EVENT_MODE_PAYLOAD, payload);
+            this.io.of('/app').emit(EVENTS.EVENT_MODE_PAYLOAD, payload);
             // Update current mode. 
             this.setCurrentMode(payload);
         });
@@ -70,59 +72,36 @@ class ModeHandler {
         this.lightConfigs = lightConfigs;
     }
 
-    setCurrentMode(mode) {
-        this.currentMode = mode;
-        console.log('Current Mode: ' + this.currentMode);
+    stopSequencer() {
+        this.sequencer.stop();
+    }
 
+    setCurrentMode(newMode) {
         // Now do something based on the modes with the sequncer.
-        switch (this.currentMode) {
-            case 0: {
-                console.log('Current Mode: Synth');
+        switch (newMode) {
+            case MODES.SYNTH: {
+                console.log('New Mode: Synth');
                 // Turn off the sequencer since we'll be processing the piano events.
                 this.sequencer.stop();
                 break;
             }
 
-            case 1: {
-                console.log('Current Mode: Dream');
-                // Subscribe a callback, so I can load a new dream config.
-
-                const numEntries = this.lightConfigs.length; 
-                const randIdx = Math.floor(Math.random() * numEntries); 
-                const randConfig = this.lightConfigs[randIdx]['config'];
-
-                if (!this.sequencer.isRunning()) {
-                    this.sequencer.begin(randConfig);
-                } else {
-                    this.sequencer.updateInterval(randConfig);
-                }
-
-                this.socket.emit(EVENT_FULL_PAYLOAD, randConfig);
-                // Turn on the sequencer
-                // After every message, send it a new dream message
+            case MODES.DREAM: {
+                console.log('New Mode: Dream');
+                // Send the previous mode.
+                this.dreamManager.update(this.currentMode, this.lightConfigs, this.io, this.socket, this.sequencer); 
                 break;
             }
 
-            case 2: {
-                console.log('Current Mode: Score');
-                if (this.lightConfigs.length > 0) {
-                    // Read the first payload entry and show it in the sequencer
-                    const firstConfig = this.lightConfigs[0];
-                    // Send this config to the app (socket) that just connected.
-                    this.socket.emit(EVENT_FULL_PAYLOAD, firstConfig);
-                    // Is there a sequencer already running? 
-                    if (this.sequencer.isRunning()) {
-                        console.log('Sequencer already running. Do nothing!!');
-                    } else {
-                        console.log('Sequencer is not running. Start it!!');
-                        this.sequencer.begin(firstConfig['config']);
-                    }
-                }
+            case MODES.SCORE: {
+                console.log('New Mode: Score');
+                // Send the previous mode. 
+                this.scoreManager.update(this.currentMode, this.lightConfigs, this.io, this.socket, this.sequencer);
                 break;
             }
 
-            case 3: {
-                console.log('Current Mode: Sweep');
+            case MODES.SWEEP: {
+                console.log('New Mode: Sweep');
                 // Turn off the sequencer
                 // Create a custom score module to handle this
                 break;
@@ -134,9 +113,11 @@ class ModeHandler {
             }
         }
 
+        // Update the current mode to new mode.
+        this.currentMode = newMode;
 
         // Emit the current mode to the app (socket) that just connected.
-        this.socket.emit(EVENT_MODE_PAYLOAD, mode);
+        this.socket.emit(EVENTS.EVENT_MODE_PAYLOAD, newMode);
     }
 
 }

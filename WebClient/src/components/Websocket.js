@@ -56,7 +56,7 @@ class Websocket {
       });
       // Read the initial data about the Modes.
       this.socket.on(EVENT_MODE_PAYLOAD, (currentMode) => {
-        ModeStore.setMode(currentMode);
+        ModeStore.setMode(currentMode, false);
       });
   }
 

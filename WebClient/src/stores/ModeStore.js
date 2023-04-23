@@ -31,7 +31,7 @@ class ModeStore {
         return this.currentMode; 
     }
 
-    setMode(newMode) {
+    setMode(newMode, commitToDb) {
         if (this.currentMode !== newMode) {
             // Set the mode
             this.currentMode = newMode;
@@ -40,9 +40,11 @@ class ModeStore {
             this.subscribers.forEach(l => {
                 l(newMode);
             });
-    
-            // Commit this data to the database.
-            Websocket.commitModeData();
+            
+            if (commitToDb) {
+                // Commit this data to the database.
+                Websocket.commitModeData();
+            }
         }
     }
 }

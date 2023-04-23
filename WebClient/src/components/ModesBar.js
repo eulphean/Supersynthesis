@@ -86,34 +86,34 @@ class ModesBar extends React.Component {
     }
     
     getHeight() {
-    let deviceHeight = window.innerHeight;
-    let deviceWidth = window.innerWidth;
-    let c = 0; 
-    if (this.props.orientation === ORIENTATION.PORTRAIT) {
-        if (deviceHeight < 900) {
-        c = 0.1
+        let deviceHeight = window.innerHeight;
+        let deviceWidth = window.innerWidth;
+        let c = 0; 
+        if (this.props.orientation === ORIENTATION.PORTRAIT) {
+            if (deviceHeight < 900) {
+            c = 0.1
+            }
+
+            if (deviceHeight > 900 && deviceHeight < 1000) {
+            c = 0.075
+            }
+
+            if (deviceHeight > 1000) {
+            c = 0.06
+            }
         }
 
-        if (deviceHeight > 900 && deviceHeight < 1000) {
-        c = 0.075
+        if (this.props.orientation === ORIENTATION.LANDSCAPE) {
+            if (deviceWidth < 1000) {
+                c = 0.15; 
+            }
+
+            if (deviceWidth > 1000) {
+                c = 0.065; 
+            }
         }
 
-        if (deviceHeight > 1000) {
-        c = 0.06
-        }
-    }
-
-    if (this.props.orientation === ORIENTATION.LANDSCAPE) {
-        if (deviceWidth < 1000) {
-        c = 0.15; 
-        }
-
-        if (deviceWidth > 1000) {
-        c = 0.065; 
-        }
-    }
-
-    return deviceHeight * c; 
+        return deviceHeight * c; 
     }
 }
 

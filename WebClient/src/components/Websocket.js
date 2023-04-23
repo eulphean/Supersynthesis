@@ -23,8 +23,8 @@ const EVENT_TIME = 'event_time';
 const EVENT_FULL_PAYLOAD = 'event_full_payload';
 const EVENT_SEQUENCER_PAYLOAD = 'event_sequencer_payload';
 
-// Piano events
-const EVENT_PIANO_NOTES = 'event_piano_notes';
+// SYNTH events
+const EVENT_SYNTH_NOTES = 'event_synth_notes';
 
 // Mode events
 const EVENT_MODE_PAYLOAD = 'event_mode_payload';
@@ -69,8 +69,8 @@ class Websocket {
     // console.log('Socket Connection Alive: ' + data);
   }
 
-  sendPianoNotes(payload) {
-    this.socket.emit(EVENT_PIANO_NOTES, payload);
+  sendSynthNotes(payload) {
+    this.socket.emit(EVENT_SYNTH_NOTES, payload);
   }
 
   commitModeData() {

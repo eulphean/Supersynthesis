@@ -103,7 +103,7 @@ class PianoRoll extends React.Component {
 
         if (newStateString !== oldStateString) {
             // Send this config over to the installation.
-            Websocket.sendPianoNotes(newStateString);
+            Websocket.sendSynthNotes(newStateString);
         }  
 
         this.setState({

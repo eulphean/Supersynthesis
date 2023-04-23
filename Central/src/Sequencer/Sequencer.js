@@ -7,7 +7,7 @@
 // How do I architect this sequencer in the best way possible? 
 // The timing for the sequencer is set by the time coming from the clients. 
 
-var LightManager = require('./lightManager.js');
+var LightManager = require('./LightManager.js');
 
 // States that the sequncer can be in.
 const PATTERN = {
@@ -249,15 +249,12 @@ class Sequencer {
 }
 
 module.exports = Sequencer;
-
-
-
-        // Send light manager all the information required to create a 
-        // payload for the clients and emit it to them. 
-        // For example, this could include the glider, current pattern, based
-        // on which LightManager can create the right light payload and emit it to
-        // // the clients. This is very much possible. 
-        // let payload = this.lightManager.createPayloadAndEmit(this.glider); 
-        // console.log(payload);
-        // let timeToWait = payload['state'] === 'NONE' ? OFF_TIME : this.intervalTime; 
-        // // Recursive call to handle interval until the timerId is cleared. 
+// Send light manager all the information required to create a 
+// payload for the clients and emit it to them. 
+// For example, this could include the glider, current pattern, based
+// on which LightManager can create the right light payload and emit it to
+// // the clients. This is very much possible. 
+// let payload = this.lightManager.createPayloadAndEmit(this.glider); 
+// console.log(payload);
+// let timeToWait = payload['state'] === 'NONE' ? OFF_TIME : this.intervalTime; 
+// // Recursive call to handle interval until the timerId is cleared. 

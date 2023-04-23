@@ -42,14 +42,17 @@ var sketch = (s) => {
   };
 
   s.mousePressed = () => {
-    if (s.mouseY > s.height || s.mouseY < 0) {
-      // Ignore. 
-    } else if (!EditModeStore.isPopupActive) {
-      console.log('Doing it');
-      EditModeStore.setUserInteracting(true); 
-      EditModeStore.setEditMode(true);
-      TimerStore.cancelReset();
-      shouldTrigger = true; 
+    const currentMode = ModeStore.currentMode; 
+    if (currentMode === MODE.SCORE) {
+      if (s.mouseY > s.height || s.mouseY < 0) {
+        // Ignore. 
+      } else if (!EditModeStore.isPopupActive) {
+        console.log('Doing it');
+        EditModeStore.setUserInteracting(true); 
+        EditModeStore.setEditMode(true);
+        TimerStore.cancelReset();
+        shouldTrigger = true; 
+      }
     }
   };
 
@@ -88,11 +91,11 @@ const styles = {
     zIndex: '1'
   },
 
-  hideCanvas: {
+  hide: {
     display: 'none'
   },
 
-  showCanvas: {
+  show: {
     display: 'inline'
   }
 };
@@ -115,7 +118,7 @@ class WaveCanvas extends React.Component {
   }
 
   componentDidUpdate() {
-    if (this.state.currentMode === MODE.SCORE) {
+    if (this.state.currentMode === MODE.SCORE || this.state.currentMode === MODE.DREAM) {
       // Don't recreate the sketch.
       if (!this.doesSketchExist) {
         console.log('New Sketch');
@@ -128,11 +131,8 @@ class WaveCanvas extends React.Component {
   render() {     
     let heightStyle = this.getHeightStyle();
     let containerStyle = [styles.container, heightStyle];
-    if (this.state.currentMode === MODE.SCORE) {
-      console.log("HELLO SCORE");
-    }
-    let canvasStyle = this.state.currentMode === MODE.SCORE ? [containerStyle, styles.showCanvas] : [containerStyle, styles.hideCanvas];
-    let pianoStyle = this.state.currentMode === MODE.SYNTH ? [containerStyle, styles.showCanvas] : [containerStyle, styles.hideCanvas];
+    let canvasStyle = (this.state.currentMode === MODE.SCORE || this.state.currentMode === MODE.DREAM) ? [containerStyle, styles.show] : [containerStyle, styles.hide];
+    let pianoStyle = this.state.currentMode === MODE.SYNTH ? [containerStyle, styles.show] : [containerStyle, styles.hide];
     return (
       <>
           <div id={'canvasContainer'} 

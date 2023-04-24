@@ -1,7 +1,8 @@
 # Author: Amay Kataria
 # Date: 02/22/2022
 # File: supersynthesis.py
-# Description: The mode that is controlled by the website (supersynthesis.art).
+# Description: When this mode is active, everything that is happening on the Webapp is forwarded to the 
+# raspberry pi cleanly. This file here should do all the work processing it.
 
 from modes.common import Common
 import time
@@ -29,6 +30,14 @@ class Supersynthesis(Common):
                 val = s['val']
                 if (val == 1):
                     self.switchOn(idx)
+    
+    def synthNotes(self, synthData):
+        for i in range(0, 24):
+            val = synthData[i]
+            if (val == 1):
+                self.switchOn(i)
+            else:
+                self.switchOff(i)
 
     def resetLights(self):
         self.lightsOn(0, self.numLights)    

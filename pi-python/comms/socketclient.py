@@ -14,16 +14,18 @@ class AppSocket(socketio.AsyncClientNamespace):
     async def on_time(self, data):
         pass
     
+    # Sequencer data trigger notes.
     async def on_event_sequencer_payload(self, data):
-        #self.callback(data)
+        self.callback(data)
         pass
     
+    # # Light config data.
     async def on_event_full_payload(self, data):
-        #self.callback(data)
+        self.callback(data)
         pass
         
-
-    async def on_event_piano_notes(self, data):
+    # Synthesizer notes. 
+    async def on_event_synth_notes(self, data):
         self.callback(data)
 
     def registerCallback(self, cbk):

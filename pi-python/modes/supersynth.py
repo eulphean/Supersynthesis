@@ -34,11 +34,3 @@ class Supersynth(Common):
         
         if (args == 0):
             self.switchOff(lightIdx)
-
-    def socketLights(self, pianoData):
-        for i in range(0, 24):
-            val = pianoData[i]
-            if (val == 1):
-                self.switchOn(i)
-            else:
-                self.switchOff(i)

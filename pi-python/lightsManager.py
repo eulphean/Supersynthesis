@@ -12,7 +12,7 @@ from enum import Enum
 NUM_LIGHTS = 24
 
 class State(Enum):
-    Supersynthesis = 1
+    Supersynthesis = 1 # Everything WebApp related!
     Supersynth = 2
     Autoscore = 3
     SHM = 4
@@ -46,19 +46,21 @@ class LightsManager:
     # This function should only process the data if it's
     # in Supersynthesis mode. 
     def processLightData(self, socketData)->None: 
-        # if (self.state == State.Supersynthesis):    
-        #     if ('index' in socketData):
-        #         self.supersynthesis.resetLights()      
-        #     else:
-        #         state = socketData['state']
-        #         # Extract state and pass it to supersynthesis.
-        #         self.supersynthesis.updateLights(state)
-        # else:
-        #     pass
-        print('Piano Notes')
-        self.supersynth.socketLights(socketData)
-
-                
+        # Supersynthesis is that state where all the Webapp related stuff is happening.
+        # In these if conditions, decide what kind of action to take based on the data that
+        # is coming from the WebApp
+        if (self.state == State.Supersynthesis):  
+            if ('index' in socketData): # Full payload
+                self.supersynthesis.resetLights()      
+            elif ('state' in socketData): # Sequencer data
+                state = socketData['state']
+                # Extract state and pass it to supersynthesis.
+                self.supersynthesis.updateLights(state)
+            else: # Synth data
+                self.supersynthesis.synthNotes(socketData)
+        else:
+            pass
+     
     def processDark(self, args):
         if (args == 1):
             # Turn off all the lights. 
@@ -70,19 +72,6 @@ class LightsManager:
         else:
             print('Dark False')
             self.relay.setDark(False)
-    
-    def processDark(self, args):
-        if (args == 1):
-            # Turn off everything
-            for x in range(0, NUM_LIGHTS):
-                self.relay.off(x)
-            self.relay.isDark = True
-            print('TURN DARK')
-            # Set dark flag
-        else:
-            print('TURN ON')
-            self.relay.isDark = False
-
     
     def processOscData(self, address, args): 
         # Set the right state. 
@@ -113,3 +102,21 @@ class LightsManager:
 
         if ('dark' in address):
             self.processDark(args)
+
+
+
+
+            #print('Piano Notes')
+        # self.supersynth.socketLights(socketData)
+
+    #     def processDark(self, args):
+    # if (args == 1):
+    #     # Turn off everything
+    #     for x in range(0, NUM_LIGHTS):
+    #         self.relay.off(x)
+    #     self.relay.isDark = True
+    #     print('TURN DARK')
+    #     # Set dark flag
+    # else:
+    #     print('TURN ON')
+    #     self.relay.isDark = False

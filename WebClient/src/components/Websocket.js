@@ -14,11 +14,12 @@ import LightConfigStore from '../stores/LightConfigStore';
 import SequencerStore from '../stores/SequencerStore';
 import ModeStore from '../stores/ModeStore';
 import EditModeStore from '../stores/EditModeStore';
+import SynthStore from '../stores/SynthStore';
 
 const localhostURL = "http://localhost:5000";
 //const herokuURL = "https://supersynth.herokuapp.com";
 
-const EVENT_SAVE_PAYLOAD = 'event_save_payload';
+const EVENT_SCORE_PAYLOAD = 'event_score_payload';
 const EVENT_TIME = 'event_time';
 const EVENT_FULL_PAYLOAD = 'event_full_payload';
 const EVENT_SEQUENCER_PAYLOAD = 'event_sequencer_payload';
@@ -57,6 +58,9 @@ class Websocket {
       // Read the initial data about the Modes.
       this.socket.on(EVENT_MODE_PAYLOAD, (currentMode) => {
         ModeStore.setMode(currentMode, false);
+      });
+      this.socket.on(EVENT_SYNTH_NOTES, data => {
+        SynthStore.setSynthNotes(data);
       });
   }
 
@@ -98,7 +102,7 @@ class Websocket {
     };
 
     // Emit payload.
-    this.socket.emit(EVENT_SAVE_PAYLOAD, payload);
+    this.socket.emit(EVENT_SCORE_PAYLOAD, payload);
   }
 
   processFullPayload(payload) {

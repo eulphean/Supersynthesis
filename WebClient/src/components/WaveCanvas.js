@@ -17,7 +17,7 @@ import MeshManager from './MeshManager'
 import BpmManager from './BpmManager'
 import TimerStore from '../stores/TimerStore'
 import LightConfigStore from '../stores/LightConfigStore'
-import PianoRoll from './PianoRoll'
+import Synth from './Synth'
 
 var sketch = (s) => {
   let lightManager, meshManager, bpmManager;
@@ -132,14 +132,14 @@ class WaveCanvas extends React.Component {
     let heightStyle = this.getHeightStyle();
     let containerStyle = [styles.container, heightStyle];
     let canvasStyle = (this.state.currentMode === MODE.SCORE || this.state.currentMode === MODE.DREAM) ? [containerStyle, styles.show] : [containerStyle, styles.hide];
-    let pianoStyle = this.state.currentMode === MODE.SYNTH ? [containerStyle, styles.show] : [containerStyle, styles.hide];
+    let synthStyle = this.state.currentMode === MODE.SYNTH ? [containerStyle, styles.show] : [containerStyle, styles.hide];
     return (
       <>
           <div id={'canvasContainer'} 
             ref={this.sketchRef} 
             style={canvasStyle}>
           </div>
-          <PianoRoll wrapperStyle={pianoStyle} />
+          <Synth wrapperStyle={synthStyle} />
       </>
     );
   }

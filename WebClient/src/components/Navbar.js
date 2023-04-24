@@ -71,9 +71,7 @@ const styles = {
 class Navbar extends React.Component {
   constructor(props) {
     super(props); 
-    this.state={
-    }
-
+    this.state={}
     this.popupRef = React.createRef(); 
   }
 

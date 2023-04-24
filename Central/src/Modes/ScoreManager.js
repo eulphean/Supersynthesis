@@ -4,33 +4,34 @@
 // Description: Handle all the business logic associated with the Score state.
 var MODES = require('./CommonTypes').MODES;
 var EVENTS = require('./CommonTypes').EVENTS;
+var CommonManager = require('./CommonManager');
 
-class ScoreManager {
-    constructor() {
-        this.currentConfig = ''
+class ScoreManager extends CommonManager {
+    constructor(io, sequencer) {
+        super(io, sequencer); 
     }
 
-    update(previousMode, lightConfigs, io, socket, sequencer) {
+    update(previousMode) {
         if (this.currentConfig) {
             // Emit this config to socket
-            socket.emit(EVENTS.EVENT_FULL_PAYLOAD, this.currentConfig);
+            this.socket.emit(EVENTS.EVENT_FULL_PAYLOAD, this.currentConfig);
         } else {
              // Read the first payload entry and show it in the sequencer
-             this.currentConfig = lightConfigs[0];
+             this.currentConfig = this.lightConfigs[0];
              // Send this config to the app (socket) that just connected.
-             socket.emit(EVENTS.EVENT_FULL_PAYLOAD, this.currentConfig);
+             this.socket.emit(EVENTS.EVENT_FULL_PAYLOAD, this.currentConfig);
         }
 
         // If the sequencer is not running, start it.
-        if (!sequencer.isRunning()) {
-            sequencer.begin(this.currentConfig['config']);
+        if (!this.sequencer.isRunning()) {
+            this.sequencer.begin(this.currentConfig['config']);
             return;
         } 
 
         if (previousMode === MODES.DREAM) {
-            sequencer.updateInterval(this.currentConfig['config']);
+            this.sequencer.updateInterval(this.currentConfig['config']);
             // Send all the connected clients this config. 
-            io.of('/app').emit(EVENTS.EVENT_FULL_PAYLOAD, this.currentConfig); 
+            this.io.of('/app').emit(EVENTS.EVENT_FULL_PAYLOAD, this.currentConfig); 
         }
     }
 }

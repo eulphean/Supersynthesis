@@ -14,6 +14,7 @@ import BpmStore from '../stores/BpmStore';
 import ConfigIndexStore from '../stores/ConfigIndexStore';
 import LightConfigStore from '../stores/LightConfigStore';
 import TimerStore from '../stores/TimerStore';
+import ModeStore, {MODE} from '../stores/ModeStore'
 
 const styles = {
     container: {
@@ -61,7 +62,8 @@ class BottomBar extends React.Component {
       dbBpm: '',
       configIndex: '',
       isEditMode: false,
-      isSendEnabled: LightConfigStore.hasConfigEdited
+      isSendEnabled: LightConfigStore.hasConfigEdited,
+      currentMode: ModeStore.getCurrentMode()
     }
   }
 
@@ -70,6 +72,7 @@ class BottomBar extends React.Component {
     ConfigIndexStore.subscribe(this.onConfigIndexUpdated.bind(this));
     EditModeStore.subscribe(this.onEditModeUpdate.bind(this));
     LightConfigStore.subscribeForConfigChange(this.onLightConfigChange.bind(this));
+    ModeStore.subscribe(this.onModeUpdate.bind(this));
   }
  
   render() {
@@ -93,13 +96,19 @@ class BottomBar extends React.Component {
   }
 
   getLeftItem(indices) {
-    let item = this.state.isEditMode ? 
-      <div
-        onClick={this.onBack.bind(this)}
-        style={[styles.info, styles.button]}
-        >BACK
-        </div> : 
-      (<div style={styles.info}>{indices}</div>);
+    let item = '';
+    if (this.state.currentMode === MODE.SYNTH) {
+      item = <div style={styles.info}>0</div>
+    } else {
+      item = this.state.isEditMode ? 
+        <div
+          onClick={this.onBack.bind(this)}
+          style={[styles.info, styles.button]}
+          >BACK
+          </div> : 
+        (<div style={styles.info}>{indices}</div>);
+    }
+
     return item; 
   }
 
@@ -215,6 +224,12 @@ class BottomBar extends React.Component {
     EditModeStore.setUserInteracting(false);
     this.setState({
       isEditMode: false
+    });
+  }
+
+  onModeUpdate(newMode) {
+    this.setState({
+      currentMode: newMode
     });
   }
 }

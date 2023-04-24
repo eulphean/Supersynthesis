@@ -1,12 +1,13 @@
 /*
-  Name: PianoRoll.js
+  Name: Synth.js
   Author: Amay Kataria
   Date: 04/12/2023
-  Description: A new component as part of the Bridge update to the project
+  Description: A new component that allows one to control the installation as a synthesizer.
 */
 
 import React from 'react'
 import Radium from 'radium'
+import SynthStore from '../stores/SynthStore';
 import Websocket from './Websocket';
 
 const ON_COLOR = 'rgb(255, 255, 255)';
@@ -26,10 +27,11 @@ const styles = {
 
 const NUM_LIGHTS = 24; 
 
-class PianoRoll extends React.Component {
+class Synth extends React.Component {
     constructor(props) {
         super(props);
         this.lightButtons = [];
+        SynthStore.subscribe(this.onSynthNotes.bind(this));
         this.state = {
             keyState: Array(24).fill(0)
         }
@@ -110,6 +112,16 @@ class PianoRoll extends React.Component {
             keyState: newKeyState
         });
     }
+
+    onSynthNotes(newSynthNotes) {
+        let newSynthString = JSON.stringify(newSynthNotes);
+        let oldStateString = JSON.stringify(this.state.keyState);
+        if (newSynthString !== oldStateString) {
+            this.setState({
+                keyState: newSynthNotes
+            });
+        }
+    }
 }
 
-export default Radium(PianoRoll);
+export default Radium(Synth);

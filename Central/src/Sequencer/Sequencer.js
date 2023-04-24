@@ -8,6 +8,7 @@
 // The timing for the sequencer is set by the time coming from the clients. 
 
 var LightManager = require('./LightManager.js');
+var MODES = require('../Modes/CommonTypes.js').MODES;
 
 // States that the sequncer can be in.
 const PATTERN = {
@@ -41,9 +42,17 @@ class Sequencer {
         this.randomNoteIdx = 0; 
         this.randomList = []; 
 
+        // Callback to track how many times a sequence has been run.
+        // Useful for Dream State
+        this.incrementSequenceCountCallback = '';
+
         // Set a new pattern to make sure initial values are
         // correct for each pattern. 
         this.chooseNewPattern(); 
+    }
+
+    setIncrementSequenceCountCallback(callback) {
+        this.incrementSequenceCountCallback = callback;
     }
 
     begin(payload) {
@@ -142,7 +151,7 @@ class Sequencer {
                     this.gliderB++; 
                     patternChanged = false; 
                 }
-                break;
+                return patternChanged;
             }
 
             // This will give us some polyphony for multiple notes being 
@@ -159,7 +168,7 @@ class Sequencer {
                     this.gliderB--; 
                     patternChanged = false; 
                 }
-                break; 
+                return patternChanged;
             }
         }
     }
@@ -210,6 +219,11 @@ class Sequencer {
                 break; 
                 // Choose where to start. 
             }
+        }
+
+        // Do we have a valid callback to call here?
+        if (this.incrementSequenceCountCallback) {
+            this.incrementSequenceCountCallback();
         }
     }
     

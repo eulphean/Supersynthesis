@@ -16,6 +16,7 @@ class Supersynthesis(Common):
         self.fullTurnOff()
     
     def updateLights(self, state):
+        #print(state);
         if (state == 'NONE'):
             # A pattern has finished, turn off all the lights. 
             # Turn off all of them in a direction. 
@@ -24,7 +25,9 @@ class Supersynthesis(Common):
         else:
             # Get the last element from the light list.
             # Get its index and value and execute it. 
+            # print(state)
             states = state.pop()
+            print(states)
             for s in states:
                 idx = s['idx']
                 val = s['val']

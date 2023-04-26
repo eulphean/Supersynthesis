@@ -4,19 +4,25 @@
 // Description: Module to handle all the modes that Backend application can be. Currently, there are 4 modes
 // that the application is using: 0: Synth, 1: Dream, 2: Score, 3: Sweep. Based on the these modes, the application 
 // uses the Sequnecer, etc to do things. 
-var Sequencer = require('../Sequencer/Sequencer.js'); 
-var database = require('../database.js');
+var Sequencer = require('./Sequencer.js'); 
+var Sweeper = require('./Sweeper.js');
+var PayloadPackager = require('./PayloadPackager.js');
 var DreamManager = require('./DreamManager.js');
 var ScoreManager = require('./ScoreManager.js');
+var database = require('../database.js');
+
 var EVENTS = require('./CommonTypes.js').EVENTS;
 var MODES = require('./CommonTypes.js').MODES;
 
 class ModeHandler {
     constructor(io) {
         this.io = io; 
-        this.sequencer = new Sequencer(io);
+        this.payloadPackager = new PayloadPackager(io);
+        this.sequencer = new Sequencer(this.payloadPackager);
+        this.sweeper = new Sweeper(this.payloadPackager);
         this.dreamManager = new DreamManager(this.io, this.sequencer);
         this.scoreManager = new ScoreManager(this.io, this.sequencer);
+
         this.lightConfigs = '';
         this.currentMode = '';
         this.socket = ''; 
@@ -60,11 +66,11 @@ class ModeHandler {
                
                 // Update sequencer with this new score data.
                 console.log("New score data. Updating sequencer.");
-                this.sequencer.updateInterval(parsedPayload); 
+                this.sequencer.updateCurrentConfig(parsedPayload); 
                 
                 // Update the light config state in the backend across the managers. 
                 // And the currentConfig of the scoreManager for others connecting to the client.
-                let lightConfigs = this.lightConfigs.unshift(configPayload); 
+                this.lightConfigs.unshift(configPayload); 
                 this.setLightConfigs(this.lightConfigs);
                 this.scoreManager.currentConfig = configPayload;
 
@@ -95,13 +101,17 @@ class ModeHandler {
         switch (newMode) {
             case MODES.SYNTH: {
                 console.log('New Mode: Synth');
-                // Turn off the sequencer since we'll be processing the piano events.
-                this.sequencer.stop();
+                // Turn off the sequencer.
+                this.checkAndStopSequencer();
+                // Turn off the sweeper.
+                this.checkAndStopSweeper();
                 break;
             }
 
             case MODES.DREAM: {
                 console.log('New Mode: Dream');
+                // Turn off the sweeper.
+                this.checkAndStopSweeper();
                 // Send the previous mode.
                 this.dreamManager.update(this.currentMode); 
                 break;
@@ -109,6 +119,7 @@ class ModeHandler {
 
             case MODES.SCORE: {
                 console.log('New Mode: Score');
+                this.checkAndStopSweeper();
                 // Send the previous mode. 
                 this.scoreManager.update(this.currentMode);
                 break;
@@ -116,8 +127,8 @@ class ModeHandler {
 
             case MODES.SWEEP: {
                 console.log('New Mode: Sweep');
-                // Turn off the sequencer
-                // Create a custom score module to handle this
+                this.checkAndStopSequencer();
+                this.sweeper.begin();
                 break;
             }
 
@@ -136,6 +147,18 @@ class ModeHandler {
 
         // Emit the current mode to the app (socket) that just connected.
         this.socket.emit(EVENTS.EVENT_MODE_PAYLOAD, newMode);
+    }
+
+    checkAndStopSweeper() {
+        if (this.sweeper.isRunning()) {
+            this.sweeper.stop();
+        }
+    }
+
+    checkAndStopSequencer() {
+        if (this.sequencer.isRunning()) {
+            this.sequencer.stop();
+        }
     }
 }
 

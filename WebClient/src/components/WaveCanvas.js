@@ -118,7 +118,9 @@ class WaveCanvas extends React.Component {
   }
 
   componentDidUpdate() {
-    if (this.state.currentMode === MODE.SCORE || this.state.currentMode === MODE.DREAM) {
+    if (this.state.currentMode === MODE.SCORE 
+          || this.state.currentMode === MODE.DREAM 
+            || this.state.currentMode === MODE.SWEEP) {
       // Don't recreate the sketch.
       if (!this.doesSketchExist) {
         console.log('New Sketch');
@@ -131,7 +133,9 @@ class WaveCanvas extends React.Component {
   render() {     
     let heightStyle = this.getHeightStyle();
     let containerStyle = [styles.container, heightStyle];
-    let canvasStyle = (this.state.currentMode === MODE.SCORE || this.state.currentMode === MODE.DREAM) ? [containerStyle, styles.show] : [containerStyle, styles.hide];
+    let canvasStyle = (this.state.currentMode === MODE.SCORE 
+      || this.state.currentMode === MODE.DREAM 
+        || this.state.currentMode === MODE.SWEEP) ? [containerStyle, styles.show] : [containerStyle, styles.hide];
     let synthStyle = this.state.currentMode === MODE.SYNTH ? [containerStyle, styles.show] : [containerStyle, styles.hide];
     return (
       <>

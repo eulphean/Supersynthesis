@@ -5,7 +5,8 @@
 
 var socket = require('socket.io');
 var database = require('./database.js');
-var ModeHandler = require('./Modes/ModeHandler.js');
+var ModeHandler = require('./Managers/ModeHandler.js');
+var MODES = require('./Managers/CommonTypes.js').MODES;
 
 // Global variables. 
 let appSocket; 
@@ -46,6 +47,7 @@ function onWebClient(socket) {
 
     // Current app (socket) interacting with the backend. 
     modeHandler.setCurrentSocket(socket); 
+
     // Subscribe to all mode handling related functions. 
     modeHandler.subscribe();
 
@@ -63,13 +65,11 @@ function onWebClient(socket) {
     let lightDataPromise = database.readData();
     let modeDataPromise = database.readModeData();
     Promise.all([lightDataPromise, modeDataPromise]).then((values) => {
-        // Light data payload.
-        let lightPayload = values[0]; 
-        modeHandler.setLightConfigs(lightPayload);
+        // Light configs.
+        modeHandler.setLightConfigs(values[0]);
 
-        // Mode data payload.
-        let modePayload = values[1];
-        modeHandler.setCurrentMode(modePayload, socket);
+        // Current mode.
+        modeHandler.setCurrentMode(values[1]);
     });
 }
 
@@ -78,6 +78,7 @@ function onDisconnect() {
     console.log('Web client disconnected.');
     console.log('Connected clients: ' + count);
     if (count === 0) {
-        modeHandler.stopSequencer();
+       console.log('Default');
+       modeHandler.setCurrentMode(MODES.DREAM);
     }
 }

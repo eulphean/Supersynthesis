@@ -7,8 +7,8 @@
 // How do I architect this sequencer in the best way possible? 
 // The timing for the sequencer is set by the time coming from the clients. 
 
-var LightManager = require('./LightManager.js');
-var MODES = require('../Modes/CommonTypes.js').MODES;
+var PayloadPackager = require('./PayloadPackager.js');
+var MODES = require('./CommonTypes.js').MODES;
 
 // States that the sequncer can be in.
 const PATTERN = {
@@ -26,9 +26,9 @@ const PATTERN_CHANGE_TIME = 1500;
 const MAX_RANDOM_NOTES = 24; 
 
 class Sequencer {
-    constructor(io) {
+    constructor(payloadPackager) {
         // Light Manager instance. 
-        this.lightManager = new LightManager(io); 
+        this.payloadPackager = payloadPackager;
 
         // Handy variables for the sequencer.
         this.timerId = ''; 
@@ -55,32 +55,39 @@ class Sequencer {
         this.incrementSequenceCountCallback = callback;
     }
 
-    begin(payload) {
-        this.lightManager.updateLights(payload); 
+    begin(lightConfig) {    
+        console.log('Sequencer: Begin');
+        // Choose from a new pattern. 
+        this.chooseNewPattern(); 
+
+        const config = lightConfig['config'];
+        this.payloadPackager.updateLightConfigForSequencer(config); 
         // Set in the beginning, then updated only when a new payload is received. 
-        this.intervalTime = this.getIntervalTime(payload['bpm']);
-        this.handleInterval(payload);
+        this.intervalTime = this.getIntervalTime(config['bpm']);
+        this.handleInterval();
     }
 
     handleInterval() {
+        console.log('Sequencer: Handle interval');
         let patternChanged = this.updateIndex();
         let timeToWait = patternChanged ? PATTERN_CHANGE_TIME : this.intervalTime; 
         this.timerId = setTimeout(this.handleInterval.bind(this), timeToWait); 
     }
 
     // New message from one of the clients triggers the sequencer to update itself. 
-    updateInterval(payload) {
+    updateCurrentConfig(lightConfig) {
+        const config = lightConfig['config'];
         // Update light manager with this new payload. 
-        this.lightManager.updateLights(payload);
+        this.payloadPackager.updateLightConfigForSequencer(config);
+        this.payloadPackager.newLightConfigAndEmit(lightConfig);
+        
+        // Reset system
+        this.chooseNewPattern();
         this.clearTimer(); 
 
         // New time interval for the sequencer. 
         console.log('Update sequencer with a new time interval.');
-        this.intervalTime = this.getIntervalTime(payload['bpm']);
-        
-        // Reset system
-        this.chooseNewPattern();
-        this.lightManager.sendResetPayload();
+        this.intervalTime = this.getIntervalTime(config['bpm']);
 
         // Wait for new_payload_time during which the intallation will flash
         // before restarting the sequencer. 
@@ -94,12 +101,12 @@ class Sequencer {
             {
                 if (this.glider === NUM_LIGHTS) {
                     // We have reached the end, clear the system.
-                    this.lightManager.sendResetPayload(); 
+                    this.payloadPackager.clearLightsPayloadAndEmit(); 
                     // Choose a new pattern. 
                     this.chooseNewPattern(); 
                     patternChanged = true; 
                 } else {
-                    this.lightManager.createPayloadAndEmit(this.glider); 
+                    this.payloadPackager.createSequencerPayloadAndEmit(this.glider); 
                     this.glider++; 
                     patternChanged =false; 
                 }
@@ -109,12 +116,12 @@ class Sequencer {
             case PATTERN.BACKWARD: {                
                 if (this.glider < 0) {
                     // We have reached the end, clear the system. 
-                    this.lightManager.sendResetPayload();
+                    this.payloadPackager.clearLightsPayloadAndEmit();
                     // Choose a new pattern. 
                     this.chooseNewPattern(); 
                     patternChanged = true; 
                 } else {
-                    this.lightManager.createPayloadAndEmit(this.glider);
+                    this.payloadPackager.createSequencerPayloadAndEmit(this.glider);
                     this.glider--;
                     patternChanged = false; 
                 }
@@ -123,13 +130,13 @@ class Sequencer {
 
             case PATTERN.RANDOM: {
                 if (this.randomNoteIdx === MAX_RANDOM_NOTES) {
-                    this.lightManager.sendResetPayload();
+                    this.payloadPackager.clearLightsPayloadAndEmit();
                     this.chooseNewPattern();
                     patternChanged = true; 
                 } else {
                     // Get a random index. 
                     this.calcRandomIndex(); 
-                    this.lightManager.createPayloadAndEmit(this.gliderA);
+                    this.payloadPackager.createSequencerPayloadAndEmit(this.gliderA);
                     this.randomNoteIdx++; 
                     patternChanged = false; 
                 }
@@ -141,12 +148,12 @@ class Sequencer {
             case PATTERN.SPLIT: {
                 // GliderA is going left, GliderB is going right.
                 if (this.gliderA < 0 && this.gliderB === NUM_LIGHTS) {
-                    this.lightManager.sendResetPayload(); 
+                    this.payloadPackager.clearLightsPayloadAndEmit(); 
                     this.chooseNewPattern();
                     patternChanged = true; 
                 } else {
                     // Send two gliders together.
-                    this.lightManager.createPayloadAndEmit(this.gliderA, this.gliderB); 
+                    this.payloadPackager.createSequencerPayloadAndEmit(this.gliderA, this.gliderB); 
                     this.gliderA--;
                     this.gliderB++; 
                     patternChanged = false; 
@@ -159,11 +166,11 @@ class Sequencer {
             case PATTERN.MERGE: {
                 // GliderA is going right, GliderB is going left. 
                 if (this.gliderA > this.gliderB) {
-                    this.lightManager.sendResetPayload();
+                    this.payloadPackager.clearLightsPayloadAndEmit();
                     this.chooseNewPattern();
                     patternChanged = true; 
                 } else {
-                    this.lightManager.createPayloadAndEmit(this.gliderA, this.gliderB);
+                    this.payloadPackager.createSequencerPayloadAndEmit(this.gliderA, this.gliderB);
                     this.gliderA++;
                     this.gliderB--; 
                     patternChanged = false; 
@@ -182,6 +189,14 @@ class Sequencer {
     }
 
     chooseNewPattern() {
+        // Reset all vals first.
+        this.glider = 0; 
+        this.gliderA = -1; 
+        this.gliderB = -1; 
+
+        this.randomNoteIdx = 0; 
+        this.randomList = []; 
+        
         this.setRandomPattern(); 
 
         switch (this.curPattern) {
@@ -242,7 +257,8 @@ class Sequencer {
 
     // Helper functions.
     stop() {
-        console.log('Stop Sequencer')
+        console.log('Stop Sequencer');
+        this.payloadPackager.clearLightsPayloadAndEmit();
         this.clearTimer(); 
     }
 
@@ -252,7 +268,7 @@ class Sequencer {
 
     clearTimer() {
         if (this.timerId !== '') {
-            console.log('Cleaning previous timer: ' + this.timerId);
+            console.log('Sequencer: Cleaning previous timer: ' + this.timerId);
             clearTimeout(this.timerId); 
             this.timerId = '';
         }
@@ -268,12 +284,3 @@ class Sequencer {
 }
 
 module.exports = Sequencer;
-// Send light manager all the information required to create a 
-// payload for the clients and emit it to them. 
-// For example, this could include the glider, current pattern, based
-// on which LightManager can create the right light payload and emit it to
-// // the clients. This is very much possible. 
-// let payload = this.lightManager.createPayloadAndEmit(this.glider); 
-// console.log(payload);
-// let timeToWait = payload['state'] === 'NONE' ? OFF_TIME : this.intervalTime; 
-// // Recursive call to handle interval until the timerId is cleared. 

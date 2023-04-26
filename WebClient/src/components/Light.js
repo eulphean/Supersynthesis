@@ -7,6 +7,7 @@
 import LightConfigStore, { LIGHT_STATE, GROW_STATE } from "../stores/LightConfigStore";
 import SequencerStore from '../stores/SequencerStore';
 import EditModeStore from "../stores/EditModeStore";
+import ModeStore, { MODE } from "../stores/ModeStore";
 
 export default class Light {
     constructor(s, i, xPos, yPos, lightWidth) {
@@ -62,7 +63,7 @@ export default class Light {
             this.p5.rect(newX, this.pos['y'], this.lightWidth, -height);  
         } else {
             // Draw the actual lights from the DB config that are lighting. 
-            if (this.isOnFromDb()) {
+            if (this.isOnFromDb()  || ModeStore.getCurrentMode() === MODE.SWEEP) {
                 this.p5.fill(this.lightInactiveColor);
                 this.p5.rect(newX, this.pos['y'], this.lightWidth, -this.p5.height);
             }

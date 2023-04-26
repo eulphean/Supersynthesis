@@ -18,6 +18,7 @@ export default class SequencerBubble {
 
     draw(light) {
         let indices = SequencerStore.getIndices();
+        console.log(indices);
         let isEditMode = EditModeStore.isEditMode;
         for (let i = 0; i < indices.length; i++) {
             let idx = indices[i];     

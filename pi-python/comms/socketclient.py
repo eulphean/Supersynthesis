@@ -19,7 +19,7 @@ class AppSocket(socketio.AsyncClientNamespace):
         self.callback(data)
         pass
     
-    # # Light config data.
+    # Light config data.
     async def on_event_full_payload(self, data):
         self.callback(data)
         pass

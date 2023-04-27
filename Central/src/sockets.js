@@ -79,6 +79,6 @@ function onDisconnect() {
     console.log('Connected clients: ' + count);
     if (count === 0) {
        console.log('Default');
-       modeHandler.setCurrentMode(MODES.DREAM);
+    //    modeHandler.setCurrentMode(MODES.DREAM);
     }
 }

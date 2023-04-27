@@ -52,7 +52,7 @@ class Sweeper {
             this.glider -= 1; 
         }  
 
-        this.timerId = setTimeout(this.handleInterval.bind(this), 500);
+        this.timerId = setTimeout(this.handleInterval.bind(this), 100);
     }
 
   

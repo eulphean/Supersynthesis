@@ -62,11 +62,11 @@ class ModeHandler {
                 // Send this new payload to other connected clients.
                 let parsedPayload = JSON.parse(payload['config']);
                 let configPayload = {'index': payload['index'], 'config': parsedPayload};
-                this.io.of('/app').emit(EVENTS.EVENT_FULL_PAYLOAD, configPayload);
+                //this.io.of('/app').emit(EVENTS.EVENT_FULL_PAYLOAD, configPayload);
                
                 // Update sequencer with this new score data.
                 console.log("New score data. Updating sequencer.");
-                this.sequencer.updateCurrentConfig(parsedPayload); 
+                this.sequencer.updateCurrentConfig(configPayload); 
                 
                 // Update the light config state in the backend across the managers. 
                 // And the currentConfig of the scoreManager for others connecting to the client.
@@ -92,11 +92,12 @@ class ModeHandler {
         this.scoreManager.setLightConfigs(lightConfigs);
     }
 
-    stopSequencer() {
-        this.sequencer.stop();
-    }
-
     setCurrentMode(newMode) {
+        // Let the managers know what mode I'm currently in.
+        // this.sequencer.setCurrentMode(newMode);
+        this.dreamManager.setCurrentMode(newMode);
+        this.scoreManager.setCurrentMode(newMode);
+
         // Now do something based on the modes with the sequncer.
         switch (newMode) {
             case MODES.SYNTH: {
@@ -140,10 +141,6 @@ class ModeHandler {
 
         // Update the current mode to new mode.
         this.currentMode = newMode;
-        
-        // Let the managers know what mode I'm currently in.
-        this.dreamManager.setCurrentMode(newMode);
-        this.scoreManager.setCurrentMode(newMode);
 
         // Emit the current mode to the app (socket) that just connected.
         this.socket.emit(EVENTS.EVENT_MODE_PAYLOAD, newMode);

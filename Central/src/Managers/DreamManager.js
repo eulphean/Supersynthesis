@@ -6,69 +6,74 @@
 var MODES = require('./CommonTypes').MODES;
 var EVENTS = require('./CommonTypes').EVENTS;
 var CommonManager = require('./CommonManager'); 
+const MAX_SEQUNCER_COUNT = 4;
 
 class DreamManager extends CommonManager {
     constructor(io, sequencer) {
         super(io, sequencer); 
         // How many times a light config has been counted.
-        this.sequenceCount = 0; 
+        this.currentSequenceCount = 0; 
+        this.maxSequenceCount = MAX_SEQUNCER_COUNT;
         // Set this callback to track the count of sequence.
         this.sequencer.setIncrementSequenceCountCallback(this.incrementSequenceCount.bind(this));
         this.currentConfig = '';
     }
 
     update(previousMode) {
-        // If there is a valid dream config, emit it back to the socket. 
-        if (this.currentConfig) {
-            console.log("DREAM: Current config has been set previously.");
-            // Emit this config to socket
-            if (this.socket) {
-                this.socket.emit(EVENTS.EVENT_FULL_PAYLOAD, this.currentConfig);
+        if (this.sequencer.isRunning()) {
+            if (previousMode !== MODES.DREAM) {
+                // We are coming from another state, set new sequencer config.
+                this.currentConfig = this.getRandomConfig();
+                this.sequencer.updateCurrentConfig(this.currentConfig);
+                this.resetMaxSequenceCount();
+            } else {
+                if (this.currentConfig) {
+                    // Sequencer is running and current config exists already, just send this config back to 
+                    // the sender. This is just another client connecting during the dream state. 
+                    this.socket.emit(EVENTS.EVENT_FULL_PAYLOAD, this.currentConfig);
+                } else {
+                    // Sequencer is running, current state is dream, and we don't have a current config.
+                    // Code should never get there. We should always have a currentConfig when the sequencer is running.
+                    console.log('WARNING: We should always have a current config when the sequencer is running!!!');
+                }
             }
         } else {
-            console.log("DREAM: Current config doesnt exist. Set it!");
-            // Get a new random config and assign it to the sequencer. 
-            const numEntries = this.lightConfigs.length; 
-            const randIdx = Math.floor(Math.random() * numEntries); 
-            this.currentConfig = this.lightConfigs[randIdx];
-            if (this.socket) {
-                this.socket.emit(EVENTS.EVENT_FULL_PAYLOAD, this.currentConfig);
-            }
-        }
-
-         // If the sequencer is not running, start it.
-         if (!this.sequencer.isRunning()) {
+            this.currentConfig = this.getRandomConfig();
             this.sequencer.begin(this.currentConfig);
-            // Reset count.
-            this.sequenceCount = 0;
-        } else if (previousMode !== MODES.DREAM) {
-            console.log('Dream: Update Sequencer Config');
-            this.sequencer.updateCurrentConfig(this.currentConfig);
-            // Reset count.
-            this.sequenceCount = 0; 
-        }       
+            this.resetMaxSequenceCount();
+        }
+    }
+
+    getRandomInt(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min) + min); // The maximum is exclusive and the minimum is inclusive
+      }
+
+    resetMaxSequenceCount() {
+        const randCount = this.getRandomInt(1, MAX_SEQUNCER_COUNT);
+        this.maxSequenceCount = randCount;
+        this.currentSequenceCount = 0; 
+    }
+
+    getRandomConfig() {
+        const numEntries = this.lightConfigs.length; 
+        const randIdx = Math.floor(Math.random() * numEntries); 
+        return this.lightConfigs[randIdx];
     }
 
     incrementSequenceCount() {
         if (this.currentMode === MODES.DREAM) {
-            this.sequenceCount = this.sequenceCount + 1;
-            if (this.sequenceCount === 3) { // Set a good random number here (with a max one)
-                // Get a random config and send it across.
-                const numEntries = this.lightConfigs.length; 
-                const randIdx = Math.floor(Math.random() * numEntries); 
-                this.currentConfig = this.lightConfigs[randIdx];
+            this.currentSequenceCount += 1; 
+            if (this.currentSequenceCount === this.maxSequenceCount) {
+                this.currentConfig = this.getRandomConfig();
                 this.sequencer.updateCurrentConfig(this.currentConfig);
-                // Reset sequence count.
-                this.sequenceCount = 0;
-            }
+                this.resetMaxSequenceCount();
+                return true;
+            } 
         }
+        return false;
     }
 }
 
 module.exports = DreamManager;
-
-//   // Send all the connected clients this config (except yourself)
-//   this.io.of('/app').emit(EVENTS.EVENT_FULL_PAYLOAD, this.currentConfig); 
-
-//                   // Send all the connected clients this config.
-//                   this.io.of('/app').emit(EVENTS.EVENT_FULL_PAYLOAD, this.currentConfig); 

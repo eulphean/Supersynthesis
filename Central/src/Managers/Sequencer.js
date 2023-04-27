@@ -30,8 +30,12 @@ class Sequencer {
         // Light Manager instance. 
         this.payloadPackager = payloadPackager;
 
-        // Handy variables for the sequencer.
-        this.timerId = ''; 
+        // Keep track of the current mode.
+        this.currentMode = '';
+
+        // Handy variables for the sequencer.      
+        // Best is to keep an array of timers, so they can be cleaned up properly.   
+        this.timerIds = []
         this.curPattern = PATTERN.SPLIT; 
         this.prevPattern = PATTERN.SPLIT; 
         this.intervalTime = ''; 
@@ -41,6 +45,8 @@ class Sequencer {
 
         this.randomNoteIdx = 0; 
         this.randomList = []; 
+
+        this.count = 0;
 
         // Callback to track how many times a sequence has been run.
         // Useful for Dream State
@@ -62,36 +68,55 @@ class Sequencer {
 
         const config = lightConfig['config'];
         this.payloadPackager.updateLightConfigForSequencer(config); 
+        this.payloadPackager.newLightConfigAndEmit(lightConfig);
+
         // Set in the beginning, then updated only when a new payload is received. 
         this.intervalTime = this.getIntervalTime(config['bpm']);
         this.handleInterval();
     }
 
     handleInterval() {
-        console.log('Sequencer: Handle interval');
+        // Has state changed during this time? If yes, turn off the sequencer. 
         let patternChanged = this.updateIndex();
-        let timeToWait = patternChanged ? PATTERN_CHANGE_TIME : this.intervalTime; 
-        this.timerId = setTimeout(this.handleInterval.bind(this), timeToWait); 
+        let configUpdated = false;
+        if (patternChanged) {
+            // Call the callback to check if it's time to update the config.
+            // Based on that we can take the next steps.
+            if (this.incrementSequenceCountCallback) {
+                configUpdated = this.incrementSequenceCountCallback();
+            }
+        }
+
+        if (!configUpdated) {
+            let timeToWait = patternChanged ? PATTERN_CHANGE_TIME : 1000;         
+            const timerId = setTimeout(this.handleInterval.bind(this), timeToWait); 
+            this.timerIds.push(timerId);
+        }
     }
 
     // New message from one of the clients triggers the sequencer to update itself. 
     updateCurrentConfig(lightConfig) {
         const config = lightConfig['config'];
-        // Update light manager with this new payload. 
-        this.payloadPackager.updateLightConfigForSequencer(config);
-        this.payloadPackager.newLightConfigAndEmit(lightConfig);
-        
-        // Reset system
+
+        // Clear sequrncer
         this.chooseNewPattern();
         this.clearTimer(); 
 
+        // Update light manager with this new payload. 
+        this.payloadPackager.updateLightConfigForSequencer(config);
+        this.payloadPackager.newLightConfigAndEmit(lightConfig);
+
         // New time interval for the sequencer. 
         console.log('Update sequencer with a new time interval.');
+        console.log('New BPM: ' + config['bpm']);
+
         this.intervalTime = this.getIntervalTime(config['bpm']);
+        console.log('New Interval Time: ' + this.intervalTime);
 
         // Wait for new_payload_time during which the intallation will flash
         // before restarting the sequencer. 
-        setTimeout(this.handleInterval.bind(this), LOAD_NEW_PAYLOAD_TIME);
+        const timerId = setTimeout(this.handleInterval.bind(this), LOAD_NEW_PAYLOAD_TIME);
+        this.timerIds.push(timerId);
     }
 
     updateIndex() {
@@ -108,7 +133,7 @@ class Sequencer {
                 } else {
                     this.payloadPackager.createSequencerPayloadAndEmit(this.glider); 
                     this.glider++; 
-                    patternChanged =false; 
+                    patternChanged = false; 
                 }
                 return patternChanged; 
             }
@@ -235,11 +260,6 @@ class Sequencer {
                 // Choose where to start. 
             }
         }
-
-        // Do we have a valid callback to call here?
-        if (this.incrementSequenceCountCallback) {
-            this.incrementSequenceCountCallback();
-        }
     }
     
     calcRandomIndex() {
@@ -267,11 +287,11 @@ class Sequencer {
     }
 
     clearTimer() {
-        if (this.timerId !== '') {
-            console.log('Sequencer: Cleaning previous timer: ' + this.timerId);
-            clearTimeout(this.timerId); 
-            this.timerId = '';
-        }
+        this.timerIds.forEach(t => {
+            const p = this.timerIds.pop();
+            clearTimeout(p);
+        });
+        this.timerIds = []; 
     }
 
     getIntervalTime(bpm) {

@@ -13,36 +13,30 @@ class ScoreManager extends CommonManager {
     }
 
     update(previousMode) {
-        if (this.currentConfig) {
-            console.log("SCORE: Current config has been set previously.");
-            // Emit this config to socket
-            if (this.socket) {
-                this.socket.emit(EVENTS.EVENT_FULL_PAYLOAD, this.currentConfig);
-            }
-        } else {
-            console.log("SCORE: Current config doesnt exist. Set it!");
-            // Read the first payload entry and show it in the sequencer
-            this.currentConfig = this.lightConfigs[0];
-            // Send this config to the app (socket) that just connected.
-            if (this.socket) {
-                this.socket.emit(EVENTS.EVENT_FULL_PAYLOAD, this.currentConfig);
-            }
-        }
-
-        // If the sequencer is not running, start it.
-        if (!this.sequencer.isRunning()) {
-            this.sequencer.begin(this.currentConfig);
-        } else {
-            console.log('Score: Previous Mode: ' + previousMode);
+        if (this.sequencer.isRunning()) {
             if (previousMode !== MODES.SCORE) {
-                console.log('SCORE: Update Sequencer Config');
+                this.currentConfig = this.getLatestConfig();
                 this.sequencer.updateCurrentConfig(this.currentConfig);
+            } else {
+                // Sequencer is running and current config exists. Another client is connecting while the system is 
+                // already running and we are in the Score mode. 
+                if (this.currentConfig) {
+                    this.socket.emit(EVENTS.EVENT_FULL_PAYLOAD, this.currentConfig);
+                } else {
+                    // Sequencer is running, the current state is score, and we don't have a current config. This is not possible.
+                    console.log('WARNING: We should always have a current config when the sequencer is running!!!');
+                }
             }
+        } else {
+            this.currentConfig = this.getLatestConfig();
+            this.sequencer.begin(this.currentConfig);
         }
+    }
+
+    getLatestConfig() {
+        return this.lightConfigs[0];
     }
 }
 
 module.exports = ScoreManager;
 
-            // // Send all the connected clients this config. 
-            // this.io.of('/app').emit(EVENTS.EVENT_FULL_PAYLOAD, this.currentConfig); 

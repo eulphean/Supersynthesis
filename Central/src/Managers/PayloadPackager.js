@@ -62,7 +62,7 @@ class PayloadPackager {
     }
 
     newLightConfigAndEmit(newConfig) {
-        // Send all the connected clients this config.
+        // Send all the connected clients including the sender.
         this.io.of('/app').emit(EVENTS.EVENT_FULL_PAYLOAD, newConfig); 
         this.clearClientLightState();
     }

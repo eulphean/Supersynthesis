@@ -24,10 +24,42 @@ class PayloadPackager {
     }
 
     // Create the payload for the Sweeper.
-    createSweeperPayloadAndEmit(glider) {
+    createSweeperPayloadAndEmit(gliderA, gliderB) {
         // Reused the logic from the sequencer to do this.
         const state = []
-        state.push({'idx' : glider, 'val': 1});
+        // GliderA
+        state.push({'idx' : gliderA, 'val': 1});
+        
+        // GliderB
+        if (gliderB) {
+            state.push({'idx' : gliderB, 'val': 1});
+        }
+
+        this.clientLightPayload.push(state);
+        let payload = { 'state' : this.clientLightPayload }
+        this.io.of('/app').emit(EVENTS.EVENT_SEQUENCER_PAYLOAD, payload); 
+    }
+
+    // isFullFlash is a boolean flag indicating the kind of flash payload we should load.
+    createSweeperFlashPayload(isFullFlash, side) {
+        const state = []; 
+        if (isFullFlash) {
+            for (let i = 0; i < 24; i++) {
+                state.push({'idx' : i, 'val': 1});
+            }
+        } else {
+            const left = side % 2 === 0; 
+            if (left) {
+                for (let i = 0; i < 12; i++) {
+                    state.push({'idx' : i, 'val': 1});
+                }
+            } else {
+                for (let i = 13; i < 24; i++) {
+                    state.push({'idx' : i, 'val': 1});
+                }
+            }
+        }
+
         this.clientLightPayload.push(state);
         let payload = { 'state' : this.clientLightPayload }
         this.io.of('/app').emit(EVENTS.EVENT_SEQUENCER_PAYLOAD, payload); 

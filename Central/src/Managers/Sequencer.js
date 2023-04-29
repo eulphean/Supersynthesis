@@ -77,7 +77,7 @@ class Sequencer {
 
     handleInterval() {
         // Has state changed during this time? If yes, turn off the sequencer. 
-        let patternChanged = this.updateIndex();
+        let patternChanged = this.updateSequencer();
         let configUpdated = false;
         if (patternChanged) {
             // Call the callback to check if it's time to update the config.
@@ -119,7 +119,7 @@ class Sequencer {
         this.timerIds.push(timerId);
     }
 
-    updateIndex() {
+    updateSequencer() {
         let patternChanged; 
         switch (this.curPattern) {
             case PATTERN.FORWARD: 

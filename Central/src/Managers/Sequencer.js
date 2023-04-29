@@ -7,9 +7,6 @@
 // How do I architect this sequencer in the best way possible? 
 // The timing for the sequencer is set by the time coming from the clients. 
 
-var PayloadPackager = require('./PayloadPackager.js');
-var MODES = require('./CommonTypes.js').MODES;
-
 // States that the sequncer can be in.
 const PATTERN = {
     FORWARD: 0,

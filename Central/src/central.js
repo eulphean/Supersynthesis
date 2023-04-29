@@ -26,3 +26,4 @@ server.listen(process.env.PORT || 5000, function() {
 
 // Ping the main server. 
 sockets.pingAlive();
+console.log('Start Start')

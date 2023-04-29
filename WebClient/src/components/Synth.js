@@ -76,7 +76,7 @@ class Synth extends React.Component {
         let lightPos = xPos + lightWidth/2;
         
         // Make the light style.
-        let style = {... styles.buttonStyle}; // Clone the style and then modify it
+        let style = {...styles.buttonStyle}; // Clone the style and then modify it
         style.width = lightWidth + 'px';
         style.left = lightPos + 'px';
         if (this.state.keyState[idx] === 1) {

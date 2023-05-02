@@ -18,7 +18,6 @@ export default class SequencerBubble {
 
     draw(light) {
         let indices = SequencerStore.getIndices();
-        console.log(indices);
         let isEditMode = EditModeStore.isEditMode;
         for (let i = 0; i < indices.length; i++) {
             let idx = indices[i];     
@@ -28,7 +27,6 @@ export default class SequencerBubble {
                 } else {
                     this.p5.fill(this.sequencerActiveColor);                
                 }
-                
                 let newX = light.getNewPos(); 
                 this.p5.ellipse(newX + light.lightWidth/2, this.p5.height/2, light.lightWidth, light.lightWidth);
             }

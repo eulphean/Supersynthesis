@@ -7,7 +7,9 @@
 import LightConfigStore, { LIGHT_STATE, GROW_STATE } from "../stores/LightConfigStore";
 import SequencerStore from '../stores/SequencerStore';
 import EditModeStore from "../stores/EditModeStore";
+import TouchStore from '../stores/TouchStore'
 import ModeStore, { MODE } from "../stores/ModeStore";
+import SynthStore from "../stores/SynthStore";
 
 export default class Light {
     constructor(s, i, xPos, yPos, lightWidth) {
@@ -42,41 +44,88 @@ export default class Light {
         setInterval(this.randomizeGrowState.bind(this), 500); 
     }
 
-
     draw(meshEllipsePos, boundaryWidth) {
-        let isEditMode = EditModeStore.isEditMode; 
+        const currentMode = ModeStore.getCurrentMode();
         let newX = this.getNewPos();
-        this.p5.noStroke();
+        this.p5.noStroke();  
+        this.p5.fill(this.lightInactiveColor);
+        
+        // All the light business for synth.
+        if (currentMode === MODE.SYNTH) {    
+            // Work on creating a clean socket config that we can work with.
+            if (SynthStore.canModify(this.curIdx)) {
+                const newNoteVal = this.analyseTouch(newX);
+                // Has note turned on?
+                if (newNoteVal) {
+                    SynthStore.setLocalNote(this.curIdx, 1);
 
-        // Draw the background lights.
-        this.p5.fill(this.lightBgColor);        
-        this.p5.rect(newX, this.pos['y'], this.lightWidth, -this.p5.height);
-
-        // This is great logic for scoring and other things. Right now I need to figure 
-        // out the logic for the keyboard.
-        // NOTE: Commenting this out briefly.
-        if (isEditMode) {
-            this.updateLight(meshEllipsePos, boundaryWidth);            
-            // Draw the actual light. 
-            let height = this.getHeight();
-            this.p5.fill(this.lightActiveColor);
-            this.p5.rect(newX, this.pos['y'], this.lightWidth, -height);  
-        } else {
-            // Draw the actual lights from the DB config that are lighting. 
-            if (this.isOnFromDb()  || ModeStore.getCurrentMode() === MODE.SWEEP) {
-                this.p5.fill(this.lightInactiveColor);
-                this.p5.rect(newX, this.pos['y'], this.lightWidth, -this.p5.height);
+                } else {
+                    // new note is off. 
+                    const oldLocalNoteVal = SynthStore.getLocalNote(this.curIdx);
+                    if (oldLocalNoteVal) {
+                        SynthStore.setLocalNote(this.curIdx, 0);
+                    }
+                }
+            } else {
+                // I can't modify these notes because somebody else has changed them.
             }
 
-            // Draw the lights from the db config that should be on. 
-            if (this.canDraw()) {
-                // Draw full light.
+            // Go through all the socket notes and turn them on. 
+            const curNoteValue = SynthStore.getSocketNote(this.curIdx);
+            if (curNoteValue) {
                 this.p5.fill(this.lightActiveColor);
-                this.p5.rect(newX, this.pos['y'], this.lightWidth, -this.p5.height);  
+            } else {
+                this.p5.fill(this.lightInactiveColor);
             }
+          
+            this.p5.rect(newX, this.pos['y'], this.lightWidth, -this.p5.height); 
         }
 
-        // this.drawLightPoint();
+        if (currentMode === MODE.SCORE || currentMode === MODE.DREAM || currentMode === MODE.SWEEP) {
+            // Draw the background lights.
+            this.p5.fill(this.lightBgColor);        
+            this.p5.rect(newX, this.pos['y'], this.lightWidth, -this.p5.height);  
+
+            let isEditMode = EditModeStore.isEditMode; 
+            // This is great logic for scoring and other things. Right now I need to figure 
+            // out the logic for the keyboard.
+            // NOTE: Commenting this out briefly.
+            if (isEditMode) {
+                this.updateLight(meshEllipsePos, boundaryWidth);            
+                // Draw the actual light. 
+                let height = this.getHeight();
+                this.p5.fill(this.lightActiveColor);
+                this.p5.rect(newX, this.pos['y'], this.lightWidth, -height);  
+            } else {
+                // Draw the actual lights from the DB config that are lighting. 
+                if (this.isOnFromDb()  || ModeStore.getCurrentMode() === MODE.SWEEP) {
+                    this.p5.fill(this.lightInactiveColor);
+                    this.p5.rect(newX, this.pos['y'], this.lightWidth, -this.p5.height);
+                }
+
+                // Draw the lights from the db config that should be on. 
+                if (this.canDraw()) {
+                    // Draw full light.
+                    this.p5.fill(this.lightActiveColor);
+                    this.p5.rect(newX, this.pos['y'], this.lightWidth, -this.p5.height);  
+                }
+            }
+        }
+        //this.drawLightPoint();
+    }
+
+    // Test if the current touch is activating the a light.
+    analyseTouch(newX) {
+        const touches = TouchStore.getTouches();
+        if (touches.length > 0) {
+            for(let i = 0; i < touches.length; i++) {
+                if (touches[i].x > newX && touches[i].x < (newX + this.lightWidth)) {
+                    return true;
+                }
+            }
+        } else {
+            return false;
+        }
     }
 
     updateLight(meshEllipsePos, boundaryWidth) {

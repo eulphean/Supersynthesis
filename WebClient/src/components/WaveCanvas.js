@@ -12,12 +12,12 @@ import p5 from 'p5'
 import { ORIENTATION } from './App'
 import EditModeStore from '../stores/EditModeStore'
 import ModeStore, {MODE} from '../stores/ModeStore'
+import TouchStore from '../stores/TouchStore'
 import LightManager from './LightManager'
 import MeshManager from './MeshManager'
 import BpmManager from './BpmManager'
 import TimerStore from '../stores/TimerStore'
 import LightConfigStore from '../stores/LightConfigStore'
-import Synth from './Synth'
 
 var sketch = (s) => {
   let lightManager, meshManager, bpmManager;
@@ -42,7 +42,9 @@ var sketch = (s) => {
   };
 
   s.mousePressed = () => {
+    TouchStore.setTouches(s.touches);
     const currentMode = ModeStore.currentMode; 
+    // For score mode, we do good things. 
     if (currentMode === MODE.SCORE) {
       if (s.mouseY > s.height || s.mouseY < 0) {
         // Ignore. 
@@ -55,6 +57,19 @@ var sketch = (s) => {
       }
     }
   };
+
+  s.mouseMoved = () => {
+    const mouseVal = {x: s.mouseX, y: s.mouseY};
+    TouchStore.setTouches([mouseVal]);
+  }
+
+  s.touchMoved = () => {
+    TouchStore.setTouches(s.touches);
+  }
+
+  s.touchEnded = () => {
+    TouchStore.setTouches(s.touches);
+  }
 
   s.mouseReleased = () => {
     if (!EditModeStore.isPopupActive) {
@@ -84,10 +99,10 @@ var sketch = (s) => {
 const styles = {
   container: {
     position: 'relative',
-    WebkitOverflowScrolling: 'touch',
     backgroundColor: color.bgBlack,
     margin: 0,
     padding: 0,
+    outline: 'none',
     zIndex: '1'
   },
 
@@ -118,32 +133,29 @@ class WaveCanvas extends React.Component {
   }
 
   componentDidUpdate() {
-    if (this.state.currentMode === MODE.SCORE 
-          || this.state.currentMode === MODE.DREAM 
-            || this.state.currentMode === MODE.SWEEP) {
       // Don't recreate the sketch.
       if (!this.doesSketchExist) {
         console.log('New Sketch');
         this.myP5 = new p5(sketch, this.sketchRef.current);   
         this.doesSketchExist = true;
       }
-    }
   }
   
   render() {     
     let heightStyle = this.getHeightStyle();
     let containerStyle = [styles.container, heightStyle];
-    let canvasStyle = (this.state.currentMode === MODE.SCORE 
-      || this.state.currentMode === MODE.DREAM 
-        || this.state.currentMode === MODE.SWEEP) ? [containerStyle, styles.show] : [containerStyle, styles.hide];
-    let synthStyle = this.state.currentMode === MODE.SYNTH ? [containerStyle, styles.show] : [containerStyle, styles.hide];
+    // let canvasStyle = (this.state.currentMode === MODE.SCORE 
+    //   || this.state.currentMode === MODE.DREAM 
+    //     || this.state.currentMode === MODE.SWEEP) ? [containerStyle, styles.show] : [containerStyle, styles.hide];
+    // let synthStyle = this.state.currentMode === MODE.SYNTH ? [containerStyle, styles.show] : [containerStyle, styles.hide];
+    let canvasStyle = [containerStyle, styles.show];
     return (
       <>
           <div id={'canvasContainer'} 
             ref={this.sketchRef} 
             style={canvasStyle}>
           </div>
-          <Synth wrapperStyle={synthStyle} />
+          {/* <Synth wrapperStyle={synthStyle} /> */}
       </>
     );
   }

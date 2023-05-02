@@ -15,8 +15,8 @@ import SequencerStore from '../stores/SequencerStore';
 import ModeStore from '../stores/ModeStore';
 import SynthStore from '../stores/SynthStore';
 
-//const localhostURL = "http://localhost:5000";
-const herokuURL = "https://supersynth.herokuapp.com";
+const webURL = "http://localhost:5000";
+//const webURL = "https://supersynth.herokuapp.com";
 
 const EVENT_SCORE_PAYLOAD = 'event_score_payload';
 const EVENT_TIME = 'event_time';
@@ -31,7 +31,7 @@ const EVENT_MODE_PAYLOAD = 'event_mode_payload';
 
 class Websocket {
   constructor() {
-      this.siteURL = herokuURL + '/app'; 
+      this.siteURL = webURL + '/app'; 
 
       this.socket = io(this.siteURL, {
           reconnection: true,

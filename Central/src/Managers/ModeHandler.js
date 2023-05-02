@@ -23,6 +23,8 @@ class ModeHandler {
         this.dreamManager = new DreamManager(this.io, this.sequencer);
         this.scoreManager = new ScoreManager(this.io, this.sequencer);
 
+        this.synthQueue = []; 
+
         this.lightConfigs = '';
         this.currentMode = '';
         this.socket = ''; 
@@ -50,8 +52,13 @@ class ModeHandler {
     // This goes directly to all the connected clients who are connected here.
     onSynthNotes(data) {
         console.log('New Synth notes received.');
-        let parsedPayload = JSON.parse(data);
-        this.io.of('/app').emit(EVENTS.EVENT_SYNTH_NOTES, parsedPayload);
+        this.synthQueue.push(JSON.parse(data)); 
+        this.handleQueue();
+    }
+
+    handleQueue() {
+        const message = this.synthQueue.shift();
+        this.io.of('/app').emit(EVENTS.EVENT_SYNTH_NOTES, message);
     }
 
     onScoreData(data) {

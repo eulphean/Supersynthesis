@@ -51,7 +51,7 @@ class ModeHandler {
 
     // This goes directly to all the connected clients who are connected here.
     onSynthNotes(data) {
-        console.log('New Synth notes received.');
+        //console.log('New Synth notes received.');
         this.synthQueue.push(JSON.parse(data)); 
         this.handleQueue();
     }

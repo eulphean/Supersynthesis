@@ -15,8 +15,8 @@ import SequencerStore from '../stores/SequencerStore';
 import ModeStore from '../stores/ModeStore';
 import SynthStore from '../stores/SynthStore';
 
-const webURL = "http://localhost:5000";
-//const webURL = "https://supersynth.herokuapp.com";
+//const webURL = "http://localhost:5000";
+const webURL = "https://supersynth.herokuapp.com";
 
 const EVENT_SCORE_PAYLOAD = 'event_score_payload';
 const EVENT_TIME = 'event_time';

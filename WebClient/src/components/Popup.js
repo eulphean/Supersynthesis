@@ -479,7 +479,7 @@ class Popup extends React.Component {
                             <div style={styles.subtitle}>{'Touch To Create A Score'}<br />{'Hit SEND'}</div>                               
                         </div>
                         <div style={styles.buttonContainer}>
-                            <div onClick={this.onYesHandle.bind(this)} style={styles.button}>ok</div>
+                            <div onClick={this.onNoHandle.bind(this)} style={styles.button}>ok</div>
                         </div>         
                     </div>
                 </div>

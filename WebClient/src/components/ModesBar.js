@@ -35,8 +35,8 @@ const styles = {
 
     buttonStyle: {
         backgroundColor: color.fgWhite,
+        color: color.bgBlack,
         borderStyle: 'none',
-        borderColor: color.selected,
         fontFamily: fontFamily.heatwave,
         letterSpacing: '2px',
         padding: padding.verySmall,

@@ -15,12 +15,13 @@ import ModeStore, {MODE} from '../stores/ModeStore'
 import TouchStore from '../stores/TouchStore'
 import LightManager from './LightManager'
 import MeshManager from './MeshManager'
+import TouchEllipseManager from './TouchEllipseManager'
 import BpmManager from './BpmManager'
 import TimerStore from '../stores/TimerStore'
 import LightConfigStore from '../stores/LightConfigStore'
 
 var sketch = (s) => {
-  let lightManager, meshManager, bpmManager;
+  let lightManager, meshManager, bpmManager, touchEllipseManager; 
   let shouldTrigger = false; 
   s.setup = () => {
     let canvasContainer = s.select('#canvasContainer');
@@ -30,6 +31,7 @@ var sketch = (s) => {
     lightManager = new LightManager(s);
     meshManager = new MeshManager(s);
     bpmManager = new BpmManager(s); 
+    touchEllipseManager = new TouchEllipseManager(s);
 
     lightManager.setup();
   };
@@ -39,6 +41,7 @@ var sketch = (s) => {
     lightManager.draw(meshManager.ellipsePos, meshManager.boundaryWidth);
     meshManager.draw(lightManager.lights); 
     bpmManager.update(meshManager.ellipsePos, lightManager.lights);
+    touchEllipseManager.draw();
   };
 
   s.mousePressed = () => {
@@ -69,9 +72,6 @@ var sketch = (s) => {
 
   s.touchEnded = () => {
     TouchStore.setTouches(s.touches);
-  }
-
-  s.mouseReleased = () => {
     if (!EditModeStore.isPopupActive) {
       EditModeStore.setUserInteracting(false); 
       let hasConfigEdited = LightConfigStore.hasConfigEdited;

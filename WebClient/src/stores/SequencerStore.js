@@ -18,6 +18,7 @@ class SequencerStore {
     }
 
     setSequencerData(payload) {
+        this.indices = []; 
         let lightState = payload['state'];
         if (lightState === 'NONE') {
             // Turn off all the lights. 
@@ -27,8 +28,9 @@ class SequencerStore {
             this.indices = []; 
         } else {
             for (let i = 0; i < lightState.length; i++) {
+                // All data is in an array. 
                 let s = lightState[i];
-                // All data is in an array.  
+                // Reset indices before
                 for (let j = 0; j < s.length; j++) {
                     let idx = s[j]['idx'];
                     let val = s[j]['val'];

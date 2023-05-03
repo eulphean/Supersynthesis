@@ -3,7 +3,7 @@ from pythonosc.dispatcher import Dispatcher
 
 # Ip Address of the host (for OSC). 
 HOST_WINDOWS = "10.1.10.66"
-HOST_PI = "10.1.10.214"
+HOST_PI = "192.168.1.29"
 HOST_PORT = 8000
 
 class OSCClient: 

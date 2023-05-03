@@ -1,7 +1,7 @@
 import socketio
 
-HOST_ADDRESS = 'http://localhost:5000'
-#HOST_HEROKU = 'https://supersynth.herokuapp.com'
+#HOST_ADDRESS = 'http://localhost:5000'
+HOST_ADDRESS = 'https://supersynth.herokuapp.com'
 # Socket handler. Implement all event methods here. 
 class AppSocket(socketio.AsyncClientNamespace):
     async def on_connect(self):

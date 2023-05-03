@@ -36,7 +36,7 @@ class Supersynthesis(Common):
     
     def synthNotes(self, synthData):
         for i in range(0, 24):
-            val = synthData[i]
+            val = synthData[i]['val']
             if (val == 1):
                 self.switchOn(i)
             else:

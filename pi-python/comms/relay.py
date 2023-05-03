@@ -43,7 +43,7 @@ class Relay:
     def off(self, idx) -> None:
         # Flipped by design.
         if (self.isDark == False):
-            print("Off, idx: " + str(idx))
+            #print("Off, idx: " + str(idx))
             led = self.relay[idx]
             led.off()
 
@@ -51,17 +51,17 @@ class Relay:
         pass
         # Set the pins
         for x in self.relayOnePins:
-            print(x)
+            #print(x)
             led = LED(x)
             self.relay.append(led)
         
         for x in self.relayTwoPins:
-            print(x)
+            #print(x)
             led = LED(x)
             self.relay.append(led)
 
         for x in self.relayThreePins:
-            print(x)
+            #print(x)
             led = LED(x)
             self.relay.append(led)
 

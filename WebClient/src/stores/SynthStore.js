@@ -23,13 +23,13 @@ class SynthStore {
         this.socketState[index] = value; 
         const payload = JSON.stringify(this.socketState);
         Websocket.sendSynthNotes(payload);
-        console.log('Local State: ' + this.localState);
+        // console.log('Local State: ' + this.localState);
     }
 
     // New data that has been received from the socket.
     setSynthNotes(data) {
         this.socketState = data; 
-        console.log('Socket State: ' + this.socketState);
+        // console.log('Socket State: ' + this.socketState);
     }
 
     getLocalNote(index, value) {

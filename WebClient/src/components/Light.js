@@ -58,17 +58,19 @@ export default class Light {
                 // Has note turned on?
                 if (newNoteVal) {
                     SynthStore.setLocalNote(this.curIdx, 1);
+                    // this.p5.fill(this.lightActiveColor);
 
                 } else {
                     // new note is off. 
                     const oldLocalNoteVal = SynthStore.getLocalNote(this.curIdx);
                     if (oldLocalNoteVal) {
                         SynthStore.setLocalNote(this.curIdx, 0);
+                        // this.p5.fill(this.lightActiveColor);
                     }
                 }
-            } else {
-                // I can't modify these notes because somebody else has changed them.
-            }
+           } else {
+               // I can't modify these notes because somebody else has changed them.
+           }
 
             // Go through all the socket notes and turn them on. 
             const curNoteValue = SynthStore.getSocketNote(this.curIdx);

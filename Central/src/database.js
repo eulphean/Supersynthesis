@@ -7,8 +7,8 @@
 var Pool = require('pg').Pool;
 
 // ------------------ postgresql database ---------------------- // 
-const connString = process.env['DATABASE_URL'];
-//const connString = 'postgres://amaykataria:abc123@localhost:5432/supersynth';
+//const connString = process.env['DATABASE_URL'];
+const connString = 'postgres://amaykataria:abc123@localhost:5432/supersynth';
 console.log('Database Connection String: ' + connString); 
 const pool = new Pool({
     connectionString: connString

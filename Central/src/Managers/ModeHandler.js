@@ -28,6 +28,15 @@ class ModeHandler {
         this.lightConfigs = '';
         this.currentMode = '';
         this.socket = ''; 
+
+        setInterval(this.processQueue.bind(this), 10);
+    }
+
+    processQueue() {
+        if (this.synthQueue.length > 0) {
+            const message = this.synthQueue.shift();
+            this.io.of('/app').emit(EVENTS.EVENT_SYNTH_NOTES, message);
+        }
     }
 
     subscribe() {
@@ -52,13 +61,7 @@ class ModeHandler {
     // This goes directly to all the connected clients who are connected here.
     onSynthNotes(data) {
         //console.log('New Synth notes received.');
-        this.synthQueue.push(JSON.parse(data)); 
-        this.handleQueue();
-    }
-
-    handleQueue() {
-        const message = this.synthQueue.shift();
-        this.io.of('/app').emit(EVENTS.EVENT_SYNTH_NOTES, message);
+        this.synthQueue.push(JSON.parse(data));
     }
 
     onScoreData(data) {

@@ -86,10 +86,11 @@ class BottomBar extends React.Component {
   getElements(heightStyle, indices, bpm) {
     let leftItem = this.getLeftItem(indices); 
     let sendButton = this.getSendButton();
+    let bpmNum = (this.state.currentMode === MODE.SYNTH || this.state.currentMode === MODE.SWEEP) ? '' : bpm;
     return (
       <div style={[styles.container, heightStyle]}>
         { leftItem }
-        <div style={styles.info}>{bpm + 'bpm'}</div>
+        {<div style={styles.info}>{bpmNum + 'bpm'}</div>}
         { sendButton }
       </div>  
     );
@@ -97,8 +98,8 @@ class BottomBar extends React.Component {
 
   getLeftItem(indices) {
     let item = '';
-    if (this.state.currentMode === MODE.SYNTH) {
-      item = <div style={styles.info}>0</div>
+    if (this.state.currentMode === MODE.SYNTH || this.state.currentMode === MODE.SWEEP) {
+      item = (<div style={styles.info}>{0}</div>);
     } else {
       item = this.state.isEditMode ? 
         <div

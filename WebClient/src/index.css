@@ -1,4 +1,6 @@
 html, body {
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
   margin: 0;
   padding: 0;
   -webkit-overflow-scrolling: touch;

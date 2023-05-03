@@ -13,6 +13,7 @@ let appSocket;
 let io; 
 
 const EVENT_TIME = 'event_time';
+const EVENT_SOCKET_ID = 'event_socket_id';
 
 module.exports = {
     socketConfig: function(server) {
@@ -45,6 +46,9 @@ function ping() {
 function onWebClient(socket) {
     console.log('***New Web Client connection: ' + socket.id + '***'); 
 
+    // As soon as I connect the socket id. 
+    socket.emit(EVENT_SOCKET_ID, socket.id);
+
     // Current app (socket) interacting with the backend. 
     modeHandler.setCurrentSocket(socket); 
 
@@ -54,6 +58,7 @@ function onWebClient(socket) {
     // Subscribe to simple, local functions. 
     socket.on('disconnect', (socket) => {
         console.log(socket);
+        modeHandler.cleanSynthConfig();
         onDisconnect(socket);
     });
 

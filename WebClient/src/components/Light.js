@@ -52,34 +52,24 @@ export default class Light {
         
         // All the light business for synth.
         if (currentMode === MODE.SYNTH) {    
-            // Work on creating a clean socket config that we can work with.
-            if (SynthStore.canModify(this.curIdx)) {
-                const newNoteVal = this.analyseTouch(newX);
-                // Has note turned on?
-                if (newNoteVal) {
-                    SynthStore.setLocalNote(this.curIdx, 1);
-                    // this.p5.fill(this.lightActiveColor);
-
-                } else {
-                    // new note is off. 
-                    const oldLocalNoteVal = SynthStore.getLocalNote(this.curIdx);
-                    if (oldLocalNoteVal) {
-                        SynthStore.setLocalNote(this.curIdx, 0);
-                        // this.p5.fill(this.lightActiveColor);
-                    }
-                }
-           } else {
-               // I can't modify these notes because somebody else has changed them.
-           }
-
-            // Go through all the socket notes and turn them on. 
-            const curNoteValue = SynthStore.getSocketNote(this.curIdx);
-            if (curNoteValue) {
-                this.p5.fill(this.lightActiveColor);
+            const noteActive = this.analyseTouch(newX);
+            if (noteActive) {
+                SynthStore.setLocalNote(this.curIdx, 1); 
             } else {
-                this.p5.fill(this.lightInactiveColor);
+                SynthStore.setLocalNote(this.curIdx, 0); 
             }
-          
+
+            // Get the colors based on socket data
+            const socketStateAtIndex = SynthStore.getSocketStateAtIndex(this.curIdx);
+            if (socketStateAtIndex) {
+                const val = socketStateAtIndex['val'];
+                if (val) {
+                    this.p5.fill(this.lightActiveColor);
+                } else {
+                    this.p5.fill(this.lightInactiveColor);
+                }
+            }
+              
             this.p5.rect(newX, this.pos['y'], this.lightWidth, -this.p5.height); 
         }
 
@@ -306,3 +296,31 @@ export default class Light {
         calcGrowState();        
     }
 }
+
+//    // Work on creating a clean socket config that we can work with.
+//    if (SynthStore.canModify(this.curIdx)) {
+//     const newNoteVal = this.analyseTouch(newX);
+//     // Has note turned on?
+//     if (newNoteVal) {
+//         SynthStore.setLocalNote(this.curIdx, 1);
+//         // this.p5.fill(this.lightActiveColor);
+
+//     } else {
+//         // new note is off. 
+//         const oldLocalNoteVal = SynthStore.getLocalNote(this.curIdx);
+//         if (oldLocalNoteVal) {
+//             SynthStore.setLocalNote(this.curIdx, 0);
+//             // this.p5.fill(this.lightActiveColor);
+//         }
+//     }
+// } else {
+//    // I can't modify these notes because somebody else has changed them.
+// }
+
+// // Go through all the socket notes and turn them on. 
+// const curNoteValue = SynthStore.getSocketNote(this.curIdx);
+// if (curNoteValue) {
+//     this.p5.fill(this.lightActiveColor);
+// } else {
+//     this.p5.fill(this.lightInactiveColor);
+// }

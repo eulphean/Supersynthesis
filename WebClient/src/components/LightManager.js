@@ -54,5 +54,8 @@ export default class LightManager {
             light.draw(meshEllipsePos, boundaryWidth);
             this.sequencerBubble.draw(light);
         }
+
+        // If I'm in Synth mode
+        
     }
 }

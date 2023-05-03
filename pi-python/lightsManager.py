@@ -57,6 +57,7 @@ class LightsManager:
                 # Extract state and pass it to supersynthesis.
                 self.supersynthesis.updateLights(state)
             else: # Synth data
+                print (socketData)
                 self.supersynthesis.synthNotes(socketData)
         else:
             pass

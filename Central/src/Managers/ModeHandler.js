@@ -29,15 +29,16 @@ class ModeHandler {
         this.currentMode = '';
         this.socket = ''; 
 
-        setInterval(this.processQueue.bind(this), 10);
+        // Default synth config
+        this.synthConfig = [];
+        for (let i = 0; i < 24; i++) {
+            const config = {'socketId': '', 'val' : 0};
+            this.synthConfig.push(config);
+        }
+
+        //setInterval(this.processQueue.bind(this), 10);
     }
 
-    processQueue() {
-        if (this.synthQueue.length > 0) {
-            const message = this.synthQueue.shift();
-            this.io.of('/app').emit(EVENTS.EVENT_SYNTH_NOTES, message);
-        }
-    }
 
     subscribe() {
         // Subscribe to all Mode related callbacks.
@@ -45,6 +46,58 @@ class ModeHandler {
         this.socket.on(EVENTS.EVENT_SYNTH_NOTES, this.onSynthNotes.bind(this)); // Receive piano notes.
         this.socket.on(EVENTS.EVENT_MODE_PAYLOAD, this.onModeData.bind(this)); // Save mode data.
     }
+
+    
+    // This goes directly to all the connected clients who are connected here.
+    onSynthNotes(data) {
+        data = JSON.parse(data);
+        // date is [index, value]
+        // and I have the socketId from where it has come
+        // console.log('SocketId: ' + this.socket.id); 
+        // console.log('index, value: ' + data[0] + ', ' + data[1])
+        // When I get my synth notes, I reconcile it with the synth config. 
+        // Then emit the synth config.
+        // Reconcile this new data with current synth config. 
+        // All this will move into SynthManager actually. 
+        const index = data[0];
+        const newValue = data[1];
+        const socketId = this.socket.id;
+        const configAtIndex = this.synthConfig[index]; 
+        if (configAtIndex['val'] === 0 && newValue === 1) {
+            configAtIndex['socketId'] = socketId; 
+            configAtIndex['val'] = newValue;
+            this.synthConfig[index] = configAtIndex; 
+            // console.log(this.synthConfig);
+            this.io.of('/app').emit(EVENTS.EVENT_SYNTH_NOTES, this.synthConfig);
+        } else if (configAtIndex['val'] === 1 && newValue === 0) {
+            if (configAtIndex['socketId'] === socketId) {
+                const newConfig = {'socketId': '', 'val': 0};
+                this.synthConfig[index] = newConfig;
+                // console.log(this.synthConfig); 
+                this.io.of('/app').emit(EVENTS.EVENT_SYNTH_NOTES, this.synthConfig);
+            }
+        }
+    }
+
+    cleanSynthConfig() {
+        console.log('Cleaning Synth Config: ' + this.socket.id);
+        for (let i = 0; i < this.synthConfig.length; i++) {
+            const socketIdFromConfig = this.synthConfig[i]['socketId'];
+            if (socketIdFromConfig === this.socket.id) {
+                const config = {'socketId': '', val: 0};
+                this.synthConfig[i] = config;
+            }
+        }
+
+        console.log(this.synthConfig);
+    }
+
+    // processQueue() {
+    //     if (this.synthQueue.length > 0) {
+    //         const message = this.synthQueue.shift();
+    //         this.io.of('/app').emit(EVENTS.EVENT_SYNTH_NOTES, message);
+    //     }
+    // }
 
     onModeData(data) {
         console.log('New Mode received.');
@@ -56,12 +109,6 @@ class ModeHandler {
             // Update current mode. 
             this.setCurrentMode(payload);
         });
-    }
-
-    // This goes directly to all the connected clients who are connected here.
-    onSynthNotes(data) {
-        //console.log('New Synth notes received.');
-        this.synthQueue.push(JSON.parse(data));
     }
 
     onScoreData(data) {
@@ -116,6 +163,9 @@ class ModeHandler {
                 this.checkAndStopSequencer();
                 // Turn off the sweeper.
                 this.checkAndStopSweeper();
+
+                // Send the current Synth config to the clients. 
+                this.io.of('/app').emit(EVENTS.EVENT_SYNTH_NOTES, this.synthConfig);
                 break;
             }
 

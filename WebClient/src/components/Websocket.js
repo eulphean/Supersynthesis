@@ -22,6 +22,7 @@ const EVENT_SCORE_PAYLOAD = 'event_score_payload';
 const EVENT_TIME = 'event_time';
 const EVENT_FULL_PAYLOAD = 'event_full_payload';
 const EVENT_SEQUENCER_PAYLOAD = 'event_sequencer_payload';
+const EVENT_SOCKET_ID = 'event_socket_id';
 
 // SYNTH events
 const EVENT_SYNTH_NOTES = 'event_synth_notes';
@@ -38,6 +39,9 @@ class Websocket {
           reconnectionDelay: 500,
           reconnectionAttempts: Infinity
       });
+
+      // I know who I am.
+      this.socketId = ''; 
 
       this.socket.once('connect', this.subscribe.bind(this));
   }
@@ -61,6 +65,10 @@ class Websocket {
       this.socket.on(EVENT_SYNTH_NOTES, data => {
         SynthStore.setSynthNotes(data);
       });
+      this.socket.on(EVENT_SOCKET_ID, data => {
+        this.socketId = data;
+        console.log('SocketId: ' + this.socketId);
+      })
   }
 
   // -------------------- DON'T CHANGE THESE -------------------    
@@ -72,7 +80,7 @@ class Websocket {
     // console.log('Socket Connection Alive: ' + data);
   }
 
-  sendSynthNotes(payload) {
+  sendSynthNote(payload) {
     this.socket.emit(EVENT_SYNTH_NOTES, payload);
   }
 

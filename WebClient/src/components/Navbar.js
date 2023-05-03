@@ -106,7 +106,7 @@ class Navbar extends React.Component {
       <div style={styles.block}>
         <Popup ref={this.popupRef}/>
         <div style={[styles.container, heightStyle]}>
-          <div style={styles.title}>supersynthesis4</div>
+          <div style={styles.title}>supersynthesis5</div>
           <div style={aboutStyle} onClick={this.handleAbout.bind(this)}>
             <About style={styles.icon} />
           </div>

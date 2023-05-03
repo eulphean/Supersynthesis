@@ -57,8 +57,6 @@ function onWebClient(socket) {
 
     // Subscribe to simple, local functions. 
     socket.on('disconnect', (socket) => {
-        console.log(socket);
-        modeHandler.cleanSynthConfig();
         onDisconnect(socket);
     });
 
@@ -78,12 +76,15 @@ function onWebClient(socket) {
     });
 }
 
-function onDisconnect() {
+function onDisconnect(socket) {
     let count = io.of('/app').sockets.size;
     console.log('Web client disconnected.');
     console.log('Connected clients: ' + count);
     if (count === 0) {
-       console.log('Default');
-    //    modeHandler.setCurrentMode(MODES.DREAM);
+       // Default
+       modeHandler.cleanSynthConfig(true);
+    } else {
+       // Cleanup for a specific socket
+       modeHandler.cleanSynthConfig(false);
     }
 }

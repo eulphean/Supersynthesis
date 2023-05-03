@@ -30,14 +30,14 @@ class SynthStore {
             // 0 -> 1
             if (valueAtIndex === 0 && newValue === 1) {
                 // console.log('0 to 1');
-                const payload = [index, newValue];
+                const payload = [index, newValue, Websocket.socketId];
                 Websocket.sendSynthNote(JSON.stringify(payload));
             }
 
             // 1 -> 0
             if ((valueAtIndex === 1) && (newValue === 0) && (socketId === socketIdAtIndex)) {
                 // console.log('1 to 0');
-                const payload = [index, newValue];
+                const payload = [index, newValue, Websocket.socketId];
                 Websocket.sendSynthNote(JSON.stringify(payload));
             }
         }

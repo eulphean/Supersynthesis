@@ -157,6 +157,15 @@ class ModeHandler {
                 // Turn off the sweeper.
                 this.checkAndStopSweeper();
 
+                // Reset the current synth config completely. 
+                this.synthConfig = [];
+                for (let i = 0; i < 24; i++) {
+                    const config = {'socketId': '', 'val' : 0};
+                    this.synthConfig.push(config);
+                }
+
+                this.payloadPackager.clearLightsPayloadAndEmit();
+
                 // Send the current Synth config to the clients. 
                 this.io.of('/app').emit(EVENTS.EVENT_SYNTH_NOTES, this.synthConfig);
                 break;

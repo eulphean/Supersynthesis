@@ -10,9 +10,9 @@
 // States that the sequncer can be in.
 const PATTERN = {
     FORWARD: 0,
-    BACKWARD: 1,
+    SPLIT: 1,
     RANDOM: 2, 
-    SPLIT: 3,
+    BACKWARD: 3,
     MERGE: 4
 }
 

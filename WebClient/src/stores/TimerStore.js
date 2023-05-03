@@ -4,6 +4,8 @@
 // Description: A simple data store to start a timer whenever a user stops interacting on the screen.
 // This time helps us schedule some events like initiating a popup for sending a message.
 
+import { PopupType } from "../components/Popup";
+
 const POPUP_TIME = 3000;
 const RESET_TIME = 30000; 
 class TimerStore {
@@ -28,7 +30,8 @@ class TimerStore {
         if (this.popupTimerId !== '') {
             clearTimeout(this.popupTimerId);
         }
-        this.popupTimerId = setTimeout(this.showPopup.bind(this), POPUP_TIME);
+        // This popup is always to SEND the score out.
+        this.popupTimerId = setTimeout(this.showPopup.bind(this, PopupType.Send), POPUP_TIME);
 
         if (this.resetTimerId !== '') {
             clearTimeout(this.resetTimerId); 
@@ -36,8 +39,9 @@ class TimerStore {
         this.resetTimerId = setTimeout(this.reset.bind(this), RESET_TIME); 
     }
     
-    showPopup() {
-        this.popupListener(); 
+    showPopup(popupType) {
+        console.log('Showing Popup: ' + popupType);
+        this.popupListener(popupType); 
         this.popupTimerId = ''; 
     }
 

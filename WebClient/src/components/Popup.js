@@ -23,7 +23,8 @@ var PopupState = {
 
 export var PopupType = {
     About: 0,
-    Send: 1
+    Send: 1,
+    Score: 2
 }
 
 // Custom Fade in animation. 
@@ -395,8 +396,10 @@ class Popup extends React.Component {
         let content, contentContainerStyle; 
         if (this.state.popupType === PopupType.About) {
             content = this.getAboutContent();
-        } else {
+        } else if (this.state.popupType === PopupType.Send) {
             content = this.getSendContent(); 
+        } else {
+            content = this.getScoreContent();
         }
 
         if (this.state.isVisible) {
@@ -455,6 +458,28 @@ class Popup extends React.Component {
                         <div style={styles.buttonContainer}>
                             <div onClick={this.onYesHandle.bind(this)} style={styles.button}>yes</div>
                             <div onClick={this.onNoHandle.bind(this)} style={styles.button}>no</div>    
+                        </div>         
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
+    getScoreContent() { 
+        let bodyStyle = [styles.body, styles.mediaQueryOnText];
+        let iconButton = this.getIconButton();  
+        return (
+            <div ref={this.content} style={styles.content}>
+                <div style={styles.stretchContainer}>
+                    { iconButton }
+                    <div style={bodyStyle}>
+                        <div style={styles.sendTitle}>SCORE</div>
+                        <div style={bodyStyle}>
+                            <div style={styles.subtitle}>supersynthesis</div>
+                            <div style={styles.subtitle}>{'Touch To Create A Score'}<br />{'Hit SEND'}</div>                               
+                        </div>
+                        <div style={styles.buttonContainer}>
+                            <div onClick={this.onYesHandle.bind(this)} style={styles.button}>ok</div>
                         </div>         
                     </div>
                 </div>
@@ -527,7 +552,7 @@ class Popup extends React.Component {
     }
 
     showPopup(popupType) {
-        console.log('Create a popup.');
+        console.log('Create a popup: ' + popupType);
 
         // Adjust the scroll top.
         this.content.current.scrollTop = 0; 

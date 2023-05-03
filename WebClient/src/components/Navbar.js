@@ -35,6 +35,7 @@ const styles = {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
+        outline: 'none',
         paddingLeft: padding.small,
         paddingRight: padding.small,
         zIndex: '1'
@@ -80,10 +81,10 @@ class Navbar extends React.Component {
     TimerStore.subscribeReset(this.onReset.bind(this));
   }
 
-  onShowPopup() 
+  onShowPopup(popupType) 
   {
     // Send popup type. 
-    this.popupRef.current.showPopup(PopupType.Send);
+    this.popupRef.current.showPopup(popupType);
     console.log('Show Poppup');
   }
 

@@ -10,13 +10,17 @@ import Radium from "radium";
 import ModeStore, { MODE } from "../stores/ModeStore";
 import { ORIENTATION } from './App';
 import {color, fontFamily, fontSize, padding} from './CommonStyles'
+import TimerStore from "../stores/TimerStore";
+import { PopupType } from "./Popup";
 
 const styles = {
     container: {
         position: 'relative',
         backgroundColor: color.bgBlack,
+        borderStyle: 'none',
         display: 'flex',
         flexDirection: 'row',
+        outline: 'none',
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingLeft: padding.small,
@@ -31,6 +35,8 @@ const styles = {
 
     buttonStyle: {
         backgroundColor: color.fgWhite,
+        borderStyle: 'none',
+        borderColor: color.selected,
         fontFamily: fontFamily.heatwave,
         letterSpacing: '2px',
         padding: padding.verySmall,
@@ -68,6 +74,10 @@ class ModesBar extends React.Component {
     }
 
     handleClick(newMode) {
+        // Create a small popup for the SCORE.
+        if (newMode === MODE.SCORE) {
+            TimerStore.showPopup(PopupType.Score);
+        }
         ModeStore.setMode(newMode, true);
     }
 

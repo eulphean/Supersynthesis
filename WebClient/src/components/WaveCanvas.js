@@ -144,10 +144,6 @@ class WaveCanvas extends React.Component {
   render() {     
     let heightStyle = this.getHeightStyle();
     let containerStyle = [styles.container, heightStyle];
-    // let canvasStyle = (this.state.currentMode === MODE.SCORE 
-    //   || this.state.currentMode === MODE.DREAM 
-    //     || this.state.currentMode === MODE.SWEEP) ? [containerStyle, styles.show] : [containerStyle, styles.hide];
-    // let synthStyle = this.state.currentMode === MODE.SYNTH ? [containerStyle, styles.show] : [containerStyle, styles.hide];
     let canvasStyle = [containerStyle, styles.show];
     return (
       <>

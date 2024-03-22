@@ -94,7 +94,6 @@ class App extends React.Component {
               <>
                 <Navbar orientation={this.state.orientation}/>
                 <VisCanvas orientation={this.state.orientation}/>
-                {/* //<BottomBar orientation={this.state.orientation} /> */}
               </>
           } 
           />

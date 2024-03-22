@@ -5,11 +5,10 @@
   Description: Class responsible to paint the interactive P5.js canvas.
 */
 
-import React from 'react'
+import React, {useEffect, useRef} from 'react'
 import Radium from 'radium'
 import {color} from './CommonStyles'
 import p5 from 'p5'
-import { ORIENTATION } from './App'
 
 var sketch = (s) => { 
   s.setup = () => {
@@ -53,82 +52,119 @@ const styles = {
   }
 };
 
-class VisCanvas extends React.Component {
-  constructor(props) {
-    super(props);   
-    this.containerRef = React.createRef();
-    this.sketchRef = React.createRef(); 
-    this.doesSketchExist = false; 
+function VisCanvas(props) {
+    let sketchRef = useRef();
+    let myP5 = useRef()
 
-    this.state = {
-    }
-  }
-
-  componentDidMount() {
-    console.log('Wave canvas mounted');    
-  }
-
-  componentDidUpdate() {
-      // Don't recreate the sketch.
-      if (!this.doesSketchExist) {
+    useEffect(() => {
         console.log('New Sketch');
-        this.myP5 = new p5(sketch, this.sketchRef.current);   
-        this.doesSketchExist = true;
-      }
-  }
-  
-  render() {     
-    let heightStyle = this.getHeightStyle();
+        // Save the value for the ref here. 
+        myP5.current = new p5(sketch, sketchRef.current);   
+    }, []);
+
+    const getHeight = (() => {
+        let deviceHeight = window.innerHeight;
+        return deviceHeight;
+    })
+
+    const getHeightStyle = (() => {
+        let height = getHeight();
+        let heightStyle = {
+            height: height + 'px'
+        };
+        return heightStyle; 
+    })
+
+    let heightStyle = getHeightStyle();
     let containerStyle = [styles.container, heightStyle];
     let canvasStyle = [containerStyle, styles.show];
     return (
-      <>
-          <div id={'canvasContainer'} 
-            ref={this.sketchRef} 
-            style={canvasStyle}>
-          </div>
-      </>
+        <>
+            <div id={'canvasContainer'} 
+              ref={sketchRef} 
+              style={canvasStyle}>
+            </div>
+        </>
     );
-  }
-
-  getHeightStyle() {
-    let height = this.getHeight();
-    let heightStyle = {
-      height: height + 'px'
-    };
-    return heightStyle; 
-  }
-
-  getHeight() {
-    let deviceHeight = window.innerHeight;
-    let deviceWidth = window.innerWidth; 
-    let c = 1; 
-    // if (this.props.orientation === ORIENTATION.PORTRAIT) {
-    //   if (deviceHeight < 900) {
-    //     c = 0.8;
-    //   }
-
-    //   if (deviceHeight > 900 && deviceHeight < 1000) {
-    //     c = 0.85;
-    //   }
-
-    //   if (deviceHeight > 1000) {
-    //     c = 0.88; 
-    //   }
-    // }
-
-    // if (this.props.orientation === ORIENTATION.LANDSCAPE) {
-    //   if (deviceWidth < 1000) {
-    //     c = 0.70;  
-    //   } 
-
-    //   if (deviceWidth > 1000) {
-    //     c = 0.82;
-    //   }
-    // }
-
-    return deviceHeight * c;
-  }
 }
+// class VisCanvas extends React.Component {
+//   constructor(props) {
+//     super(props);   
+//     this.containerRef = React.createRef();
+//     this.sketchRef = React.createRef(); 
+//     this.doesSketchExist = false; 
+
+//     this.state = {
+
+//     }
+//   }
+
+//   componentDidMount() {
+//     console.log('Wave canvas mounted');  
+//     // Fetch all the data.   
+//   }
+
+//   componentDidUpdate() {
+//       // Don't recreate the sketch.
+//       if (!this.doesSketchExist) {
+//         console.log('New Sketch');
+//         this.myP5 = new p5(sketch, this.sketchRef.current);   
+//         this.doesSketchExist = true;
+//       }
+//   }
+  
+//   render() {     
+//     let heightStyle = this.getHeightStyle();
+//     let containerStyle = [styles.container, heightStyle];
+//     let canvasStyle = [containerStyle, styles.show];
+//     return (
+//       <>
+//           <div id={'canvasContainer'} 
+//             ref={this.sketchRef} 
+//             style={canvasStyle}>
+//           </div>
+//       </>
+//     );
+//   }
+
+//   getHeightStyle() {
+//     let height = this.getHeight();
+//     let heightStyle = {
+//       height: height + 'px'
+//     };
+//     return heightStyle; 
+//   }
+
+//   getHeight() {
+//     let deviceHeight = window.innerHeight;
+//     let deviceWidth = window.innerWidth; 
+//     let c = 1; 
+//     // if (this.props.orientation === ORIENTATION.PORTRAIT) {
+//     //   if (deviceHeight < 900) {
+//     //     c = 0.8;
+//     //   }
+
+//     //   if (deviceHeight > 900 && deviceHeight < 1000) {
+//     //     c = 0.85;
+//     //   }
+
+//     //   if (deviceHeight > 1000) {
+//     //     c = 0.88; 
+//     //   }
+//     // }
+
+//     // if (this.props.orientation === ORIENTATION.LANDSCAPE) {
+//     //   if (deviceWidth < 1000) {
+//     //     c = 0.70;  
+//     //   } 
+
+//     //   if (deviceWidth > 1000) {
+//     //     c = 0.82;
+//     //   }
+//     // }
+
+//     return deviceHeight * c;
+//   }
+// }
 
 export default Radium(VisCanvas);

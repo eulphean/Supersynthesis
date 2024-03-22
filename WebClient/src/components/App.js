@@ -5,13 +5,16 @@
   Description: Entry point component for the application. 
 */
 
+
 import React from 'react'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Radium from 'radium'
 
 import Navbar from './Navbar';
 import WaveCanvas from './WaveCanvas';
 import BottomBar from './Bottombar';
 import ModesBar from './ModesBar';
+import VisCanvas from './VisCanvas';
 
 // Enum to track the device orientation. 
 export const ORIENTATION = {
@@ -76,11 +79,22 @@ class App extends React.Component {
   render() {
     return (
       <div style={styles.container}>
-        <Navbar orientation={this.state.orientation} />
-        <WaveCanvas orientation={this.state.orientation} />
-        <ModesBar orientation={this.state.orientation} />
-        <BottomBar orientation={this.state.orientation} />
+      <Router basename="/">
+        <Routes>
+          <Route path="/" element={
+              <>
+                <Navbar orientation={this.state.orientation} />
+                <WaveCanvas orientation={this.state.orientation} />
+                <ModesBar orientation={this.state.orientation} />
+                <BottomBar orientation={this.state.orientation} />  
+              </>
+            }
+          />
+          <Route path="/vis" element={<VisCanvas />} />
+        </Routes>
+      </Router>
       </div>
+
     );
   }
 

@@ -17,7 +17,8 @@ const EVENTS = {
     EVENT_SYNTH_NOTES: 'event_synth_notes',
     EVENT_MODE_PAYLOAD: 'event_mode_payload',
     EVENT_SCORE_PAYLOAD: 'event_score_payload',
-    EVENT_SEQUENCER_PAYLOAD: 'event_sequencer_payload'
+    EVENT_SEQUENCER_PAYLOAD: 'event_sequencer_payload',
+    EVENT_FULL_DATABASE_PAYLOAD: 'event_full_database_payload'
 }
 
 module.exports = {

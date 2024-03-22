@@ -140,15 +140,14 @@ function onInsertTimer(timerId) {
 
 
 function onReadConfigs(socket) {
-    console.log('Read database');
     let promise = new Promise((resolve, reject) => {
+            // Only read the last value from the table.
             pool.query('SELECT * FROM entries ORDER BY index DESC;', (error, result) => {
             if (error) {
                 console.log('Some error');
                 throw error; 
             }
 
-            
             console.log('Success: entries table successfully read.');
             let entries = result.rows; 
             resolve(entries);

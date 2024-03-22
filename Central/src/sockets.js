@@ -11,6 +11,7 @@ var MODES = require('./Managers/CommonTypes.js').MODES;
 // Global variables. 
 let appSocket; 
 let io; 
+let fullPayload; 
 
 const EVENT_TIME = 'event_time';
 const EVENT_SOCKET_ID = 'event_socket_id';

@@ -45,6 +45,14 @@ class ModeHandler {
         this.socket.on(EVENTS.EVENT_SCORE_PAYLOAD, this.onScoreData.bind(this)); // Save config.
         this.socket.on(EVENTS.EVENT_SYNTH_NOTES, this.onSynthNotes.bind(this)); // Receive piano notes.
         this.socket.on(EVENTS.EVENT_MODE_PAYLOAD, this.onModeData.bind(this)); // Save mode data.
+        this.socket.on(EVENTS.EVENT_FULL_DATABASE_PAYLOAD, this.onRequestForFullDatabase.bind(this));
+    }
+
+    onRequestForFullDatabase(data) {
+        console.log('Event: Request for full database received.');      
+        // We alread the light configs stored from before.
+        const payload = this.lightConfigs; 
+        this.socket.emit(EVENTS.EVENT_FULL_DATABASE_PAYLOAD, payload)
     }
 
     // This goes directly to all the connected clients who are connected here.
@@ -140,6 +148,10 @@ class ModeHandler {
         this.lightConfigs = lightConfigs; 
         this.dreamManager.setLightConfigs(lightConfigs);
         this.scoreManager.setLightConfigs(lightConfigs);
+    }
+
+    getLightConfigs() {
+        return this.lightConfigs;
     }
 
     setCurrentMode(newMode) {

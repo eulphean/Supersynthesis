@@ -30,6 +30,9 @@ const EVENT_SYNTH_NOTES = 'event_synth_notes';
 // Mode events
 const EVENT_MODE_PAYLOAD = 'event_mode_payload';
 
+// Database events
+const EVENT_FULL_DATABASE_PAYLOAD = 'event_full_database_payload'; // Receives the entire database collection
+
 class Websocket {
   constructor() {
       this.siteURL = webURL + '/app'; 
@@ -64,6 +67,23 @@ class Websocket {
       });
       this.socket.on(EVENT_SYNTH_NOTES, data => {
         SynthStore.setSynthNotes(data);
+      });
+      this.socket.on(EVENT_FULL_DATABASE_PAYLOAD, data => {
+        // If filtering of the data is required, use the following function.
+        // For now, all the data has been filtered on the database itself.
+        // let s = new Set(); 
+        // let filteredData = [];
+        // let badData = [];
+        // data.forEach(d => {
+        //   if (!s.has(d.index)) {
+        //     s.add(d.index);
+        //     filteredData.push(d);
+        //   } else {
+        //     badData.push(d);
+        //   }
+        // })
+        // console.log(filteredData);
+        // console.log(badData);
       });
       this.socket.on(EVENT_SOCKET_ID, data => {
         this.socketId = data;
@@ -130,6 +150,10 @@ class Websocket {
     // Clear the current configuration so we can restart 
     // again. 
     SequencerStore.clearConfig();
+  }
+
+  fetchFullDatabase() {
+    this.socket.emit(EVENT_FULL_DATABASE_PAYLOAD);
   }
 }
 

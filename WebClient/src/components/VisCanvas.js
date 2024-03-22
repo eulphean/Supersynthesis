@@ -6,6 +6,7 @@
 */
 
 import React, {useEffect, useRef} from 'react'
+import Websocket from './Websocket'
 import Radium from 'radium'
 import {color} from './CommonStyles'
 import p5 from 'p5'
@@ -59,7 +60,10 @@ function VisCanvas(props) {
     useEffect(() => {
         console.log('New Sketch');
         // Save the value for the ref here. 
-        myP5.current = new p5(sketch, sketchRef.current);   
+        myP5.current = new p5(sketch, sketchRef.current); 
+        
+        console.log('Exclusively fetching all database data to render');
+        Websocket.fetchFullDatabase();
     }, []);
 
     const getHeight = (() => {

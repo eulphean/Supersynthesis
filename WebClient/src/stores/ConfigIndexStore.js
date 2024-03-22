@@ -22,7 +22,9 @@ class ConfigIndexStore {
     setConfigIndex(newConfigIndex) {
         this.configIndex = newConfigIndex;
         // Let subscriber know we have updates. 
-        this.subscriber(); 
+        if (this.subscriber) {
+            this.subscriber();
+        }
     }
 }
 

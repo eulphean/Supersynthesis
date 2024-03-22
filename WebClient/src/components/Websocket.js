@@ -52,7 +52,7 @@ class Websocket {
       this.socket.on(EVENT_TIME, this.logTime.bind(this));
       // Show up when user starts interacting.
       this.socket.on(EVENT_FULL_PAYLOAD, (payload) => {
-        // this.processFullPayload(payload); 
+        this.processFullPayload(payload); 
       }); 
       // Shows the data when user is not interacting
       this.socket.on(EVENT_SEQUENCER_PAYLOAD, data => {

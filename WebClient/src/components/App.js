@@ -90,7 +90,14 @@ class App extends React.Component {
               </>
             }
           />
-          <Route path="/vis" element={<VisCanvas />} />
+          <Route path="/vis" element={
+              <>
+                <Navbar orientation={this.state.orientation}/>
+                <VisCanvas orientation={this.state.orientation}/>
+                {/* //<BottomBar orientation={this.state.orientation} /> */}
+              </>
+          } 
+          />
         </Routes>
       </Router>
       </div>

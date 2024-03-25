@@ -6,27 +6,25 @@
 */
 
 import React, {useEffect, useRef} from 'react'
-import FullDbConfigStore from '../../stores/FullDbConfigStore'
 import Radium from 'radium'
 import {color} from '../CommonStyles'
-import VisLightManager from './VisLightManager'
+import VisManager from './VisManager'
 import p5 from 'p5'
 
 var sketch = (s) => { 
-  let visLightManager; 
+  let visManager; 
   s.setup = () => {
     let canvasContainer = s.select('#canvasContainer');
     let height = canvasContainer.height;
     s.createCanvas(window.innerWidth, height);
-    visLightManager = new VisLightManager(s); 
-    visLightManager.setup();
+
+    // Vis Manager is the key class that handles all the data management.
+    visManager = new VisManager(s);
   };
 
   s.draw = () => {
     s.background(s.color(0, 0, 0));   
-    // s.fill(0, 255, 0);
-    // s.circle(s.width/2, s.height/2, 200);
-    visLightManager.draw();
+    visManager.draw();
   };
 
   s.windowResized = () => {
@@ -36,7 +34,7 @@ var sketch = (s) => {
       let height = canvasContainer.height;
       s.resizeCanvas(window.innerWidth, height); 
 
-      visLightManager.prepareLights();
+      visManager.prepareLights();
     }, 500);
   }
 };
@@ -64,16 +62,11 @@ function VisCanvas(props) {
     let sketchRef = useRef();
     let myP5 = useRef()
 
-    const processDbConfigs = (data) => {
-      
-    }
 
     useEffect(() => {
         console.log('New Sketch');
         // Save the value for the ref here. 
         myP5.current = new p5(sketch, sketchRef.current); 
-        FullDbConfigStore.subscribeForDbConfigs(processDbConfigs);
-        FullDbConfigStore.getLightConfigs();
     }, []);
 
     const getHeight = (() => {

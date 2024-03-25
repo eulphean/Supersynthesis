@@ -11,14 +11,11 @@ class FullDbConfigStore {
         this.allLightConfigsSubscriber = '';
     }
 
-    subscribeForDbConfigs(listener) {
-        this.fullDbConfigSubscriber = listener; 
-    }
-
-    getLightConfigs() {
+    getLightConfigs(callback) {
         if (this.allLightConfigs.length > 0) {
-            return this.allLightConfigs;
+            callback();
         } else {
+            this.fullDbConfigSubscriber = callback;
             Websocket.fetchLightConfigs();
         }
     }
@@ -26,7 +23,7 @@ class FullDbConfigStore {
     setLightConfigs(data) {
         this.allLightConfigs = data; 
         if (this.fullDbConfigSubscriber) {
-            this.fullDbConfigSubscriber(this.allLightConfigs);
+            this.fullDbConfigSubscriber();
         }
     }
 }

@@ -1,27 +1,32 @@
 /*
-  Name: WaveCanvas.js
+  Name: VisCanvas.js
   Author: Amay Kataria
-  Date: 02/19/2022
-  Description: Class responsible to paint the interactive P5.js canvas.
+  Date: 03/25/2024
+  Description: A special canvas to render a data visualization of all the data that has been created here.
 */
 
 import React, {useEffect, useRef} from 'react'
-import Websocket from './Websocket'
+import FullDbConfigStore from '../../stores/FullDbConfigStore'
 import Radium from 'radium'
-import {color} from './CommonStyles'
+import {color} from '../CommonStyles'
+import VisLightManager from './VisLightManager'
 import p5 from 'p5'
 
 var sketch = (s) => { 
+  let visLightManager; 
   s.setup = () => {
     let canvasContainer = s.select('#canvasContainer');
     let height = canvasContainer.height;
     s.createCanvas(window.innerWidth, height);
+    visLightManager = new VisLightManager(s); 
+    visLightManager.setup();
   };
 
   s.draw = () => {
-    s.background(s.color(255, 0, 0));  
-    s.fill(0, 255, 0);
-    s.circle(s.width/2, s.height/2, 200);
+    s.background(s.color(0, 0, 0));   
+    // s.fill(0, 255, 0);
+    // s.circle(s.width/2, s.height/2, 200);
+    visLightManager.draw();
   };
 
   s.windowResized = () => {
@@ -30,6 +35,8 @@ var sketch = (s) => {
       let canvasContainer = s.select('#canvasContainer');
       let height = canvasContainer.height;
       s.resizeCanvas(window.innerWidth, height); 
+
+      visLightManager.prepareLights();
     }, 500);
   }
 };
@@ -57,13 +64,16 @@ function VisCanvas(props) {
     let sketchRef = useRef();
     let myP5 = useRef()
 
+    const processDbConfigs = (data) => {
+      
+    }
+
     useEffect(() => {
         console.log('New Sketch');
         // Save the value for the ref here. 
         myP5.current = new p5(sketch, sketchRef.current); 
-        
-        console.log('Exclusively fetching all database data to render');
-        Websocket.fetchFullDatabase();
+        FullDbConfigStore.subscribeForDbConfigs(processDbConfigs);
+        FullDbConfigStore.getLightConfigs();
     }, []);
 
     const getHeight = (() => {

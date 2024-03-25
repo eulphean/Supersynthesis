@@ -14,7 +14,7 @@ import Navbar from './Navbar';
 import WaveCanvas from './WaveCanvas';
 import BottomBar from './Bottombar';
 import ModesBar from './ModesBar';
-import VisCanvas from './VisCanvas';
+import VisCanvas from './Visualization/VisCanvas';
 
 // Enum to track the device orientation. 
 export const ORIENTATION = {

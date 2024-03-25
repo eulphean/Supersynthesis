@@ -14,6 +14,7 @@ import LightConfigStore from '../stores/LightConfigStore';
 import SequencerStore from '../stores/SequencerStore';
 import ModeStore from '../stores/ModeStore';
 import SynthStore from '../stores/SynthStore';
+import FullDbConfigStore from '../stores/FullDbConfigStore';
 
 //const webURL = "http://localhost:5000";//Comment
 const webURL = "https://supersynth.herokuapp.com";
@@ -69,21 +70,7 @@ class Websocket {
         SynthStore.setSynthNotes(data);
       });
       this.socket.on(EVENT_FULL_DATABASE_PAYLOAD, data => {
-        // If filtering of the data is required, use the following function.
-        // For now, all the data has been filtered on the database itself.
-        // let s = new Set(); 
-        // let filteredData = [];
-        // let badData = [];
-        // data.forEach(d => {
-        //   if (!s.has(d.index)) {
-        //     s.add(d.index);
-        //     filteredData.push(d);
-        //   } else {
-        //     badData.push(d);
-        //   }
-        // })
-        // console.log(filteredData);
-        // console.log(badData);
+        FullDbConfigStore.setLightConfigs(data);
       });
       this.socket.on(EVENT_SOCKET_ID, data => {
         this.socketId = data;
@@ -152,7 +139,7 @@ class Websocket {
     SequencerStore.clearConfig();
   }
 
-  fetchFullDatabase() {
+  fetchLightConfigs() {
     this.socket.emit(EVENT_FULL_DATABASE_PAYLOAD);
   }
 }

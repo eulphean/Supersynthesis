@@ -22,6 +22,15 @@ export default class VisManager {
         this.numEntries = 50; // Dumb value. Will be updated later. 
         this.pointSize = 5;
         this.showPoints = true;
+        this.pointShape = "circle";
+        this.rotate = false;
+        this.rotateSpeed = 0.01;
+        this.showInactive = true;
+        this.showActive = true;
+        this.colorActive = '#FFFFFF';
+        this.colorInactive = '#000000';
+
+        this.showLights = true;
 
         // Prepare all the lights. 
         this.prepareLights();
@@ -78,29 +87,48 @@ export default class VisManager {
     draw() {
         // Draw the lights based on the state. 
         for (let i = 0; i < this.visLights.length; i++) {
-            let light = this.visLights[i]; 
-            light.draw();
+            if (this.showLights) {
+                let light = this.visLights[i]; 
+                light.draw();
+            }
 
             // Draw all the points on that column.
             if (this.dataPoints.length > 0 && this.showPoints) {
                 for (let j = 0; j < this.dataPoints[i].length; j++) {
-                    this.dataPoints[i][j].draw(this.pointSize);
+                    this.dataPoints[i][j].draw(this.pointSize, this.pointShape, this.rotate, this.rotateSpeed, this.showActive, this.showInactive, this.colorActive, this.colorInactive);
                 }
             }
         }
     }
 
-    setMaxEntries(maxEntries) {
-        this.numEntries = maxEntries;
-        this.prepareDataPoints();
-    }
+    guiUpdates(newData) {
+        // Num Entries
+        const newNumEntries = newData['numEntries'];
+        if (this.numEntries !== newNumEntries) {
+            this.numEntries = newNumEntries; 
+            this.prepareDataPoints();
+        }
 
-    setPointSize(newPointSize) {
-        console.log('New Point Size: ' + newPointSize);
-        this.pointSize = newPointSize;
-    }
+        // Point Size
+        this.pointSize = newData['pointSize'];
 
-    updateShowPoints(newShowPoints) {
-        this.showPoints = newShowPoints;
+        // Show Point
+        this.showPoints = newData['showPoints'];
+        
+        // Point Shape
+        this.pointShape = newData['pointShape'];
+
+        this.rotate = newData['rotate'];
+
+        this.rotateSpeed = newData['rotateSpeed'];
+
+        this.showInactive = newData['showInactive'];
+
+        this.showActive = newData['showActive'];
+
+        this.showLights = newData['showLights'];
+
+        this.colorActive = newData['colorActive'];
+        this.colorInactive = newData['colorInactive'];
     }
 }

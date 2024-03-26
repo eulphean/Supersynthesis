@@ -11,7 +11,7 @@ import Radium from 'radium'
 import {color} from '../CommonStyles'
 import VisManager from './VisManager'
 import p5 from 'p5'
-import DatGui, { DatNumber, DatString, DatBoolean } from "@tim-soft/react-dat-gui";
+import DatGui, { DatNumber, DatString, DatBoolean, DatSelect, DatColor } from "@tim-soft/react-dat-gui";
 
 var sketch = (s) => { 
   let visManager;
@@ -42,12 +42,7 @@ var sketch = (s) => {
   }
 
   s.updateGuiData = (newData) => {
-      const numEntriesData = newData['numEntries'];
-      const pointSize = newData['pointSize'];
-      const showPoints = newData['showPoints'];
-      visManager.setMaxEntries(numEntriesData);
-      visManager.setPointSize(pointSize);
-      visManager.updateShowPoints(showPoints);
+    visManager.guiUpdates(newData);
   }
 };
 
@@ -81,7 +76,15 @@ function VisCanvas(props) {
       title: "Score Visualization",
       numEntries: 50,
       pointSize: 5,
-      showPoints: true
+      showPoints: true,
+      pointShape: 'circle',
+      rotation: false,
+      rotateSpeed: 0.1, 
+      showInactive: true,
+      colorActive: "#FFFFFF",
+      colorInactive: '#000000',
+      showActive: true,
+      showLights: true
     });
 
     useEffect(() => {
@@ -137,12 +140,42 @@ function VisCanvas(props) {
                 path="pointSize"
                 label="Point Size"
                 min={1}
-                max={10}
+                max={20}
                 step={0.5}
               />
                <DatBoolean
                 path="showPoints"
                 label="Show Points"
+              />
+              <DatSelect
+                label="Point Shape"
+                path="pointShape"
+                options={["circle", "rectangle", "triangle", "arc"]}
+              />
+              <DatBoolean
+                path="rotate"
+                label="Rotate"
+              />
+               <DatNumber
+                path="rotateSpeed"
+                label="Rotate Speed"
+                min={0.01}
+                max={0.5}
+                step={0.01}
+              />
+              <DatBoolean
+                path="showInactive"
+                label="Show Inactive"
+              />
+              <DatColor label="Color" path="colorInactive" />
+              <DatBoolean
+                path="showActive"
+                label="Show Active"
+              />
+              <DatColor label="Color" path="colorActive" />
+              <DatBoolean
+                path="showLights"
+                label="Show Lights"
               />
           </DatGui>
           <div id={'canvasContainer'} ref={sketchRef} style={canvasStyle}></div>

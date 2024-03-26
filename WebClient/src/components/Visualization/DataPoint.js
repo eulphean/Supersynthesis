@@ -12,17 +12,50 @@ export default class DataPoint {
       this.xPos = xPos; 
       this.yPos = yPos; 
       this.val = value;
+      this.rot = 0;
     }
 
-    draw(pointSize) {
-      //this.p5.fill(this.p5.color("green"));
-      if (this.val === 1) {
-        this.p5.fill("black");
-        // Change the color based on the value. 
-        this.p5.circle(this.xPos, this.yPos, pointSize);
-      } else {
-        this.p5.fill("white");
-        this.p5.circle(this.xPos, this.yPos, pointSize);
-      }
+    draw(pointSize, pointShape, rotate, rotateSpeed, showInactive, showActive, colorInactive, colorActive) {
+      if (this.val === 1 && showActive || this.val === 0 && showInactive) {
+          // Choose color
+          if (this.val === 1) {
+            this.p5.fill(colorInactive);
+          } else {
+            this.p5.fill(colorActive);
+          }
+
+          this.p5.push();
+          this.p5.translate(this.xPos, this.yPos);
+          this.p5.rotate(this.rot);
+
+          if (rotate) {
+            this.rot += rotateSpeed;
+          }
+
+          // Circle
+          if (pointShape === 'circle') 
+            this.p5.circle(0, 0, pointSize);
+            
+          // Rectangle
+          if (pointShape === 'rectangle') {
+            this.p5.push();
+            this.p5.rectMode(this.p5.CENTER);
+            this.p5.rect(0, 0, pointSize, pointSize);
+            this.p5.pop();
+          }
+
+          // Triangle
+          if (pointShape === 'triangle') {
+            const x = 0;
+            const y = 0;
+            this.p5.triangle(x-pointSize, y-pointSize, x+pointSize, y-pointSize, x, y+pointSize);  
+          }
+
+          if (pointShape === 'arc') {
+            this.p5.arc(0, 0, pointSize*2, pointSize*2, 0, this.p5.PI);
+          }
+
+          this.p5.pop();
+        }
     }
 }

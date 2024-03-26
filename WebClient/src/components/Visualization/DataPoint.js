@@ -14,15 +14,15 @@ export default class DataPoint {
       this.val = value;
     }
 
-    draw() {
+    draw(pointSize) {
       //this.p5.fill(this.p5.color("green"));
-      if (this.val == 1) {
+      if (this.val === 1) {
         this.p5.fill("black");
         // Change the color based on the value. 
-        this.p5.circle(this.xPos, this.yPos, 20);
+        this.p5.circle(this.xPos, this.yPos, pointSize);
       } else {
         this.p5.fill("white");
-        this.p5.circle(this.xPos, this.yPos, 20);
+        this.p5.circle(this.xPos, this.yPos, pointSize);
       }
     }
 }

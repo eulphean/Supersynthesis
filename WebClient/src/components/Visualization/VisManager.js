@@ -16,7 +16,12 @@ export default class VisManager {
     constructor(s) {
         this.p5 = s; 
         this.visLights = [];
-        this.dataPoints = new Array(NUM_LIGHTS).fill(0).map(a => []);
+        this.dataPoints = []; // Dumb type. Will be update later.
+        // NOTE: This value is the same as in the React component. Ideally, it should be passed through to 
+        // this component.
+        this.numEntries = 50; // Dumb value. Will be updated later. 
+        this.pointSize = 5;
+        this.showPoints = true;
 
         // Prepare all the lights. 
         this.prepareLights();
@@ -27,21 +32,22 @@ export default class VisManager {
 
     // It should be called when light configs are actually ready. 
     prepareDataPoints() {
+        // Prepare empty array.
+        this.dataPoints = new Array(NUM_LIGHTS).fill(0).map(a => []);
         let data = FullDbConfigStore.allLightConfigs;
 
         // Distance between each tube. 
         const lightIncrement = (this.p5.width) / NUM_LIGHTS;
         const lightWidth = lightIncrement / 2; 
-        if (data) {
-            let numEntries = data.length/20; 
-            for (let i = 0; i < numEntries; i++) {
+        if (data) { 
+            for (let i = 0; i < this.numEntries; i++) {
                 let lights = data[i]['config']['lights'];
                 for (let j = 0; j < NUM_LIGHTS; j++) {
                     let v = lights[j];
                     
                     // Calculate the light position based on different variables.
                     const xPos = j * lightIncrement + lightWidth; 
-                    const yPos = this.p5.map(i, 0, numEntries, 10, this.p5.height);
+                    const yPos = this.p5.map(i, 0, this.numEntries, 10, this.p5.height);
                     
                     // Create a new data point.
                     let dp = new DataPoint(this.p5, xPos, yPos, v);
@@ -49,7 +55,7 @@ export default class VisManager {
                 }
             }
             
-            console.log(this.dataPoints);
+            // console.log(this.dataPoints);
         }
     }
 
@@ -76,9 +82,25 @@ export default class VisManager {
             light.draw();
 
             // Draw all the points on that column.
-            for (let j = 0; j < this.dataPoints[i].length; j++) {
-                this.dataPoints[i][j].draw();
+            if (this.dataPoints.length > 0 && this.showPoints) {
+                for (let j = 0; j < this.dataPoints[i].length; j++) {
+                    this.dataPoints[i][j].draw(this.pointSize);
+                }
             }
         }
+    }
+
+    setMaxEntries(maxEntries) {
+        this.numEntries = maxEntries;
+        this.prepareDataPoints();
+    }
+
+    setPointSize(newPointSize) {
+        console.log('New Point Size: ' + newPointSize);
+        this.pointSize = newPointSize;
+    }
+
+    updateShowPoints(newShowPoints) {
+        this.showPoints = newShowPoints;
     }
 }

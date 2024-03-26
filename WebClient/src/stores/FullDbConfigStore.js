@@ -8,22 +8,22 @@ class FullDbConfigStore {
     constructor() {
         // An array of all the light configs received from the Database.
         this.allLightConfigs = [];
-        this.allLightConfigsSubscriber = '';
+        this.allLightConfigsSubscriber = [];
     }
 
     getLightConfigs(callback) {
         if (this.allLightConfigs.length > 0) {
             callback();
         } else {
-            this.fullDbConfigSubscriber = callback;
+            this.allLightConfigsSubscriber.push(callback);
             Websocket.fetchLightConfigs();
         }
     }
 
     setLightConfigs(data) {
         this.allLightConfigs = data; 
-        if (this.fullDbConfigSubscriber) {
-            this.fullDbConfigSubscriber();
+        if (this.allLightConfigsSubscriber.length > 0) {
+            this.allLightConfigsSubscriber.forEach(c => c());
         }
     }
 }

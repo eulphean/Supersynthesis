@@ -6,9 +6,23 @@
 */
 
 export default class DataPoint {
-    constructor(index, xPos, value) {
-      this.index = index;
-      this.xPos = xPos;
+    constructor(s, xPos, yPos, value) {
+      // Sketch variable
+      this.p5 = s;
+      this.xPos = xPos; 
+      this.yPos = yPos; 
       this.val = value;
+    }
+
+    draw() {
+      //this.p5.fill(this.p5.color("green"));
+      if (this.val == 1) {
+        this.p5.fill("black");
+        // Change the color based on the value. 
+        this.p5.circle(this.xPos, this.yPos, 20);
+      } else {
+        this.p5.fill("white");
+        this.p5.circle(this.xPos, this.yPos, 20);
+      }
     }
 }

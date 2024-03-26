@@ -30,15 +30,21 @@ export default class VisManager {
         let data = FullDbConfigStore.allLightConfigs;
 
         // Distance between each tube. 
-        let lightIncrement = (this.p5.width) / NUM_LIGHTS;
+        const lightIncrement = (this.p5.width) / NUM_LIGHTS;
+        const lightWidth = lightIncrement / 2; 
         if (data) {
-            for (let i = 0; i < data.length; i++) {
+            let numEntries = data.length/20; 
+            for (let i = 0; i < numEntries; i++) {
                 let lights = data[i]['config']['lights'];
                 for (let j = 0; j < NUM_LIGHTS; j++) {
                     let v = lights[j];
-            
-                    const xPos = j * lightIncrement; 
-                    let dp = new DataPoint(i, xPos, v)
+                    
+                    // Calculate the light position based on different variables.
+                    const xPos = j * lightIncrement + lightWidth; 
+                    const yPos = this.p5.map(i, 0, numEntries, 10, this.p5.height);
+                    
+                    // Create a new data point.
+                    let dp = new DataPoint(this.p5, xPos, yPos, v);
                     this.dataPoints[j].push(dp);
                 }
             }
@@ -51,10 +57,10 @@ export default class VisManager {
         this.visLights = []; 
 
         // Distance between each tube. 
-        let lightIncrement = (this.p5.width) / NUM_LIGHTS;
+        const lightIncrement = (this.p5.width) / NUM_LIGHTS;
 
         // Width of each light is half the distance between each light.
-        let lightWidth = lightIncrement / 2;
+        const lightWidth = lightIncrement / 2;
         for (let i = 0; i < NUM_LIGHTS; i++) {
             let xPos = i * lightIncrement; 
             // Create a new light instance. 
@@ -68,8 +74,11 @@ export default class VisManager {
         for (let i = 0; i < this.visLights.length; i++) {
             let light = this.visLights[i]; 
             light.draw();
-            // Draw the data point as well.
-            // this.dataPoints[i].draw();
+
+            // Draw all the points on that column.
+            for (let j = 0; j < this.dataPoints[i].length; j++) {
+                this.dataPoints[i][j].draw();
+            }
         }
     }
 }

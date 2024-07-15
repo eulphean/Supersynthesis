@@ -7,7 +7,7 @@
 
 
 import React from 'react'
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { HashRouter as Router, Routes, Route } from 'react-router-dom'
 import Radium from 'radium'
 
 import Navbar from './Navbar';
@@ -79,7 +79,7 @@ class App extends React.Component {
   render() {
     return (
       <div style={styles.container}>
-      <Router basename="/">
+      <Router basename={process.env.PUBLIC_URL}>
         <Routes>
           <Route path="/" element={
               <>

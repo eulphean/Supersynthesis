@@ -11,7 +11,7 @@ import Radium from 'radium'
 import {color} from '../CommonStyles'
 import VisManager from './VisManager'
 import p5 from 'p5'
-import DatGui, { DatNumber, DatString, DatBoolean, DatSelect, DatColor } from "@tim-soft/react-dat-gui";
+import DatGui, { DatNumber, DatFolder, DatString, DatBoolean, DatSelect, DatColor } from "@tim-soft/react-dat-gui";
 
 var sketch = (s) => { 
   let visManager;
@@ -69,6 +69,7 @@ function VisCanvas(props) {
     let sketchRef = useRef();
     let myP5 = useRef();
     let numEntries = useRef();
+    const gui = useRef();
     
     // GUI Data
     const [numMaxEntries, setMaxEntries] = useState();
@@ -84,8 +85,11 @@ function VisCanvas(props) {
       colorActive: "#FFFFFF",
       colorInactive: '#000000',
       showActive: true,
-      showLights: true
+      showLights: true,
+      hideGui: false
     });
+
+    const [hideGui, setHideGui] = useState(false);  
 
     useEffect(() => {
         console.log('New Sketch');
@@ -113,6 +117,8 @@ function VisCanvas(props) {
 
     // Update GUI data and push it to the p5.js sketch.
     const handleUpdate = (newData) => {
+      setHideGui(newData.hideGui);
+      
       setData(prevData =>  {
         return {...prevData, ...newData}
       });
@@ -126,59 +132,69 @@ function VisCanvas(props) {
     let canvasStyle = [containerStyle, styles.show];
     return (
         <>
-          <DatGui data={data} onUpdate={handleUpdate} style={{'zIndex': 2, position: 'absolute'}}>
+         {hideGui ? 
+            <></> :
+            <DatGui ref={gui} data={data} onUpdate={handleUpdate} style={{'zIndex': 2, position: 'absolute'}}>
               <DatString path="title" label="Supersynthesis" />
-              <DatNumber
-                ref={numEntries}
-                path="numEntries"
-                label="Num Entries"
-                min={0}
-                max={numMaxEntries}
-                step={1}
-              />
-              <DatNumber
-                path="pointSize"
-                label="Point Size"
-                min={1}
-                max={20}
-                step={0.5}
-              />
-               <DatBoolean
-                path="showPoints"
-                label="Show Points"
-              />
-              <DatSelect
-                label="Point Shape"
-                path="pointShape"
-                options={["circle", "rectangle", "triangle", "arc"]}
-              />
+              <DatFolder title="Data Visualization" closed={false}>
+                <DatNumber
+                  ref={numEntries}
+                  path="numEntries"
+                  label="Num Entries"
+                  min={0}
+                  max={numMaxEntries}
+                  step={1}
+                />
+                <DatNumber
+                  path="pointSize"
+                  label="Point Size"
+                  min={1}
+                  max={20}
+                  step={0.5}
+                />
+                <DatBoolean
+                  path="showPoints"
+                  label="Show Points"
+                />
+                <DatSelect
+                  label="Point Shape"
+                  path="pointShape"
+                  options={["circle", "rectangle", "triangle", "arc"]}
+                />
+                <DatBoolean
+                  path="rotate"
+                  label="Rotate"
+                />
+                <DatNumber
+                  path="rotateSpeed"
+                  label="Rotate Speed"
+                  min={0.01}
+                  max={0.5}
+                  step={0.01}
+                />
+                <DatBoolean
+                  path="showInactive"
+                  label="Show Inactive"
+                />
+                <DatColor label="Color" path="colorInactive" />
+                <DatBoolean
+                  path="showActive"
+                  label="Show Active"
+                />
+                <DatColor label="Color" path="colorActive" />
+                <DatBoolean
+                  path="showLights"
+                  label="Show Lights"
+                />
+              </DatFolder>
               <DatBoolean
-                path="rotate"
-                label="Rotate"
+                  path="hideGui"
+                  label="Hide Gui"
               />
-               <DatNumber
-                path="rotateSpeed"
-                label="Rotate Speed"
-                min={0.01}
-                max={0.5}
-                step={0.01}
-              />
-              <DatBoolean
-                path="showInactive"
-                label="Show Inactive"
-              />
-              <DatColor label="Color" path="colorInactive" />
-              <DatBoolean
-                path="showActive"
-                label="Show Active"
-              />
-              <DatColor label="Color" path="colorActive" />
-              <DatBoolean
-                path="showLights"
-                label="Show Lights"
-              />
-          </DatGui>
-          <div id={'canvasContainer'} ref={sketchRef} style={canvasStyle}></div>
+            </DatGui>
+        }
+          
+        <div id={'canvasContainer'} ref={sketchRef} style={canvasStyle}></div>
         </>
     );
 }

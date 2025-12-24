@@ -16,8 +16,10 @@ import ModeStore from '../stores/ModeStore';
 import SynthStore from '../stores/SynthStore';
 import FullDbConfigStore from '../stores/FullDbConfigStore';
 
+// NOTE: On 12/24/2025, the backend has migrated from Heroku to Render. 
+// And the postgres database is currently hosted on Supabase.
 //const webURL = "http://localhost:5000";//Comment
-const webURL = "https://supersynth.herokuapp.com";
+const webURL = "https://supersynth-backend.onrender.com";
 
 const EVENT_SCORE_PAYLOAD = 'event_score_payload';
 const EVENT_TIME = 'event_time';
